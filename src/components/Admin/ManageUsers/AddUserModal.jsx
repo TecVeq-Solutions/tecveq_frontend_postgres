@@ -71,7 +71,7 @@ const Selectable = ({ label, role, setRole }) => {
     )
 }
 
-const LevelSelectable = ({ label, alllevels, defaultValue }) => {
+const LevelSelectable = ({ label, alllevels, defaultValue, name }) => {
     return (
         <div className='flex flex-col text-start py-1'>
             <div className='flex flex-col gap-1'>
@@ -85,6 +85,7 @@ const LevelSelectable = ({ label, alllevels, defaultValue }) => {
                 </div>
                 <div>
                     <select
+                        name={name}
                         defaultValue={defaultValue}
                         onChange={(e) => {
                             const formData = JSON.parse(localStorage.getItem('addUserFormData') || '{}');
@@ -185,47 +186,65 @@ const AddUserModal = ({ closeModal, refetch }) => {
         e.preventDefault();
         setLoading(true);
 
+        const elements = e.target.elements;
+
         try {
             let dataBody = {};
             console.log("After form submit: ", e);
 
             if (role === "parent") {
+                const password = elements.password.value;
+                const confirmPassword = elements.confirmPassword.value;
+
+                if (password.length < 6) return toast.error("Password must be at least 6 characters.");
+                if (confirmPassword !== password) return toast.error("Password and Confirm Password do not match!");
+
                 dataBody = {
                     role,
-                    sName: e.target[1].value,
-                    sID: e.target[2].value,
-                    password: e.target[3].value,
+                    sName: elements.sName.value,
+                    sID: elements.sID.value,
+                    password: password,
                     profilePic: default_profile,
                 };
             } else if (role === "student") {
-                const isValidName = namePattern.test(e.target[1].value);
-                const isValidEmail = emailPattern.test(e.target[2].value);
-                const isValidGuardianName = namePattern.test(e.target[9].value);
-                const isValidGuardianEmail = emailPattern.test(e.target[10].value);
-                const isValidPassword = passwordPattern.test(e.target[8].value);
+                const name = elements.name.value;
+                const email = elements.email.value;
+                const guardianName = elements.guardianName.value;
+                const guardianEmail = elements.guardianEmail.value;
+                const password = elements.password.value;
+                const confirmPassword = elements.confirmPassword.value;
+                const levelDataRaw = elements.levelID.value;
+
+                const isValidName = namePattern.test(name);
+                const isValidEmail = emailPattern.test(email);
+                const isValidGuardianName = namePattern.test(guardianName);
+                const isValidGuardianEmail = emailPattern.test(guardianEmail);
 
                 if (!isValidName) return toast.error("Name cannot have digits or special characters.");
                 if (!isValidEmail) return toast.error("Invalid Email!");
                 if (!isValidGuardianName) return toast.error("Guardian Name cannot have digits or special characters.");
                 if (!isValidGuardianEmail) return toast.error("Invalid Guardian Email!");
-                if (e.target[8].value.length < 15) return toast.error("Password should be maximum 15 characters.");
-                if (e.target[13].value !== e.target[12].value) return toast.error("Password and Confirm Password do not match!");
+                if (!levelDataRaw) return toast.error("Please select a level to enroll in.");
+                if (password.length < 6) return toast.error("Password must be at least 6 characters.");
+                if (confirmPassword !== password) return toast.error("Password and Confirm Password do not match!");
+
+                const levelData = JSON.parse(levelDataRaw);
 
                 dataBody = {
                     userType: role,
-                    name: e.target[1].value,
-                    email: e.target[2].value,
-                    rollNo: e.target[3].value,
-                    referenceNo: e.target[4].value,
-                    gender: e.target.gender.value, // Capture gender from select dropdown
-                    bio: e.target[6].value,
-                    phoneNumber: e.target[7].value,
-                    levelID: JSON.parse(e.target[8].value).id,
+                    name,
+                    email,
+                    rollNo: elements.rollNo.value,
+                    referenceNo: elements.referenceNo.value,
+                    gender: elements.gender.value,
+                    bio: elements.bio.value,
+                    phoneNumber: elements.phoneNumber.value,
+                    levelID: levelData.id,
                     isAccepted: true,
-                    guardianName: e.target[9].value,
-                    guardianEmail: e.target[10].value,
-                    guardianPhoneNumber: e.target[11].value,
-                    password: e.target[12].value,
+                    guardianName,
+                    guardianEmail,
+                    guardianPhoneNumber: elements.guardianPhoneNumber.value,
+                    password,
                     profilePic: default_profile,
                 };
 
@@ -241,31 +260,28 @@ const AddUserModal = ({ closeModal, refetch }) => {
                     throw new Error("Failed to register user.");
                 }
             } else if (role === "teacher") {
-                const isValidName = namePattern.test(e.target[1].value);
-                const isValidEmail = emailPattern.test(e.target[2].value);
-                const password = e.target[6].value;
-                const confirmPassword = e.target[7].value;
-                const isValidPassword = passwordPattern.test(password);
+                const name = elements.name.value;
+                const email = elements.email.value;
+                const password = elements.password.value;
+                const confirmPassword = elements.confirmPassword.value;
+
+                const isValidName = namePattern.test(name);
+                const isValidEmail = emailPattern.test(email);
 
                 if (!isValidName) return toast.error("Name cannot have digits or special characters.");
                 if (!isValidEmail) return toast.error("Invalid Email!");
                 if (password.length < 6) return toast.error("Password should be at least 6 characters.");
-                // if (!isValidPassword) return toast.error("Password must include a capital letter, number, or symbol.");
                 if (password !== confirmPassword) return toast.error("Passwords do not match.");
-                // let cvurl = await uploadFile(e.target[6].files[0], "CV");
 
                 dataBody = {
                     userType: role,
-                    name: e.target[1].value,
-                    email: e.target[2].value,
-                    bio: e.target[3].value,
-                    phoneNumber: e.target[4].value,
-                    referenceNo: e.target[5].value,
-                    // qualification: e.target[5].value,
-                    // cv: cvurl,
+                    name,
+                    email,
+                    bio: elements.bio.value,
+                    phoneNumber: elements.phoneNumber.value,
+                    referenceNo: elements.referenceNo.value,
                     isAccepted: true,
-                    // experience: e.target[7].value,
-                    password: e.target[6].value,
+                    password: password,
                     profilePic: default_profile,
                 };
 
@@ -328,7 +344,7 @@ const AddUserModal = ({ closeModal, refetch }) => {
                                         </div>
                                         <CustomInput label={"Bio"} type="text" placeholder={"Enter your Bio"} name="bio" defaultValue={initialFormData.bio} />
                                         <CustomInput label={"Phone no."} type="text" placeholder={"Enter your Phone Number"} required name="phoneNumber" defaultValue={initialFormData.phoneNumber} />
-                                        <LevelSelectable label={"Enroll in"} alllevels={allLevels} defaultValue={initialFormData.levelID} />
+                                        <LevelSelectable label={"Enroll in"} alllevels={allLevels} defaultValue={initialFormData.levelID} name="levelID" />
                                         <CustomInput label={"Guardian Name"} type="text" placeholder={"Enter Guardian Name"} required name="guardianName" defaultValue={initialFormData.guardianName} />
                                         <CustomInput label={"Guardian Email"} type="email" placeholder={"Enter Guardian Email"} required name="guardianEmail" defaultValue={initialFormData.guardianEmail} />
                                         <CustomInput label={"Guardian Phone no."} type="text" placeholder={"Enter Guardian Phone no."} required name="guardianPhoneNumber" defaultValue={initialFormData.guardianPhoneNumber} />
