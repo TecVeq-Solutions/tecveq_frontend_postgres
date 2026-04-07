@@ -6,8 +6,8 @@ const ConfirmModal = ({ isOpen, title, description, onconfirm, onclose }) => {
   return (
     <>
       {isOpen && (
-        <div className="fixed w-full h-full top-0 left-0 z-50 bg-[rgba(0,0,0,0.4)] flex justify-center items-center cursor-default">
-          <div className="w-[400px] max-w-[100vw] bg-white text-black p-5 rounded-lg flex flex-col gap-5">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 cursor-default">
+          <div className="w-full max-w-sm bg-white text-black p-6 rounded-xl shadow-2xl border border-black/10 flex flex-col gap-6">
             <p className="text-xl font-bold text-center">{title}</p>
             <p className="font-medium text-center">{description}</p>
             <div className="flex justify-end gap-5">
@@ -26,7 +26,7 @@ const ConfirmModal = ({ isOpen, title, description, onconfirm, onclose }) => {
         </div>
       )}
     </>
-  );
+    );
 };
 
 export default ConfirmModal;

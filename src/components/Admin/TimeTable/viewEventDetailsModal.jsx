@@ -192,22 +192,10 @@ const { teacherSubject } = useGetTeacherSubject(parsedTeacher?.id);
   console.log(event, "class event are here");
 
   return (
-    <div
-      ref={ref}
-      className={`
-    fixed inset-0 z-50 flex items-center justify-center
-    ${open ? "" : "hidden"}
-    px-4
-  `}
-    >
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ${open ? "" : "hidden"}`}>
       <div
-        className={`
-      bg-white text-black rounded-xl p-4 sm:p-6
-      w-full
-      ${isEditMode ? "max-w-3xl" : "max-w-lg"}
-      max-h-[90vh] overflow-y-auto
-      shadow-lg
-    `}
+        ref={ref}
+        className={`bg-white text-black rounded-xl p-4 sm:p-6 w-full ${isEditMode ? "max-w-3xl" : "max-w-lg"} max-h-[90vh] overflow-y-auto shadow-2xl border border-black/20 relative`}
       >
 
 

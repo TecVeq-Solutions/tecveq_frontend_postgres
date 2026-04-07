@@ -80,7 +80,8 @@ const RequestModal = ({ refetch, data, onclose }) => {
     }
 
     return (
-        <div ref={modalRef} className='py-2 mt-10 w-72 sm:right-10 right-3 absolute z-10 px-2 rounded-md border-black/20 shadow-md bg-white'>
+        <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4'>
+            <div ref={modalRef} className='bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-black/20 relative p-4'>
             <div className=''>
                 <div className='border-b border-black/10 py-2 flex items-center justify-center'>
                     <p>Request</p>
@@ -110,6 +111,7 @@ const RequestModal = ({ refetch, data, onclose }) => {
                 }
             </div>
         </div>
+    </div>
     )
 }
 
