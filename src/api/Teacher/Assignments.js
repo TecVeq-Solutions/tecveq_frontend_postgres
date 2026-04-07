@@ -53,3 +53,14 @@ export const gradeAssignments = apiRequest(async (data, id) => {
 })
 
 
+export const checkAssignmentPlagiarism = apiRequest(async (id) => {
+    const url = `${BACKEND_URL}/assignment/check-plagiarism/${id}`;
+    const response = await axios.get(url);
+    return response;
+});
+
+export const checkSingleAssignmentSubmission = apiRequest(async (assignmentID, studentID) => {
+    const url = `${BACKEND_URL}/assignment/check-submission/${assignmentID}/${studentID}`;
+    const response = await axios.get(url);
+    return response;
+});

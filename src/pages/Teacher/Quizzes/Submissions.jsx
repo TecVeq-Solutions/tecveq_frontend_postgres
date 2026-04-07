@@ -11,9 +11,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useBlur } from "../../../context/BlurContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { getMultipleQuizesForGrading } from "../../../api/Teacher/Quiz";
+import { getMultipleQuizesForGrading, checkQuizPlagiarism } from "../../../api/Teacher/Quiz";
 import LargeLoader from "../../../utils/LargeLoader";
 import { useUser } from "../../../context/UserContext";
+import PlagiarismReportModal from "../../../components/Teacher/QuizAssignment/PlagiarismReportModal";
+import { LuBrainCircuit } from "react-icons/lu";
+import { toast } from "react-toastify";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Submissions = () => {
   const [mail, setmail] = useState(false);
@@ -25,6 +29,9 @@ const Submissions = () => {
   const { isBlurred, toggleBlur } = useBlur();
 
   const [searchText, setSearchText] = useState("");
+  const [isGlobalAnalyzing, setIsGlobalAnalyzing] = useState(false);
+  const [globalReportData, setGlobalReportData] = useState(null);
+  const [isGlobalModalOpen, setIsGlobalModalOpen] = useState(false);
 
   const toggleProfielMenu = () => {
     setIsProfileMenu(!isProfileMenu);
@@ -102,6 +109,24 @@ const Submissions = () => {
   });
 
   console.log("all quiz submissions are : ", data);
+
+  const handleGlobalPlagiarismCheck = async () => {
+    setIsGlobalAnalyzing(true);
+    try {
+      const response = await checkQuizPlagiarism(location.state.id);
+      if (response) {
+        setGlobalReportData(response);
+        setIsGlobalModalOpen(true);
+      } else {
+        toast.error("Failed to run global plagiarism scan.");
+      }
+    } catch (error) {
+      console.error("Global analysis error:", error);
+      toast.error(error?.response?.data?.message || "Error running class-wide plagiarism scan.");
+    } finally {
+      setIsGlobalAnalyzing(false);
+    }
+  };
 
   const handleDownloadAll = () => {
     if (data?.submissions) {
@@ -230,6 +255,20 @@ const Submissions = () => {
                       <p className="flex items-center justify-center px-4 py-2 text-sm text-white bg-[#6A00FF] rounded-3xl cursor-pointer" onClick={handleDownloadAll}>
                         Download All
                       </p>
+                      <button 
+                        disabled={isGlobalAnalyzing}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-3xl transition-all ${
+                          isGlobalAnalyzing ? "bg-gray-100 text-gray-400" : "bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200 shadow-sm"
+                        }`}
+                        onClick={handleGlobalPlagiarismCheck}
+                      >
+                        {isGlobalAnalyzing ? (
+                          <AiOutlineLoading3Quarters className="animate-spin text-purple-700" />
+                        ) : (
+                          <LuBrainCircuit className="text-purple-700" size={18} />
+                        )}
+                        {isGlobalAnalyzing ? "Scanning Class..." : "Check Global Plagiarism"}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -256,6 +295,8 @@ const Submissions = () => {
                         header={false}
                         index={index + 1}
                         bgColor={"#FFFFFF"}
+                        quizID={location.state.id}
+                        studentID_val={submission?.studentID?.id}
                         name={submission?.studentID?.name}
                         submissionData={submission?.submission}
                         submission={submission?.submission?.submittedAt}
@@ -270,6 +311,11 @@ const Submissions = () => {
               </div>
             </div>
           </div>
+          <PlagiarismReportModal 
+            isOpen={isGlobalModalOpen} 
+            onClose={() => setIsGlobalModalOpen(false)} 
+            data={globalReportData} 
+          />
         </div>
       </>
   );

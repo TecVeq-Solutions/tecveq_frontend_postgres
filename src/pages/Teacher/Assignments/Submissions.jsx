@@ -12,8 +12,12 @@ import { useUser } from "../../../context/UserContext";
 import { useBlur } from "../../../context/BlurContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { getMultipleAssignmentsForGrading } from "../../../api/Teacher/Assignments";
+import { getMultipleAssignmentsForGrading, checkAssignmentPlagiarism } from "../../../api/Teacher/Assignments";
 import ProfileDetails from "../../../components/Teacher/ProfileDetails";
+import PlagiarismReportModal from "../../../components/Teacher/QuizAssignment/PlagiarismReportModal";
+import { LuBrainCircuit } from "react-icons/lu";
+import { toast } from "react-toastify";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
 const Submissions = () => {
@@ -23,6 +27,9 @@ const Submissions = () => {
   const [isProfileDetails, setIsProfileDetails] = useState(false);
 
   const [searchText, setSearchText] = useState("");
+  const [isGlobalAnalyzing, setIsGlobalAnalyzing] = useState(false);
+  const [globalReportData, setGlobalReportData] = useState(null);
+  const [isGlobalModalOpen, setIsGlobalModalOpen] = useState(false);
 
   const { isBlurred, toggleBlur } = useBlur();
 
@@ -82,6 +89,24 @@ const Submissions = () => {
 
   console.log("all submissions are are : ", data);
 
+
+  const handleGlobalPlagiarismCheck = async () => {
+    setIsGlobalAnalyzing(true);
+    try {
+      const response = await checkAssignmentPlagiarism(location.state.id);
+      if (response) {
+        setGlobalReportData(response);
+        setIsGlobalModalOpen(true);
+      } else {
+        toast.error("Failed to run global plagiarism scan.");
+      }
+    } catch (error) {
+      console.error("Global analysis error:", error);
+      toast.error(error?.response?.data?.message || "Error running class-wide plagiarism scan.");
+    } finally {
+      setIsGlobalAnalyzing(false);
+    }
+  };
 
   const handleDownloadAll = () => {
     if (data?.submissions) {
@@ -210,9 +235,23 @@ const Submissions = () => {
                         placeholder="Search"
                       />
                     </div>
-                    <p className="flex cursor pointer items-center justify-center px-4 py-2 text-sm text-white bg-[#0B1053] rounded-3xl" onClick={handleDownloadAll}>
+                    <p className="flex cursor-pointer items-center justify-center px-4 py-2 text-sm text-white bg-[#0B1053] rounded-3xl" onClick={handleDownloadAll}>
                       Download All
                     </p>
+                    <button 
+                      disabled={isGlobalAnalyzing}
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-3xl transition-all ${
+                        isGlobalAnalyzing ? "bg-gray-100 text-gray-400" : "bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200 shadow-sm"
+                      }`}
+                      onClick={handleGlobalPlagiarismCheck}
+                    >
+                      {isGlobalAnalyzing ? (
+                        <AiOutlineLoading3Quarters className="animate-spin text-purple-700" />
+                      ) : (
+                        <LuBrainCircuit className="text-purple-700" size={18} />
+                      )}
+                      {isGlobalAnalyzing ? "Scanning Class..." : "Check Global Plagiarism"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -235,6 +274,8 @@ const Submissions = () => {
                       index={index + 1}
                       bgColor={"#FFFFFF"}
                       key={submission?.studentID?.id || index}
+                      assignmentID={location.state.id}
+                      studentID_val={submission?.studentID?.id}
                       name={submission?.studentID?.name}
                       submissionData={submission?.submission}
                       submission={submission?.submission?.submittedAt}
@@ -249,6 +290,11 @@ const Submissions = () => {
             </div>
           </div>
         </div>
+        <PlagiarismReportModal 
+          isOpen={isGlobalModalOpen} 
+          onClose={() => setIsGlobalModalOpen(false)} 
+          data={globalReportData} 
+        />
       </div>
   );
 };

@@ -91,3 +91,14 @@ export const gradeQuizes = apiRequest(async (data, id) => {
     return response;
 })
 
+export const checkQuizPlagiarism = apiRequest(async (id) => {
+    const url = `${BACKEND_URL}/quiz/check-plagiarism/${id}`;
+    const response = await axios.get(url);
+    return response;
+});
+
+export const checkSingleQuizSubmission = apiRequest(async (quizID, studentID) => {
+    const url = `${BACKEND_URL}/quiz/check-submission/${quizID}/${studentID}`;
+    const response = await axios.get(url);
+    return response;
+});

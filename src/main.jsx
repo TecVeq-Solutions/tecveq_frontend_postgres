@@ -22,15 +22,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <AdminProvider>
           <TeacherProvider>
             <StudentProvider>
-              <ParentProvider>
-                <UserProvider>
+              <UserProvider>
+                <ParentProvider>
                   <SidebarProvider>
                     <BlurProvider>
                       <App />
                     </BlurProvider>
                   </SidebarProvider>
-                </UserProvider>
-              </ParentProvider>
+                </ParentProvider>
+              </UserProvider>
             </StudentProvider>
           </TeacherProvider>
         </AdminProvider>
