@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useUser } from './UserContext';
 
 import { useQuery } from '@tanstack/react-query';
 import { getAllQiuzes } from '../api/Student/Quiz';
@@ -19,6 +20,8 @@ export const ParentProvider = ({ children }) => {
     const [selectedChild, setSelectedChild] = useState(null);
     const [allAnnouncements, setAllAnnouncements] = useState([]);
     const [meetingStart, setMeetingStart] = useState({ start: false, event: null });
+
+    const { userData } = useUser();
 
     // const announcementQuery = useQuery({
     //     queryKey: ["announcements"], queryFn: async () => {
@@ -59,17 +62,19 @@ export const ParentProvider = ({ children }) => {
 
     useEffect(() => {
         let child = localStorage.getItem("selectedChild");
-        //console.log(child ,"child");
         
-        if (child != null) {
-            console.log("inside");
-            
+        if (child != null && userData?.userType === "parent") {
             setSelectedChild(JSON.parse(child));
             setParentLogedIn(true);
-
-
+        } else {
+            // Ensure parent mode is off for other roles
+            setParentLogedIn(false);
+            if (userData?.userType !== "parent" && userData !== null) {
+                // Optional: clear selectedChild if switching to teacher/admin
+                // localStorage.removeItem("selectedChild");
+            }
         }
-    }, [])
+    }, [userData])
 
     useEffect(() => {
         //console.log("parse dataa is is success", selectedChild);
