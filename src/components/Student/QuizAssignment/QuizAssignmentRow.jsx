@@ -12,6 +12,7 @@ import { submitAssignment } from '../../../api/Student/Assignments';
 import { useUser } from '../../../context/UserContext';
 import { useSidebar } from '../../../context/SidebarContext';
 import { FiEdit } from 'react-icons/fi';
+import ConfirmModal from './ConfirmModal';
 
 const QuizAssignmentRow = (props) => {
 
@@ -22,6 +23,7 @@ const QuizAssignmentRow = (props) => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadedFileUrl, setUploadedFileUrl] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const { isSidebarOpen } = useSidebar();
 
     const { userData } = useUser();
@@ -52,14 +54,22 @@ const QuizAssignmentRow = (props) => {
         }
     })
 
-    const handleFileChange = async (event) => {
+    const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
         setSelectedFile(file);
+        setShowConfirmModal(true);
+        // Reset file input value so same file can be selected again if cancelled
+        event.target.value = '';
+    };
 
+    const handleConfirmUpload = async () => {
+        if (!selectedFile) return;
+        
+        setShowConfirmModal(false);
         await handleProfileImageUpdate(
-            file,
+            selectedFile,
             (url) => {
                 console.log("Submission Cloudinary URL:", url);
                 setUploadedFileUrl(url);
@@ -244,6 +254,17 @@ const QuizAssignmentRow = (props) => {
                 }
 
             </div>
+
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                title={`Confirm Submission`}
+                description={`Are you sure you want to submit this ${props.isQuiz ? 'Quiz' : 'Assignment'}? once submitted you can still change it but teacher would see both.`}
+                onConfirm={handleConfirmUpload}
+                onCancel={() => {
+                    setShowConfirmModal(false);
+                    setSelectedFile(null);
+                }}
+            />
         </>
     )
 }
