@@ -31,7 +31,6 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
 
     const { userData } = useUser();
     const { allSubjects, adminUsersData } = useAdmin();
-    const [allClassrooms, setAllClassrooms] = useState([]);
     const [selectedSubject, setSelctedSubject] = useState();
     const [selectedTeacher, setSelectedTeacher] = useState();
     const [selectedClassrooms, setSelectedClassrooms] = useState([]);
@@ -40,13 +39,27 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
 
 
 
-    const { data, isPending, isRefetching } = useQuery({ queryKey: ["classroom"], queryFn: getAllClassroom });
+    const { data: classroomsData, isPending: classroomsPending } = useQuery({ queryKey: ["classroom"], queryFn: getAllClassroom });
 
-    useEffect(() => {
-      if (!isPending) {
-        setAllClassrooms(data);
+    const filteredClassrooms = React.useMemo(() => {
+      if (!classroomsData) return [];
+      if (!selectedSubject) return classroomsData;
+
+      try {
+        const subject = JSON.parse(selectedSubject);
+        // If the subject has a specific classroomId (from teacherSubject hook)
+        if (subject.classroomId) {
+          return classroomsData.filter(c => c.id === subject.classroomId);
+        }
+        // If the subject has a levelID (from allSubjects)
+        if (subject.levelID) {
+          return classroomsData.filter(c => c.levelID === subject.levelID);
+        }
+      } catch (e) {
+        console.error("Error parsing subject", e);
       }
-    }, [])
+      return classroomsData;
+    }, [classroomsData, selectedSubject]);
 
     console.log(userData, "user data is ");
 
@@ -198,7 +211,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
                 />
                 <CustomMultiSelectableField
                   label={"Select Classroom"}
-                  options={allClassrooms}
+                  options={filteredClassrooms}
                   selectedOption={selectedClassrooms}
                   setSelectedOption={setSelectedClassrooms}
                   isMulti={true}

@@ -11,7 +11,7 @@ import { useBlur } from '../../../context/BlurContext';
 import { useAdmin } from '../../../context/AdminContext';
 
 
-const InputFiled = ({ label, req, val, name, dataObj, setDataObj }) => {
+const InputFiled = ({ label, req, val, name, dataObj, setDataObj, type = "text" }) => {
 
 
     return (
@@ -22,7 +22,17 @@ const InputFiled = ({ label, req, val, name, dataObj, setDataObj }) => {
                     {req ? <LuAsterisk className='text-maroon' size={16} /> : <></>}
                 </div>
                 <div className='w-full flex-1'>
-                    <input type="text" onChange={(e) => { setDataObj({ ...dataObj, [name]: e.target.value }) }} value={val} placeholder={label} className='rounded-md w-full outline-none border border-black/20 py-2 px-4' />
+                    <input
+                        type={type}
+                        onChange={(e) => {
+                            if (setDataObj) {
+                                setDataObj((prev) => ({ ...prev, [name]: e.target.value }));
+                            }
+                        }}
+                        value={val || ""}
+                        placeholder={label}
+                        className='rounded-md w-full outline-none border border-black/20 py-2 px-4'
+                    />
                 </div>
             </div>
         </div>
@@ -56,19 +66,25 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
 
 
     const [userObj, setUsrObj] = useState({
-        name: data.name,
-        email: data.email,
-        rollNo: data.rollNo,
-        phone: data.phoneNumber,
-        gender: data.gender,
-        gPhone: data.guardianPhoneNumber,
-        gEmail: data.guardianEmail,
-        gName: data.guardianName,
-        referenceNo: data.referenceNo,
-        levelID: data.levelID,
+        name: data.name || "",
+        email: data.email || "",
+        rollNo: data.rollNo || "",
+        phoneNumber: data.phoneNumber || "",
+        gender: data.gender || "",
+        guardianPhoneNumber: data.guardianPhoneNumber || "",
+        guardianEmail: data.guardianEmail || "",
+        guardianName: data.guardianName || "",
+        referenceNo: data.referenceNo || "",
+        levelID: data.levelID || "",
+        password: "",
+        confirmPassword: ""
     });
 
     const handleUpdateUser = async () => {
+        if (userObj.password !== userObj.confirmPassword) {
+            toast.error("Passwords do not match!");
+            return;
+        }
         console.log("mutation ")
         mutation.mutate(userObj);
     }
@@ -97,10 +113,10 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
                     </div>
                 </div>
                 <div className='flex flex-col gap-2 px-10 flex-1 py-4'>
-                    <InputFiled label={"Occupation"} req={false} val={data.userType} dataObj={userObj} name={"occupation"} />
-                    <InputFiled label={"Name"} req={false} val={userObj.name} dataObj={userObj} name={"name"} setDataObj={setUsrObj} />
+                    <InputFiled label={"Occupation"} req={false} val={data.userType} name={"occupation"} />
+                    <InputFiled label={"Name"} req={false} val={userObj.name} name={"name"} setDataObj={setUsrObj} />
                     <InputFiled label={"Email"} req={false} val={userObj.email} name={"email"} setDataObj={setUsrObj} />
-                    <InputFiled label={"Phone No."} req={false} val={userObj.phone} name={"phoneNumber"} setDataObj={setUsrObj} />
+                    <InputFiled label={"Phone No."} req={false} val={userObj.phoneNumber} name={"phoneNumber"} setDataObj={setUsrObj} />
                     <InputFiled label={"Reference No"} req={false} val={userObj.referenceNo} name={"referenceNo"} setDataObj={setUsrObj} />
 
                     <label htmlFor="">Gender</label>
@@ -132,12 +148,13 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
                                     </option>
                                 ))}
                             </select>
-                            <InputFiled label={"Guardian Name"} req={false} val={data.guardianName} />
-                            <InputFiled label={"Guardian Email"} req={false} val={data.guardianEmail} />
+                            <InputFiled label={"Guardian Name"} req={false} val={userObj.guardianName} name={"guardianName"} setDataObj={setUsrObj} />
+                            <InputFiled label={"Guardian Email"} req={false} val={userObj.guardianEmail} name={"guardianEmail"} setDataObj={setUsrObj} />
+                            <InputFiled label={"Guardian Phone No."} req={false} val={userObj.guardianPhoneNumber} name={"guardianPhoneNumber"} setDataObj={setUsrObj} />
                         </>
                     }
-                    <InputFiled label={"Password"} req={false} />
-                    <InputFiled label={"Confirm Password"} req={false} />
+                    <InputFiled label={"Password"} req={false} val={userObj.password} name={"password"} setDataObj={setUsrObj} type="password" />
+                    <InputFiled label={"Confirm Password"} req={false} val={userObj.confirmPassword} name={"confirmPassword"} setDataObj={setUsrObj} type="password" />
                     {mutation.isPending && <div className='flex flex-1'><Loader /></div>}
                     {!mutation.isPending &&
                         <CustomButton label={"Update User"} btnClick={handleUpdateUser} />
