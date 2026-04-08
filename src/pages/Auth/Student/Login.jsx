@@ -95,7 +95,7 @@ const Login = () => {
             }
         } catch (error) {
             console.log("error in student login UI screen is : ", error);
-            toast.error(error?.response?.data?.message);
+            // toast.error handled globally by axios interceptor
         }
         setLoading(false);
     }

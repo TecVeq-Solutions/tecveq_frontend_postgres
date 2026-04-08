@@ -47,6 +47,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { key: "dashboard", title: "Dashboard", icon: "home", route: "/superadmin/dashboard" },
+    { key: "platformFees", title: "Platform Fees", icon: "levels", route: "/superadmin/platform-fees" },
    ];
 
   // const { userData } = useUser();

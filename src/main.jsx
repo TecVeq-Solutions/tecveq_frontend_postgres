@@ -10,6 +10,9 @@ import { AdminProvider } from './context/AdminContext.jsx'
 import { TeacherProvider } from './context/TeacherContext.jsx'
 import { StudentProvider } from './context/StudentContext.jsx'
 import { SidebarProvider } from './context/SidebarContext.jsx';
+import setupAxios from './utils/setupAxios'
+
+setupAxios();
 
 import { ParentProvider } from './context/ParentContext.jsx'
 

@@ -279,6 +279,7 @@ const AddUserModal = ({ closeModal, refetch }) => {
                     email,
                     bio: elements.bio.value,
                     phoneNumber: elements.phoneNumber.value,
+                    gender: elements.gender.value,
                     referenceNo: elements.referenceNo.value,
                     isAccepted: true,
                     password: password,
@@ -362,6 +363,18 @@ const AddUserModal = ({ closeModal, refetch }) => {
                                             <CustomInput label={"Email"} type="email" placeholder={"Enter your email"} required name="email" defaultValue={initialFormData.email} />
                                             <CustomInput label={"Bio"} type="text" placeholder={"Enter your Bio"} name="bio" defaultValue={initialFormData.bio} />
                                             <CustomInput label={"Phone"} type="text" placeholder={"Enter your phone no."} required name="phoneNumber" defaultValue={initialFormData.phoneNumber} />
+                                            <div className="flex flex-col">
+                                                <label className="text-gray-700 font-medium">Gender</label>
+                                                <select name="gender" className="border p-2 rounded-md" required defaultValue={initialFormData.gender} onChange={(e) => {
+                                                    const formData = JSON.parse(localStorage.getItem('addUserFormData') || '{}');
+                                                    formData['gender'] = e.target.value;
+                                                    localStorage.setItem('addUserFormData', JSON.stringify(formData));
+                                                }}>
+                                                    <option value="">Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                </select>
+                                            </div>
                                             <CustomInput label={"Reference No"} type="text" placeholder={"Enter your Reference No"} name="referenceNo" defaultValue={initialFormData.referenceNo} />
 
                                             {/* <CustomSelectable label={"Qualification"} options={qualification} />

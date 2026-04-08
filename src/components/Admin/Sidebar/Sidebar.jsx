@@ -59,6 +59,7 @@ const Sidebar = () => {
     { key: "bulkAssign", title: "Bulk Subject Assign", icon: "subjects", route: "/admin/bulk-subject-assign" },
     { key: "subjects", title: "Subjects", icon: "subjects", route: "/admin/subjects" },
     { key: "classroom", title: "Classroom", icon: "classroom", route: "/admin/classrooms" },
+    { key: "fees", title: "Fees", icon: "levels", route: "/admin/fees" },
     { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" }
   ];
 

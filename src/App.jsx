@@ -10,6 +10,7 @@ import Reports from "./pages/Student/Reports/Reports";
 import TReports from "./pages/Teacher/StudentReports/StudentReports";
 import AReports from "./pages/Admin/Students/StudentReports";
 import PReports from "./pages/Parent/Reports/Reports";
+import PFees from "./pages/Parent/Fees/Fees";
 
 import ATeachers from "./pages/Admin/Teachers/Teachers";
 import ATeacherDetails from "./pages/Admin/Teachers/TeacherDetails";
@@ -49,6 +50,7 @@ import ATimeTable from "./pages/Admin/TimeTable/TimeTable";
 import AAnnouncements from "./pages/Admin/Announcements/Announcements";
 // import AAnnouncements from "./pages/Parent/an";
 import AManageUsers from "./pages/Admin/ManageUsers/ManageUsers";
+import AFees from "./pages/Admin/Fees/Fees";
 
 import ALevels from "./pages/Admin/Levels/Levels";
 import ASubjects from "./pages/Admin/Subjects/Subjects";
@@ -76,6 +78,7 @@ import AddCSVFile from "./pages/Admin/AddCSVFile/AddCSVFile";
 import AttendenceReport from "./pages/Admin/AttendenceReport/AttendenceReport";
 import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import ProtectedSuperAdmin from "./utils/ProtectedSuperAdmin";
+import SAPlatformFees from "./pages/SuperAdmin/PlatformFees/PlatformFees";
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
 import BulkSubjectAssign from "./pages/Admin/BulkSubjectAssign/BulkSubjectAssign";
 import ChatBot from "./components/ChatBot/ChatBot";
@@ -248,6 +251,14 @@ function App() {
               </AdminLayout>
             }
           />
+          <Route
+            path="/admin/fees"
+            element={
+              <AdminLayout>
+                <AFees />
+              </AdminLayout>
+            }
+          />
         </Route>
         <Route element={<ProtectedSuperAdmin />}>
           <Route
@@ -255,6 +266,14 @@ function App() {
             element={
               <SuperAdminLayout>
                 <SuperAdminDashboard />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/platform-fees"
+            element={
+              <SuperAdminLayout>
+                <SAPlatformFees />
               </SuperAdminLayout>
             }
           />
@@ -522,9 +541,17 @@ function App() {
               <ChildrenScreen />
             }
           />
+          <Route
+            path="/parent/fees"
+            element={
+              <ParentLayout>
+                <PFees />
+              </ParentLayout>
+            }
+          />
         </Route>
       </Routes>
-      <ToastContainer />
+      <ToastContainer limit={1} autoClose={3000} pauseOnHover={false} />
       <ChatBot />
     </>
 

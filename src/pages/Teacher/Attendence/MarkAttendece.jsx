@@ -49,8 +49,7 @@ const MarkAttendence = () => {
                 navigate("/teacher/attendence");
                 console.log(" data is: ", data);
             } else {
-                toast.error(error.response.data.message);
-
+                // toast.error handled globally by axios interceptor
             }
         }
     })

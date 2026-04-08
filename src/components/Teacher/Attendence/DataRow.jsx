@@ -74,7 +74,7 @@ const DataRow = (props) => {
             className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-center md:text-[14px]  text-[11px] ${props.header ? "font-semibold" : ""
               }`}
           >
-            {props.header ? "Status" : props?.allData?.attendance?.length !== 0 ? "Already Submitted" : "Not submitted yet"}
+            {props.header ? "Status" : (props?.allData?.attendance?.length > 0) ? "Already Submitted" : "Not submitted yet"}
           </p>
         </div>
         <div className="relative ml-2 mr-2 lg:mr-5">

@@ -127,8 +127,8 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
                         className="border rounded px-3 py-2 w-full"
                     >
                         <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                     </select>
 
                     {data.userType == "student" &&

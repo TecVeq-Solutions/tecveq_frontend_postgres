@@ -39,13 +39,19 @@ const SubjectReport = () => {
   const { data: report, isPending, isError } = useQuery({
     queryKey: ["report", location.state?.id],
     queryFn: async () => await getStudentReport(location.state?.id),
-    enabled: !!location.state?.id
+    enabled: !!location.state?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: subjects, isSuccess, isPending: subjectPending } = useQuery({
     queryKey: ["subjectofstudents", location.state?.id],
     queryFn: async () => await getStudentSubjectsForAdmin(location.state?.id),
-    enabled: !!location.state?.id
+    enabled: !!location.state?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   console.log(subjects, "hahahhahahahhahahahhaha");
@@ -54,7 +60,10 @@ const SubjectReport = () => {
   const { data: subjectReport, isPending: subjectReportPending } = useQuery({
     queryKey: ["student-assignments-quizes", location.state?.id, selectedSubject && JSON.parse(selectedSubject).id],
     queryFn: async () => await getStudentSubjectReport(location.state?.id, JSON.parse(selectedSubject).id),
-    enabled: !!selectedSubject && !!location.state?.id
+    enabled: !!selectedSubject && !!location.state?.id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -70,7 +79,10 @@ const SubjectReport = () => {
   const { data: studentSubjectWithLevel, isSuccess: studentIsSuccess, isPending: studentSubjectPending } = useQuery({
     queryKey: ["studentSubjectwithLevel", studentData?.levelID],
     queryFn: async () => await getStudentSubjectsWithLevel(studentData?.levelID),
-    enabled: !!studentData?.levelID
+    enabled: !!studentData?.levelID,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   console.log(studentSubjectWithLevel, "student subject with level ");

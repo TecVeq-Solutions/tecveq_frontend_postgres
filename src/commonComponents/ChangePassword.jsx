@@ -47,7 +47,7 @@ const ChangePassword = () => {
             return result;
         },
         onError: (error) => {
-            toast.error(`Failed to update password: ${error.message}`);
+            // toast.error handled globally by axios interceptor
         },
     });
 

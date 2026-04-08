@@ -16,6 +16,7 @@ const Sidebar = () => {
   const [timetable, setTimetable] = useState(false);
   const [reports, setReports] = useState(false);
   const [assignments, setAssignments] = useState(false);
+  const [fees, setFees] = useState(false);
   const [dashboard, setDashboard] = useState(true);
   const [loading, setLoading] = useState(false);
   const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
@@ -31,6 +32,7 @@ const Sidebar = () => {
     setQuizes(false);
     setReports(false);
     setAssignments(false);
+    setFees(false);
     setTimetable(false);
     setIsSidebarOpen(false);
     setIsopen(false);
@@ -42,6 +44,7 @@ const Sidebar = () => {
     setQuizes(false);
     setReports(true);
     setAssignments(false);
+    setFees(false);
     setTimetable(false);
     setIsSidebarOpen(false);
     setIsopen(false);
@@ -53,6 +56,7 @@ const Sidebar = () => {
     setQuizes(true);
     setReports(false);
     setAssignments(false);
+    setFees(false);
     setTimetable(false);
     setIsSidebarOpen(false);
     setIsopen(false);
@@ -64,10 +68,23 @@ const Sidebar = () => {
     setQuizes(false);
     setReports(false);
     setAssignments(true);
+    setFees(false);
     setTimetable(false);
     setIsSidebarOpen(false);
     setIsopen(false);
     navigate("/parent/assignments");
+  };
+  
+  const handleFeesClick = async () => {
+    setDashboard(false);
+    setQuizes(false);
+    setReports(false);
+    setAssignments(false);
+    setFees(true);
+    setTimetable(false);
+    setIsSidebarOpen(false);
+    setIsopen(false);
+    navigate("/parent/fees");
   };
 
 
@@ -124,6 +141,12 @@ const Sidebar = () => {
             title={"Quizzes"}
             active={quizes}
             onpress={handleQuizzesClick}
+          />
+          <Custombutton
+            icon={"levels"}
+            title={"Fees"}
+            active={fees}
+            onpress={handleFeesClick}
           />
         </div>
         {loading && <div className="flex flex-1"> <Loader /> </div>}

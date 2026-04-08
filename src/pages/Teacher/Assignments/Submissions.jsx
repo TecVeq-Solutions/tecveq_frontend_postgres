@@ -102,7 +102,7 @@ const Submissions = () => {
       }
     } catch (error) {
       console.error("Global analysis error:", error);
-      toast.error(error?.response?.data?.message || "Error running class-wide plagiarism scan.");
+      // toast.error handled globally by axios interceptor
     } finally {
       setIsGlobalAnalyzing(false);
     }

@@ -96,13 +96,7 @@ const Login = () => {
 
         } catch (error) {
             console.log("error in student login UI screen is : ", error);
-            if (error.response && error.response.status === 403) {
-                toast.error(error.response.data.message);
-            } else if (error.response && error.response.data && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error("Login failed. Please try again.");
-            }
+            // toast.error handled globally by axios interceptor
         }
         setLoading(false);
     }
