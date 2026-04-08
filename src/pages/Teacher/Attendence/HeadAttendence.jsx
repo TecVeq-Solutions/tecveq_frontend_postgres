@@ -139,7 +139,8 @@ const HeadAttendence = () => {
                             classesSchedualled={cls.classes.length}
                             students={cls.students.length}
                             teachers={cls.teachers.length}
-                            createdBy={cls.createdBy.userType}
+                            levelName={cls.level?.name || "N/A"}
+                            createdBy={cls.createdBy?.name || cls.creator?.name || cls.createdBy?.userType || "N/A"}
                             bgColor={"#FFFFFF"}
                             header={false}
                           />
@@ -160,7 +161,8 @@ const HeadAttendence = () => {
                             classesSchedualled={cls.classes.length}
                             students={cls.students.length}
                             teachers={cls.teachers.length}
-                            createdBy={cls.createdBy.userType}
+                            levelName={cls.level?.name || "N/A"}
+                            createdBy={cls.createdBy?.name || cls.creator?.name || cls.createdBy?.userType || "N/A"}
                             bgColor={"#FFFFFF"}
                             header={false}
                             threeDots={false}

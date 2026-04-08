@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getAllUsers } from "../../../api/Admin/AdminApi";
+import { getAllAdmins } from "../../../api/Admin/AdminApi";
 import { generatePlatformFee } from "../../../api/Admin/FeesApi";
 import Loader from "../../../utils/Loader";
 import { toast } from "react-toastify";
@@ -18,9 +18,9 @@ const GeneratePlatformFeeModal = ({ onClose, onSuccess }) => {
     const { data: usersData, isLoading: usersLoading } = useQuery({
         queryKey: ["allAdmins"],
         queryFn: async () => {
-            const resp = await getAllUsers();
-            // apiRequest returns the data directly. If it's an array, filter it.
-            return Array.isArray(resp) ? resp.filter(u => u.userType === 'admin') : [];
+            const resp = await getAllAdmins();
+            // The API already returns admins, so we just ensure it's an array.
+            return Array.isArray(resp) ? resp : [];
         },
         staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false

@@ -94,10 +94,7 @@ const Assignments = () => {
                   />
 
                   {isSuccess && data.map((assignment, index) => {
-                    const expectedCount = assignment?.classroomID?.students?.filter(student => (
-                      (!student?.subjects || student?.subjects?.length === 0) ||
-                      student?.subjects?.some(sub => (sub?.id || sub)?.toString() === (assignment?.subjectID?.id || assignment?.subjectID)?.toString())
-                    ))?.length || 0;
+                    const expectedCount = assignment?.classroomID?.students?.length || 0;
 
                     return (
                       <QuizAssignmentRow

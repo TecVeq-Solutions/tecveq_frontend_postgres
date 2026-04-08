@@ -16,6 +16,12 @@ export const getAllUsers = apiRequest(async () => {
     return response;
 })
 
+export const getAllAdmins = apiRequest(async () => {
+    const url = `${BACKEND_URL}/user/admins`
+    const response = await axios.get(url);
+    return response;
+})
+
 
 
 export const useGetAllStudentsWithLevel = (levelId) => {

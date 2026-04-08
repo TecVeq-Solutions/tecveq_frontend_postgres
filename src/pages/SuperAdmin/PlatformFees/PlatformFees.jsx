@@ -105,10 +105,10 @@ const PlatformFees = () => {
                                                         id: fee.id, 
                                                         status: fee.status === 'paid' ? 'unpaid' : 'paid' 
                                                     })}
-                                                    className={`text-[11px] font-bold px-4 py-2 rounded-lg transition-all ${
+                                                    className={`text-[10px] font-black px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 uppercase tracking-widest ${
                                                         fee.status === 'paid'
-                                                        ? 'bg-rose-600 text-white hover:bg-rose-700'
-                                                        : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                                        ? 'bg-maroon text-white hover:bg-[#8B1829] shadow-maroon/20'
+                                                        : 'bg-green_dark text-white hover:bg-[#0E9003] shadow-green_dark/20'
                                                     }`}
                                                 >
                                                     {fee.status === 'paid' ? 'SUSPEND ACCESS' : 'MARK AS PAID'}
