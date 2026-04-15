@@ -74,7 +74,6 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
         guardianPhoneNumber: data.guardianPhoneNumber || "",
         guardianEmail: data.guardianEmail || "",
         guardianName: data.guardianName || "",
-        guardianGender: data.guardianGender || "",
         referenceNo: data.referenceNo || "",
         levelID: data.levelID || "",
         password: "",
@@ -152,17 +151,6 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
                             <InputFiled label={"Guardian Name"} req={false} val={userObj.guardianName} name={"guardianName"} setDataObj={setUsrObj} />
                             <InputFiled label={"Guardian Email"} req={false} val={userObj.guardianEmail} name={"guardianEmail"} setDataObj={setUsrObj} />
                             <InputFiled label={"Guardian Phone No."} req={false} val={userObj.guardianPhoneNumber} name={"guardianPhoneNumber"} setDataObj={setUsrObj} />
-                            
-                            <label className='font-medium'>Guardian Gender</label>
-                            <select
-                                value={userObj.guardianGender || ""}
-                                onChange={(e) => setUsrObj({ ...userObj, guardianGender: e.target.value })}
-                                className="border outline-none rounded-md border-black/20 px-4 w-full py-[8px]"
-                            >
-                                <option value="">Select Guardian Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
                         </>
                     }
                     <InputFiled label={"Password"} req={false} val={userObj.password} name={"password"} setDataObj={setUsrObj} type="password" />

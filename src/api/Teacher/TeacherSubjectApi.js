@@ -10,14 +10,19 @@ export const useGetAllTeacherSubjects = (teacherId) => {
 
     const getMyAllTeacherSubjectsRequest = async () => {
         const url = `${BACKEND_URL}/subject/teacher-subject/${teacherId}`;
-        const response = await axios.get(url);
-
-        // Note: Axios does not use response.ok, so check the status code directly
-        if (response.status !== 200) {
-            throw new Error('Failed to get user');
+        try {
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            // If the error is a 404 with the specific message, return an empty array
+            if (error.response && error.response.status === 404) {
+                const message = error.response.data?.message || error.response.data;
+                if (message === "Teacher not found in any classroom." || message === "No subjects found for the given teacher.") {
+                    return [];
+                }
+            }
+            throw error;
         }
-
-        return response.data; // Axios automatically parses the JSON response
     };
 
     // Updated useQuery call with object form

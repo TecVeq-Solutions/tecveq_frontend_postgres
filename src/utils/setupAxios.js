@@ -21,11 +21,15 @@ const setupAxios = () => {
           error.message ||
           "An unexpected error occurred";
 
-        // Prevent duplicate toasts by using a fixed toastId
-        toast.error(errMsg, {
-          toastId: "global-api-error-toast",
-          autoClose: 3000,
-        });
+        // Skip toast for specific expected "errors" like teacher not being in a classroom yet
+        const skipToast = errMsg === "Teacher not found in any classroom." || errMsg === "No subjects found for the given teacher.";
+
+        if (!skipToast) {
+          toast.error(errMsg, {
+            toastId: "global-api-error-toast",
+            autoClose: 3000,
+          });
+        }
 
         console.error("Global API Error:", errMsg);
       }

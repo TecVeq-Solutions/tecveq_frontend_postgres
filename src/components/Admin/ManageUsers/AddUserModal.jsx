@@ -244,7 +244,6 @@ const AddUserModal = ({ closeModal, refetch }) => {
                     guardianName,
                     guardianEmail,
                     guardianPhoneNumber: elements.guardianPhoneNumber.value,
-                    guardianGender: elements.guardianGender.value,
                     password,
                     profilePic: default_profile,
                 };
@@ -350,20 +349,6 @@ const AddUserModal = ({ closeModal, refetch }) => {
                                         <CustomInput label={"Guardian Name"} type="text" placeholder={"Enter Guardian Name"} required name="guardianName" defaultValue={initialFormData.guardianName} />
                                         <CustomInput label={"Guardian Email"} type="email" placeholder={"Enter Guardian Email"} required name="guardianEmail" defaultValue={initialFormData.guardianEmail} />
                                         <CustomInput label={"Guardian Phone no."} type="text" placeholder={"Enter Guardian Phone no."} required name="guardianPhoneNumber" defaultValue={initialFormData.guardianPhoneNumber} />
-                                        
-                                        <div className="flex flex-col">
-                                            <label className="text-gray-700 font-medium">Guardian Gender</label>
-                                            <select name="guardianGender" className="border p-2 rounded-md" required defaultValue={initialFormData.guardianGender} onChange={(e) => {
-                                                const formData = JSON.parse(localStorage.getItem('addUserFormData') || '{}');
-                                                formData['guardianGender'] = e.target.value;
-                                                localStorage.setItem('addUserFormData', JSON.stringify(formData));
-                                            }}>
-                                                <option value="">Select Guardian Gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                            </select>
-                                        </div>
-
                                         <CustomInput label={"Password"} type="password" placeholder={"Enter your Password"} required name="password" defaultValue={initialFormData.password} />
                                         <CustomInput label={"Confirm Password"} type="password" placeholder={"Confirm your Password"} required name="confirmPassword" defaultValue={initialFormData.confirmPassword} />
                                     </>
