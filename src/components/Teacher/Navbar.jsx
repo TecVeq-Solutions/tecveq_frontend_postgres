@@ -3,8 +3,8 @@ import ProfileMenu from "./ProfileMenu";
 import Notifications from "./Notifications";
 import ProfileDetails from "./ProfileDetails";
 import profile from "../../assets/images/profilepic.png";
-
 import RecentMessages from "./Dashboard/RecentMessages";
+import GlobalSearch from "../../commonComponents/GlobalSearch";
 
 import { CiBellOn } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
@@ -80,6 +80,7 @@ const Navbar = ({ heading }) => {
               </div>
             }
           </div>
+          <GlobalSearch />
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="flex gap-2 sm:gap-4">
               <div

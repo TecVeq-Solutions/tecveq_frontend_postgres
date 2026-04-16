@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import IMAGES from "../../../assets/images";
 import Card from "../../../components/Parent/Reports/Card";
 import GradeCard from "../../../components/Parent/Reports/GradeCard";
+import ParentNavbar from "../../../components/Parent/Dashboard/Navbar";
 
 const AssignmentReport = () => {
   const { subject, title } = useParams();
@@ -16,11 +17,11 @@ const AssignmentReport = () => {
           <Sidebar currentScreen={"reports"} />
         </div> */}
         <div className="flex-grow w-full lg:px-20 sm:px-10 px-7 lg:ml-72 ">
-          <div className="pt-16 ">
-            <div className="flex flex-row items-center justify-between flex-grow">
+          <div className="pt-2 ">
+            <ParentNavbar heading={title} />
+            <div className="flex flex-row items-center justify-between flex-grow mt-2">
               <div className="flex flex-col justify-between gap-3 xl:flex-row md:gap-4">
-                <p className="font-semibold md:text-[25px]">{title}</p>
-                <div className="flex flex-row gap-1 text-[10px] items-center">
+                <div className="flex flex-row gap-1 text-[10px] items-center ml-14 lg:ml-0">
                   <p>
                     <img
                       src={IMAGES.Book}
@@ -70,43 +71,6 @@ const AssignmentReport = () => {
                     className="sm:px-3 px-1 bg-[#F6E8EA] flex "
                   >
                     <p className="font-semibold text-center">{title}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-center gap-2 sm:flex-row md:gap-4">
-                <div className="flex flex-row items-center gap-3 sm:gap-3">
-                  <p className="text-center md:text-[16px] text-[9px]">
-                    M. Haseeb
-                  </p>
-                  <div>
-                    <img
-                      src={IMAGES.ProfilePic}
-                      alt=""
-                      className="w-[29px] h-[30px]"
-                    />
-                  </div>
-                  <div>
-                    <img
-                      src={IMAGES.ArrowLeft}
-                      alt=""
-                      className="w-[22px] h-[30px]"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-row items-center gap-1 sm:gap-3">
-                  <div className="p-1 bg-white rounded-sm border-1 border-grey">
-                    <img
-                      src={IMAGES.Notification}
-                      alt=""
-                      className="md:w-[22px] md:h-[22px] w-[13px] h-[13px]"
-                    />
-                  </div>
-                  <div className="p-1 bg-white rounded-sm border-1 border-grey">
-                    <img
-                      src={IMAGES.SMS}
-                      alt=""
-                      className="md:w-[22px] md:h-[22px] w-[13px] h-[13px]"
-                    />
                   </div>
                 </div>
               </div>

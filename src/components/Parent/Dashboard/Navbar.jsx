@@ -12,6 +12,7 @@ import { useBlur } from "../../../context/BlurContext";
 import { useUser } from "../../../context/UserContext";
 import RecentMessages from "./RecentMessages";
 import { useQuery } from "@tanstack/react-query";
+import GlobalSearch from "../../../commonComponents/GlobalSearch";
 import { getAllNotifications } from "../../../api/Admin/NotificationApi";
 import moment from "moment";
 import { Dot } from "recharts";
@@ -129,6 +130,7 @@ const Navbar = ({ heading }) => {
             <p className="hidden md:block ">Welcome to your learning space!</p>
           </div>
         }
+        <GlobalSearch />
         <div className="flex items-center  gap-2">
           <div className="flex gap-2 sm:gap-4">
             {/* p-1 sm:p-2 border cursor-pointer  rounded-md border-black/50 transition-all duration-500  */}

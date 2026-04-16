@@ -12,6 +12,7 @@ import { useUser } from "../../../context/UserContext";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getStudentSubjectReport } from "../../../api/Student/StudentApis";
 import { useStudent } from "../../../context/StudentContext";
+import StudentNavbar from "../../../components/Student/Dashboard/Navbar";
 
 // File ke top mein add karein:
 // File ke top mein add karein:
@@ -89,13 +90,11 @@ const SubjectReport = () => {
         <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
           <div className="flex flex-1">
             <div className="flex-grow w-full px-2 lg:px-20 sm:px-10 lg:ml-72">
-              <div className=" pt-20 sm:pt-16 ">
-                <div className="flex flex-row items-center justify-between flex-grow">
+              <div className=" pt-2 ">
+                <StudentNavbar heading={subject + " Report"} />
+                <div className="flex flex-row items-center justify-between flex-grow mt-2">
                   <div className="flex flex-col justify-between gap-1 md:flex-row md:gap-6">
-                    <p className="font-semibold md:text-[25px]">
-                      {subject + " Report"} 
-                    </p>
-                    <div className="flex flex-row gap-1 text-[10px] items-center">
+                    <div className="flex flex-row gap-1 text-[10px] items-center ml-14 lg:ml-0">
                       <p>
                         <img
                           src={IMAGES.Book}
@@ -126,39 +125,6 @@ const SubjectReport = () => {
                       <div className="px-3 bg-[#F6E8EA] flex ">
                         <p className="font-semibold">{subject}</p>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row items-center gap-1 sm:gap-2 md:gap-4">
-                    <div className="p-1 bg-white rounded-sm border-1 border-grey">
-                      <img
-                        src={IMAGES.Notification}
-                        alt=""
-                        className="md:w-[22px] md:h-[22px] w-[13px] h-[13px]"
-                      />
-                    </div>
-                    <div className="p-1 bg-white rounded-sm border-1 border-grey">
-                      <img
-                        src={IMAGES.SMS}
-                        alt=""
-                        className="md:w-[22px] md:h-[22px] w-[13px] h-[13px]"
-                      />
-                    </div>
-                    <p className="text-justify md:text-[16px] text-[12px]">
-                      M. {userData.name}
-                    </p>
-                    <div>
-                      <img
-                        src={userData.profilePic || IMAGES.ProfilePic}
-                        alt=""
-                        className= "sm:w-[29px] sm:h-[29px]  w-[34px] h-[34px] rounded-full"
-                      />
-                    </div>
-                    <div>
-                      <img
-                        src={IMAGES.ArrowLeft}
-                        alt=""
-                        className="w-[1rem] h-[1rem]"
-                      />
                     </div>
                   </div>
                 </div>

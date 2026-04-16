@@ -82,6 +82,7 @@ import SAPlatformFees from "./pages/SuperAdmin/PlatformFees/PlatformFees";
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
 import BulkSubjectAssign from "./pages/Admin/BulkSubjectAssign/BulkSubjectAssign";
 import ChatBot from "./components/ChatBot/ChatBot";
+import StudentProfileDashboard from "./pages/Common/StudentProfileDashboard";
 
 function App() {
 
@@ -259,6 +260,14 @@ function App() {
               </AdminLayout>
             }
           />
+          <Route
+            path="/student-profile/:studentId"
+            element={
+              <AdminLayout>
+                <StudentProfileDashboard />
+              </AdminLayout>
+            }
+          />
         </Route>
         <Route element={<ProtectedSuperAdmin />}>
           <Route
@@ -333,6 +342,14 @@ function App() {
             element={
               <StudentLayout>
                 <TimeTable />
+              </StudentLayout>
+            }
+          />
+          <Route
+            path="/student-profile/:studentId"
+            element={
+              <StudentLayout>
+                <StudentProfileDashboard />
               </StudentLayout>
             }
           />
@@ -461,6 +478,14 @@ function App() {
               </TeacherLayout>
             }
           />
+          <Route
+            path="/student-profile/:studentId"
+            element={
+              <TeacherLayout>
+                <StudentProfileDashboard />
+              </TeacherLayout>
+            }
+          />
         </Route>
         <Route element={<ProtectedParent />} >
           <Route
@@ -546,6 +571,14 @@ function App() {
             element={
               <ParentLayout>
                 <PFees />
+              </ParentLayout>
+            }
+          />
+          <Route
+            path="/student-profile/:studentId"
+            element={
+              <ParentLayout>
+                <StudentProfileDashboard />
               </ParentLayout>
             }
           />

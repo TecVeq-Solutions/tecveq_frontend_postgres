@@ -16,8 +16,20 @@ axios.defaults.withCredentials = true;
 // }
 
 
-export const logout = apiRequest(async () =>{
+export const logout = apiRequest(async () => {
     const url = `${BACKEND_URL}/user/logout`
     const response = await axios.get(url);
     return response;
-})
+});
+
+export const getStudentCompleteProfile = apiRequest(async (studentID) => {
+    const url = `${BACKEND_URL}/user/student-profile/${studentID}`;
+    const response = await axios.get(url);
+    return response;
+});
+
+export const addStudentNote = apiRequest(async (data) => {
+    const url = `${BACKEND_URL}/user/student-note`;
+    const response = await axios.post(url, data);
+    return response;
+});

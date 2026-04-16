@@ -15,13 +15,8 @@ const Deliverables = () => {
 
 
 
-  const matchedAssignments = allAssignments?.filter(assignment =>
-    !userData.subjects || userData.subjects.length === 0 || userData.subjects.includes(assignment.subjectID.id)
-  );
-
-  const matchedAQuizes = allQuizes?.filter(quiz =>
-    !userData.subjects || userData.subjects.length === 0 || userData.subjects.includes(quiz.subjectID.id)
-  );
+  const matchedAssignments = allAssignments || [];
+  const matchedAQuizes = allQuizes || [];
 
 
 

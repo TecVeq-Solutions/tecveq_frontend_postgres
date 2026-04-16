@@ -4,6 +4,7 @@ import Notifications from "./Notifications";
 import ProfileDetails from "./ProfileDetails";
 import profile from "../../assets/images/profilepic.png";
 import RecentMessages from "./Dashboard/RecentMessages";
+import GlobalSearch from "../../commonComponents/GlobalSearch";
 
 import { CiBellOn } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
@@ -111,6 +112,7 @@ const Navbar = ({ heading }) => {
           <div className="flex flex-col justify-center px-2">
             <p className="text-[14px]  ml-10 md:ml-0 md:text-2xl sm:font-medium font-normal">{heading} </p>
           </div>
+          <GlobalSearch />
           <div className="flex  items-center gap-1">
             <div className="flex gap-2">
               <div

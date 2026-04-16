@@ -16,9 +16,7 @@ const Assignments = () => {
   const { userData } = useUser();
 
 
-  const studentAssignments = allAssignments?.filter(assignment =>
-    !userData.subjects || userData.subjects.length === 0 || userData.subjects.includes(assignment?.subject?.id || assignment?.subjectID?.id || assignment?.subjectID)
-  );
+  const studentAssignments = allAssignments || [];
   //console.log("Filtered Assignments:", studentAssignments);
   return (
     <div className="flex flex-1 bg-[#F9F9F9] font-poppins">

@@ -42,10 +42,7 @@ const SubjectsEnrolled = () => {
     enabled: studentLogedIn
   });
 
-  const assignedSubjects = subjectQuery?.data?.assignedSubjects || userData.subjects;
-  const filteredSubjects = subjectQuery?.data?.subjects?.filter((item) =>
-    !assignedSubjects || assignedSubjects.length === 0 || assignedSubjects.includes(item?.subject?.id || item?.id)
-  );
+  const filteredSubjects = subjectQuery?.data?.subjects || subjectQuery?.data || [];
 
   //console.log(filteredSubjects, "Filtered Subjects for Student");
 

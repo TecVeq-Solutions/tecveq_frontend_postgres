@@ -61,6 +61,14 @@ export const getTeachersForChat = apiRequest(async() =>{
     return response;
 })
 
+export const getParentChatrooms = apiRequest(async () => {
+    // Calling the optional studentID endpoint without a studentID
+    const url = `${BACKEND_URL}/parent/chats/all`; 
+    const response = await axios.get(url);
+    return response;
+})
+
+
 export const getChildFees = apiRequest(async (sid) => {
     const url = `${BACKEND_URL}/fees/student/${sid}`;
     return await axios.get(url);
