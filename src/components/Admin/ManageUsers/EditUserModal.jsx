@@ -11,7 +11,7 @@ import { useBlur } from '../../../context/BlurContext';
 import { useAdmin } from '../../../context/AdminContext';
 
 
-const InputFiled = ({ label, req, val, name, dataObj, setDataObj, type = "text" }) => {
+const InputFiled = ({ label, req, val, name, dataObj, setDataObj, type = "text", autoComplete = "off" }) => {
 
 
     return (
@@ -24,6 +24,7 @@ const InputFiled = ({ label, req, val, name, dataObj, setDataObj, type = "text" 
                 <div className='w-full flex-1'>
                     <input
                         type={type}
+                        autoComplete={autoComplete}
                         onChange={(e) => {
                             if (setDataObj) {
                                 setDataObj((prev) => ({ ...prev, [name]: e.target.value }));
@@ -153,8 +154,8 @@ const EditUserModal = ({ closeModal, refetch, data }) => {
                             <InputFiled label={"Guardian Phone No."} req={false} val={userObj.guardianPhoneNumber} name={"guardianPhoneNumber"} setDataObj={setUsrObj} />
                         </>
                     }
-                    <InputFiled label={"Password"} req={false} val={userObj.password} name={"password"} setDataObj={setUsrObj} type="password" />
-                    <InputFiled label={"Confirm Password"} req={false} val={userObj.confirmPassword} name={"confirmPassword"} setDataObj={setUsrObj} type="password" />
+                    <InputFiled label={"Password"} req={false} val={userObj.password} name={"password"} setDataObj={setUsrObj} type="password" autoComplete="new-password" />
+                    <InputFiled label={"Confirm Password"} req={false} val={userObj.confirmPassword} name={"confirmPassword"} setDataObj={setUsrObj} type="password" autoComplete="new-password" />
                     {mutation.isPending && <div className='flex flex-1'><Loader /></div>}
                     {!mutation.isPending &&
                         <CustomButton label={"Update User"} btnClick={handleUpdateUser} />

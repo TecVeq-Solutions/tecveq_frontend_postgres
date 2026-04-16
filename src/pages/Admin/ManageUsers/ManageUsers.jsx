@@ -179,7 +179,7 @@ const ManageUsers = () => {
                     <DataRows
                       header={true}
                       role={"Role"}
-                      userId={selectText === "teacher" || selectText === "parent" ? "Reaference No" : "Roll No"}
+                      userId={selectText === "teacher" || selectText === "parent" ? "Reference No" : "Roll No"}
                       index={"Sr No"}
                       userName={"Name"}
                       userclass={"Class"}
