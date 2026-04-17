@@ -124,10 +124,13 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { BACKEND_URL } from '../../../constants/api';
+import { useGetSettings } from '../../../api/Admin/SettingsApi';
 
 const SystemOverview = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { settings } = useGetSettings();
+  const isUniversity = settings?.institutionType === 'university';
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -176,7 +179,7 @@ const SystemOverview = () => {
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="Students" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="Parents" stroke="#82ca9d" />
+          {!isUniversity && <Line type="monotone" dataKey="Parents" stroke="#82ca9d" />}
           <Line type="monotone" dataKey="Teachers" stroke="#ffc658" />
         </LineChart>
       </ResponsiveContainer>

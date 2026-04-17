@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import IMAGES from "../../../assets/images";
 import useClickOutside from "../../../hooks/useClickOutlise";
+import { useGetSettings } from "../../../api/Admin/SettingsApi";
 
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
@@ -12,14 +13,11 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
 
   const { toggleBlur } = useBlur();
 
-  console.log("subject data is : ", subjectData);
-
-  const [subjectValue, setSubjectValue] = useState(((isEditTrue && subjectData) && subjectData.subjectName) || "");
-  // const [levelValue, setLevelValue] = useState(
-  //   isEditTrue && subjectData ? subjectData.levelName : ""
-  // );
-
+  const [subjectValue, setSubjectValue] = useState("");
   const [levelValue, setLevelValue] = useState("");
+  const [creditHours, setCreditHours] = useState(3);
+  const { settings } = useGetSettings();
+  const isUniversity = settings?.institutionType === 'university';
   const [errormsg, setErrormsg] = useState(false);
 
   const ref = useRef(null);
@@ -32,7 +30,6 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
 
   const handleAddSubject = async () => {
     if (subjectValue && levelValue) {
-      console.log("mutation")
       const subjectNamePattern = /^[a-zA-Z0-9\s]+$/;
       const isValidSubjectName = subjectNamePattern.test(subjectValue);
       if (isValidSubjectName) {
@@ -51,19 +48,23 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
   const mutation = useMutation({
     mutationFn: async (subjectValue) => {
       let result;
-      console.log(" sending obj is : ", { name: subjectValue, levelID: levelValue })
+      const payload = { 
+        name: subjectValue, 
+        levelID: levelValue,
+        creditHours: parseFloat(creditHours) || 3
+      };
+      
       if (isEditTrue) {
-        result = await editSubject({ name: subjectValue, levelID: levelValue }, subjectData?.data.id);
-        console.log("subject updatd ", result);
+        result = await editSubject(payload, subjectData?.data.id);
       } else {
-        result = await createSubject({ name: subjectValue, levelID: levelValue });
+        result = await createSubject(payload);
       }
       await refetch();
       toast.success(`Subject ${isEditTrue ? "updated" : "added"} successfully!`);
       return result;
     }, onSettled: (data, error) => {
       if (error) {
-        toast.error("Subject name already exists!");
+        toast.error("Subject already exists or error occurred!");
       } else {
         setSubjectValue("");
         setLevelValue("");
@@ -75,12 +76,16 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
 
   useEffect(() => {
     if (isEditTrue && subjectData) {
-      // Find the matching level ID
       const matchingLevel = allLevels?.find(item => item.name === subjectData.levelName);
       setLevelValue(matchingLevel?.id || "");
+      setSubjectValue(subjectData?.subjectName || "");
+      setCreditHours(subjectData?.data?.creditHours || 3);
+    } else {
+      setSubjectValue("");
+      setLevelValue("");
+      setCreditHours(3);
     }
-  }, [isEditTrue, subjectData, allLevels]);
-  console.log("hahhahahaha", levelValue);
+  }, [isEditTrue, subjectData, allLevels, open]);
 
   return (
     <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ${open ? "" : "hidden"}`}>
@@ -105,6 +110,7 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
                   toggleBlur();
                   setopen(false);
                 }}
+                alt="close"
               />
             </div>
           </div>
@@ -114,13 +120,13 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
               <p className="text-xs font-semibold text-grey_700">Subject Name</p>
               <div className="flex flex-col border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
                 <input
-                  className="w-full text-sm outline-none text-custom-gray-3"
+                  className="w-full text-sm outline-none text-custom-gray-3 py-2"
                   placeholder="Enter subject name"
                   value={subjectValue}
                   onChange={(e) => setSubjectValue(e.target.value)}
                 />
               </div>
-              {errormsg && <p className="text-maroon text-sm self-center">Subject Name is required!</p>}
+              {errormsg && !subjectValue && <p className="text-red-500 text-xs">Subject Name is required!</p>}
             </div>
           </div>
 
@@ -131,7 +137,7 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
                 <select
                   value={levelValue}
                   onChange={(e) => setLevelValue(e.target.value)}
-                  className="w-full text-sm outline-none text-custom-gray-3"
+                  className="w-full text-sm outline-none text-custom-gray-3 py-2 bg-transparent"
                 >
                   <option value="">Select Level</option>
                   {allLevels?.map((item) => (
@@ -141,22 +147,40 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
                   ))}
                 </select>
               </div>
-              {errormsg && <p className="text-[#6A00FF] text-sm self-center">Level is required!</p>}
+              {errormsg && !levelValue && <p className="text-red-500 text-xs">Level is required!</p>}
             </div>
           </div>
 
+          {isUniversity && (
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col flex-1 gap-1">
+                <p className="text-xs font-semibold text-grey_700">Credit Hours</p>
+                <div className="flex flex-col border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
+                  <input
+                    type="number"
+                    step="0.5"
+                    className="w-full text-sm outline-none text-custom-gray-3 py-2"
+                    placeholder="Enter credit hours (e.g. 3.0)"
+                    value={creditHours}
+                    onChange={(e) => setCreditHours(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {mutation.isPending && <div> <Loader /> </div>}
 
-          {!mutation.isPending && <div className="flex items-center gap-3 w-full justify-center">
-            <div
-              onClick={() => {
-                handleAddSubject();
-              }}
-              className="flex items-center justify-center w-1/2 py-2 text-center rounded-3xl cursor-pointer bg-[#6A00FF]"
-            >
-              <p className="text-sm text-white">{isEditTrue ? "Update" : "Create"}</p>
+          {!mutation.isPending && (
+            <div className="flex items-center gap-3 w-full justify-center mt-4">
+              <div
+                onClick={handleAddSubject}
+                className="flex items-center justify-center w-full py-3 text-center rounded-xl cursor-pointer bg-[#6A00FF] hover:bg-[#5a00d6] transition-colors"
+              >
+                <p className="text-sm text-white font-bold">{isEditTrue ? "Update Subject" : "Create Subject"}</p>
+              </div>
             </div>
-          </div>}
+          )}
         </div>
       </div>
       </div>

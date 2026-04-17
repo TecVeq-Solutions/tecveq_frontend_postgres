@@ -4,11 +4,12 @@ import Attendance from "../../../components/Parent/Dashboard/Attendance";
 import SubjectsEnrolled from "../../../components/Parent/Dashboard/SubjectsEnrolled";
 import LastDeliverables from "../../../components/Parent/Dashboard/LastDeliverables";
 
-import { useBlur } from "../../../context/BlurContext";
-
+import { useParent } from "../../../context/ParentContext";
+import PerformanceSummary from "../../../components/Common/PerformanceSummary";
 
 const Dashboard = () => {
   const { isBlurred } = useBlur();
+  const { selectedChild } = useParent();
 
 
   
@@ -35,7 +36,7 @@ const Dashboard = () => {
               <LastDeliverables />
             </div>
             <div className="flex flex-[2]">
-              <Attendance />
+              <PerformanceSummary studentId={selectedChild?.id} />
             </div>
           </div>
         </div>

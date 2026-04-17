@@ -24,6 +24,10 @@ const Sidebar = () => {
     { key: "quizzes", icon: "quiz", title: "Quizzes", path: "/quizzes" },
     { key: "reports", icon: "graph", title: "Reports", path: "/reports" },
     { key: "timetable", icon: "time", title: "Time Table", path: "/timetable" },
+    { key: "leaves", icon: "time", title: "Leaves", path: "/leaves" },
+    { key: "reportCard", icon: "quiz", title: "Report Card", path: "/report-card" },
+
+
   ];
 
   const handleMenuClick = (key, path) => {

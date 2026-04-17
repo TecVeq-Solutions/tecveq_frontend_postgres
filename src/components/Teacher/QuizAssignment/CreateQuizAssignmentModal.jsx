@@ -15,6 +15,7 @@ import { createQuiz, editQuiz } from "../../../api/Teacher/Quiz";
 import { createAssignment, editAssignment, } from "../../../api/Teacher/Assignments";
 import useClickOutside from "../../../hooks/useClickOutlise";
 import { getTeacherSubjectsOfClassroom } from "../../../api/Teacher/TeacherSubjectApi";
+import MCQBuilder from "./MCQBuilder";
 
 
 const CreateQuizAssignmentModal = ({
@@ -51,6 +52,7 @@ const CreateQuizAssignmentModal = ({
     subjectID: isEditTrue ? data?.subjectID : "",
     totalMarks: isEditTrue ? data?.totalMarks : 0,
     classroomID: isEditTrue ? data?.classroomID : "",
+    type: isEditTrue ? data?.type : (isQuiz ? "quiz" : "assignment"),
     files: "",
   })
   const [selectedFile, setSelectedFile] = useState(null);
@@ -58,6 +60,16 @@ const CreateQuizAssignmentModal = ({
   const [uploadedFileUrl, setUploadedFileUrl] = useState(isEditTrue && data?.files?.[0]?.url ? data.files[0].url : "");
   const [selectedClassroom, setSelectedClassroom] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("");
+  const [quizMode, setQuizMode] = useState(isEditTrue && data?.questions?.length > 0 ? "mcq" : "file"); // "file" or "mcq"
+  const [mcqQuestions, setMcqQuestions] = useState(
+    isEditTrue && data?.questions 
+      ? data.questions.map(q => ({
+          title: q.text,
+          marks: q.marks,
+          options: q.options.map(o => ({ text: o.text, isCorrect: o.isCorrect }))
+        })) 
+      : []
+  );
 
 
   // Just updating the key parts of your component. Keep the rest of your original code structure.
@@ -153,17 +165,41 @@ const CreateQuizAssignmentModal = ({
 
     const hasText = !!quizAssignmentDataObj?.text?.trim();
     const hasFile = !!selectedFile?.name || !!uploadedFileUrl;
+    const hasMCQ = quizMode === "mcq" && mcqQuestions.length > 0;
 
-    if (!hasText && !hasFile) {
-      toast.error("Please provide either text or a file before creating the quiz.");
+    // MCQ mode skips file/text requirement
+    if (!hasMCQ && !hasText && !hasFile) {
+      toast.error("Please provide either text, a file, or MCQ questions before creating the quiz.");
       setLoading(false);
       return;
+    }
+
+    // Validate MCQ questions have text and at least one correct answer
+    if (hasMCQ) {
+      for (let i = 0; i < mcqQuestions.length; i++) {
+        const q = mcqQuestions[i];
+        if (!q.title?.trim()) {
+          toast.error(`Question ${i + 1} is missing its text.`);
+          setLoading(false);
+          return;
+        }
+        if (!q.options.some(o => o.isCorrect)) {
+          toast.error(`Question ${i + 1} must have at least one correct option.`);
+          setLoading(false);
+          return;
+        }
+        if (q.options.some(o => !o.text?.trim())) {
+          toast.error(`Question ${i + 1} has an empty option. Please fill all options.`);
+          setLoading(false);
+          return;
+        }
+      }
     }
 
     try {
       let filesArr = [];
 
-      if (uploadedFileUrl) {
+      if (uploadedFileUrl && quizMode === "file") {
         filesArr.push({ name: selectedFile?.name || data?.files?.[0]?.name || "File", url: uploadedFileUrl });
       }
 
@@ -177,6 +213,7 @@ const CreateQuizAssignmentModal = ({
           dueDate,
           files: filesArr,
           id: data?.id,
+          ...(hasMCQ && { mcqQuestions }),
         };
 
         quizEditMutate.mutate(sendingObj);
@@ -184,24 +221,18 @@ const CreateQuizAssignmentModal = ({
         // Loop through all selected classrooms for quiz creation
         for (const classroom of selectedClassroom) {
           const classroomID = classroom.id;
-
-          let subjectID = selectedSubject;
-
-          // (Optional) Dynamic subject detection based on teacher
-          // const teachEntry = classroom.teachers.find(
-          //   t => t.teacher === userData.id
-          // );
-          // if (teachEntry) subjectID = teachEntry.subject;
+          const subjectID = selectedSubject;
 
           const sendingObj = {
             ...quizAssignmentDataObj,
             classroomID,
             subjectID,
             files: filesArr,
-            dueDate
+            dueDate,
+            ...(hasMCQ && { mcqQuestions }),
           };
 
-          await createQuiz(sendingObj); // replace with your direct API or mutation call
+          await createQuiz(sendingObj);
         }
 
         toast.success("Quizzes created for all selected classrooms!");
@@ -500,6 +531,32 @@ const CreateQuizAssignmentModal = ({
           </div>
           <div className="flex items-center gap-3">
             <div className="flex flex-col flex-1 gap-1">
+              <p className="text-xs font-semibold text-grey_700">{isQuiz ? "Quiz" : "Assignment"} Type</p>
+              <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
+                <select
+                  className="text-sm outline-none text-custom-gray-3 w-full"
+                  value={quizAssignmentDataObj.type}
+                  onChange={(e) => setQuizAssignmentDataObj({ ...quizAssignmentDataObj, type: e.target.value })}
+                >
+                  {isQuiz ? (
+                    <>
+                      <option value="quiz">Standard Quiz</option>
+                      <option value="surprise_quiz">Surprise Quiz</option>
+                      <option value="class_test">Class Test</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="assignment">Standard Assignment</option>
+                      <option value="homework">Homework</option>
+                      <option value="project">Project / Portfolio</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col flex-1 gap-1">
               <p className="text-xs font-semibold text-grey_700">{isQuiz ? "Text Quiz" : "Text Assignment"}</p>
               <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
                 <textarea
@@ -569,6 +626,24 @@ const CreateQuizAssignmentModal = ({
               </div>
             </div>
           }
+          {isQuiz &&
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col flex-1 gap-1">
+                <p className="text-xs font-semibold text-grey_700">Quiz Mode</p>
+                <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
+                  <select
+                    value={quizMode}
+                    className="text-sm outline-none text-custom-gray-3 w-full"
+                    onChange={(e) => setQuizMode(e.target.value)} >
+                    <option value="file">File Upload</option>
+                    <option value="mcq">Online MCQ Builder</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          }
+
+          {(!isQuiz || quizMode === "file") ? (
           <div className="flex flex-1 border-2 rounded-lg border-[#00000010] py-6 px-16">
             <div className="flex flex-col items-center justify-center flex-1 gap-2">
               {/* Upload Button */}
@@ -643,6 +718,11 @@ const CreateQuizAssignmentModal = ({
               )}
             </div>
           </div>
+          ) : (
+            <div className="border border-gray-100 rounded-xl p-4 max-h-96 overflow-y-auto w-full custom-scrollbar">
+               <MCQBuilder questions={mcqQuestions} setQuestions={setMcqQuestions} />
+            </div>
+          )}
           {(loading || quizCreateMutate.isPending || quizEditMutate.isPending || assignmentCreateMutate.isPending || assignmentUpdateMutate.isPending) && <div><Loader /> </div>}
           {
             (!loading && !quizCreateMutate.isPending && !quizEditMutate.isPending && !assignmentCreateMutate.isPending && !assignmentUpdateMutate.isPending) &&

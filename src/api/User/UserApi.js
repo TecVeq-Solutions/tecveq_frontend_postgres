@@ -33,3 +33,10 @@ export const addStudentNote = apiRequest(async (data) => {
     const response = await axios.post(url, data);
     return response;
 });
+
+export const addDisciplineRecord = apiRequest(async (data) => {
+    const url = `${BACKEND_URL}/discipline`;
+    const response = await axios.post(url, data);
+    return response;
+});
+

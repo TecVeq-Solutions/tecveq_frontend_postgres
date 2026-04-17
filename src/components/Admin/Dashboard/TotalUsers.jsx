@@ -1,10 +1,13 @@
 import { Circle } from 'rc-progress'
 import React from 'react'
 import { useAdmin } from '../../../context/AdminContext';
+import { useGetSettings } from '../../../api/Admin/SettingsApi';
 
 const TotalUsers = () => {
 
     const { adminUsersData } = useAdmin();
+    const { settings } = useGetSettings();
+    const isUniversity = settings?.institutionType === 'university';
 
     const UsersCard = ({ title, value }) => {
         return (
@@ -36,7 +39,7 @@ const TotalUsers = () => {
                 <div className='grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-2'>
                     <UsersCard value={adminUsersData.allStudents.length} title={"Students"} />
                     <UsersCard value={adminUsersData.allTeachers.length} title={"Teachers"} />
-                    <UsersCard value={adminUsersData.allParents.length} title={"Parents"} />
+                    {!isUniversity && <UsersCard value={adminUsersData.allParents.length} title={"Parents"} />}
                     <UsersCard value={adminUsersData.allUsers.length} title={"Total Users"} />
                 </div>
             </div>

@@ -97,12 +97,24 @@ const SubmissionRow = (props) => {
               }`}
           >
             {!props.header ?
-              props?.submissionData?.file ?
-                <p className="px-4 py-2 text-sm text-white bg-[#0B1053] rounded-3xl cursor-pointer hover:opacity-90 transition-all shadow-sm">
-                  <a href={props?.submissionData?.file} download target="_blank" rel="noopener noreferrer"> Download</a>
-                </p>
+              props?.submissionData ?
+                props?.submissionData?.file ?
+                  <p className="px-4 py-2 text-sm text-white bg-[#0B1053] rounded-3xl cursor-pointer hover:opacity-90 transition-all shadow-sm">
+                    <a href={props?.submissionData?.file} download target="_blank" rel="noopener noreferrer"> Download</a>
+                  </p>
+                  :
+                  <div className="flex flex-col items-center">
+                    <p className="px-4 py-2 text-sm text-white bg-emerald-600 rounded-3xl cursor-default shadow-sm font-bold min-w-[120px]">
+                      MCQ Results
+                    </p>
+                    {props?.submissionData?.marks !== null && (
+                      <span className="text-[10px] font-black text-emerald-600 mt-1">
+                        Score: {props.submissionData.marks}
+                      </span>
+                    )}
+                  </div>
                 :
-                <p className="px-4 py-2 text-sm text-gray-400 bg-gray-100 border border-gray-200 rounded-3xl cursor-not-allowed">
+                <p className="px-4 py-2 text-sm text-gray-400 bg-gray-100 border border-gray-200 rounded-3xl cursor-not-allowed min-w-[120px]">
                   Pending
                 </p>
               : "Actions"}

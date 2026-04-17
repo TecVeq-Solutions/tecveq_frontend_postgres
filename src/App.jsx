@@ -83,6 +83,18 @@ import SuperAdminLayout from "./layouts/SuperAdminLayout";
 import BulkSubjectAssign from "./pages/Admin/BulkSubjectAssign/BulkSubjectAssign";
 import ChatBot from "./components/ChatBot/ChatBot";
 import StudentProfileDashboard from "./pages/Common/StudentProfileDashboard";
+import StudentLeaves from "./pages/Student/Leaves/Leaves";
+import AdminLeaveRequests from "./pages/Admin/Leaves/LeaveRequests";
+import Exams from "./pages/Admin/Exams/Exams";
+import EnterMarks from "./pages/Admin/Exams/EnterMarks";
+import ReportCard from "./pages/Student/ReportCard/ReportCard";
+import GradingSystem from "./pages/Admin/Exams/GradingSystem";
+import AdmitCards from "./pages/Admin/Exams/AdmitCards";
+
+
+
+
+
 
 function App() {
 
@@ -268,7 +280,50 @@ function App() {
               </AdminLayout>
             }
           />
+          <Route
+            path="/admin/leave-requests"
+            element={
+              <AdminLayout>
+                <AdminLeaveRequests />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/exams"
+            element={
+              <AdminLayout>
+                <Exams />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/exams/marks/:examId"
+            element={
+              <AdminLayout>
+                <EnterMarks />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/exams/admit-cards"
+            element={
+              <AdminLayout>
+                <AdmitCards />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/exams/grading"
+            element={
+              <AdminLayout>
+                <GradingSystem />
+              </AdminLayout>
+            }
+          />
         </Route>
+
+
+
         <Route element={<ProtectedSuperAdmin />}>
           <Route
             path="/superadmin/dashboard"
@@ -353,7 +408,25 @@ function App() {
               </StudentLayout>
             }
           />
+          <Route
+            path="/leaves"
+            element={
+              <StudentLayout>
+                <StudentLeaves />
+              </StudentLayout>
+            }
+          />
+          <Route
+            path="/report-card"
+            element={
+              <StudentLayout>
+                <ReportCard />
+              </StudentLayout>
+            }
+          />
         </Route>
+
+
         <Route element={<ProtectedTeacher />} >
           <Route
             path="/teacher/dashboard"
@@ -479,6 +552,14 @@ function App() {
             }
           />
           <Route
+            path="/teacher/leave-requests"
+            element={
+              <TeacherLayout>
+                <AdminLeaveRequests />
+              </TeacherLayout>
+            }
+          />
+          <Route
             path="/student-profile/:studentId"
             element={
               <TeacherLayout>
@@ -486,7 +567,34 @@ function App() {
               </TeacherLayout>
             }
           />
+          <Route
+            path="/teacher/leave-requests"
+            element={
+              <TeacherLayout>
+                <AdminLeaveRequests />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/exams"
+            element={
+              <TeacherLayout>
+                <Exams />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/exams/marks/:examId"
+            element={
+              <TeacherLayout>
+                <EnterMarks />
+              </TeacherLayout>
+            }
+          />
         </Route>
+
+
+
         <Route element={<ProtectedParent />} >
           <Route
             path="/parent/dashboard"
@@ -582,6 +690,15 @@ function App() {
               </ParentLayout>
             }
           />
+          <Route
+            path="/parent/report-card/:studentId"
+            element={
+              <ParentLayout>
+                <ReportCard />
+              </ParentLayout>
+            }
+          />
+
         </Route>
       </Routes>
       <ToastContainer limit={1} autoClose={3000} pauseOnHover={false} />

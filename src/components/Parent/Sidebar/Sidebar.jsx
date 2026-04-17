@@ -9,9 +9,15 @@ import Loader from "../../../utils/Loader";
 import { logout } from "../../../api/User/UserApi";
 import { IoClose } from "react-icons/io5";
 import { useSidebar } from "../../../context/SidebarContext";
+import { useUser } from "../../../context/UserContext";
+import { useGetSettings } from "../../../api/Admin/SettingsApi";
+
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { userData } = useUser();
+  // Parent has 'students' relation — first child
+  const childId = userData?.students?.[0]?.id || userData?.id;
   const [quizes, setQuizes] = useState(false);
   const [timetable, setTimetable] = useState(false);
   const [reports, setReports] = useState(false);
@@ -20,6 +26,9 @@ const Sidebar = () => {
   const [dashboard, setDashboard] = useState(true);
   const [loading, setLoading] = useState(false);
   const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
+  const { settings } = useGetSettings();
+
+  const isUniversity = settings?.institutionType === 'university';
 
   const toggleSidebar = () => {
     console.log("here");
@@ -148,7 +157,25 @@ const Sidebar = () => {
             active={fees}
             onpress={handleFeesClick}
           />
+          <Custombutton
+            icon={"graph"}
+            title={"Report Card"}
+            active={false}
+            onpress={() => {
+              setIsSidebarOpen(false);
+              setIsopen(false);
+              navigate(`/parent/report-card/${childId}`);
+            }}
+          />
+
         </div>
+        {isUniversity && (
+          <div className="mt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+             <p className="text-[10px] font-bold text-orange-400 uppercase tracking-widest leading-relaxed">
+               University Mode: Parent access is currently restricted. Please contact the administrator.
+             </p>
+          </div>
+        )}
         {loading && <div className="flex flex-1"> <Loader /> </div>}
         {!loading &&
           <div

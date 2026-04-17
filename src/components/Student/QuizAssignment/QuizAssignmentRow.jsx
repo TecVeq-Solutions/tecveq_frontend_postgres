@@ -13,6 +13,7 @@ import { useUser } from '../../../context/UserContext';
 import { useSidebar } from '../../../context/SidebarContext';
 import { FiEdit } from 'react-icons/fi';
 import ConfirmModal from './ConfirmModal';
+import TakeQuizModal from './TakeQuizModal';
 
 const QuizAssignmentRow = (props) => {
 
@@ -24,17 +25,18 @@ const QuizAssignmentRow = (props) => {
     const [uploadedFileUrl, setUploadedFileUrl] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [isTakeQuizModalOpen, setIsTakeQuizModalOpen] = useState(false);
     const { isSidebarOpen } = useSidebar();
 
     const { userData } = useUser();
 
     const quizAssignmentMutation = useMutation({
-        mutationKey: ["quizAssignment"], mutationFn: async (fileUrl) => {
-            if (!fileUrl) throw new Error("No file uploaded");
+        mutationKey: ["quizAssignment"], mutationFn: async ({ fileUrl, answers }) => {
+            if (!fileUrl && !answers) throw new Error("No data provided");
 
             let results;
             if (props.isQuiz) {
-                results = await submitQiuz({ file: fileUrl }, props.alldata.id)
+                results = await submitQiuz({ file: fileUrl, answers }, props.alldata.id)
             } else {
                 results = await submitAssignment({ file: fileUrl }, props.alldata.id)
             }
@@ -73,10 +75,14 @@ const QuizAssignmentRow = (props) => {
             (url) => {
                 console.log("Submission Cloudinary URL:", url);
                 setUploadedFileUrl(url);
-                quizAssignmentMutation.mutate(url);
+                quizAssignmentMutation.mutate({ fileUrl: url });
             },
             setIsUploading
         );
+    };
+
+    const handleCompleteQuiz = async (answers) => {
+        quizAssignmentMutation.mutate({ answers });
     };
 
     const compareDateAndTime = (dateTimeString) => {
@@ -175,30 +181,42 @@ const QuizAssignmentRow = (props) => {
                             )}
                         </div>
 
-                        {/* Upload */}
                         <div className={`flex-[2] my-1 md:my-0 flex items-center justify-center`}>
                             {props.header ? (
-                                <p className={`md:text-[14px] sm:text-[11px] text-[9px] font-semibold`}>Upload</p>
+                                <p className={`md:text-[14px] sm:text-[11px] text-[9px] font-semibold`}>Action</p>
                             ) : (
                                 !isUploaded ? (
-                                    <>
+                                    <div className="flex flex-col sm:flex-row gap-2">
                                         {(quizAssignmentMutation.isPending || isUploading) && <div><Loader /></div>}
-                                        {!quizAssignmentMutation.isPending && !isUploading &&
-                                            <label htmlFor={`upload-${props.id}`} className='bg-[#6A00FF] cursor-pointer rounded-xl flex items-center justify-center py-1 text-white md:text-[14px] text-[11px] px-2 sm:px-4'>
-                                                Upload
-                                                <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className='hidden' />
-                                            </label>
-                                        }
-                                    </>
+                                        {!quizAssignmentMutation.isPending && !isUploading && (
+                                            <>
+                                                {props.isQuiz && props.alldata?.questions?.length > 0 ? (
+                                                    <button 
+                                                        onClick={() => setIsTakeQuizModalOpen(true)}
+                                                        className='bg-emerald-500 hover:bg-emerald-600 cursor-pointer rounded-xl flex items-center justify-center py-1 text-white md:text-[14px] text-[11px] px-2 sm:px-4 font-bold shadow-sm transition-all'
+                                                    >
+                                                        Take Quiz
+                                                    </button>
+                                                ) : (
+                                                    <label htmlFor={`upload-${props.id}`} className='bg-[#6A00FF] cursor-pointer rounded-xl flex items-center justify-center py-1 text-white md:text-[14px] text-[11px] px-2 sm:px-4'>
+                                                        Upload
+                                                        <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className='hidden' />
+                                                    </label>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
                                 ) : (
                                     <div className='flex justify-center items-center gap-1 sm:gap-2'>
-                                        <div className='bg-[#91919133] rounded-3xl flex items-center justify-center sm:py-2 sm:px-3 py-1 px-2 text-black md:text-[14px] text-[11px]'>
-                                            Uploaded
+                                        <div className='bg-emerald-50 text-emerald-600 font-bold border border-emerald-100 rounded-3xl flex items-center justify-center sm:py-2 sm:px-3 py-1 px-2 text-[10px] md:text-sm shadow-sm uppercase tracking-tight'>
+                                            Completed
                                         </div>
-                                        <label htmlFor={`upload-${props.id}`} className="cursor-pointer text-[#6A00FF] hover:text-blue-600">
-                                            <FiEdit size={18} />
-                                            <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className='hidden' />
-                                        </label>
+                                        {(!props.isQuiz || props.alldata?.questions?.length === 0) && (
+                                            <label htmlFor={`upload-${props.id}`} className="cursor-pointer text-[#6A00FF] hover:text-blue-600">
+                                                <FiEdit size={18} />
+                                                <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className='hidden' />
+                                            </label>
+                                        )}
                                     </div>
                                 )
                             )}
@@ -264,6 +282,13 @@ const QuizAssignmentRow = (props) => {
                     setShowConfirmModal(false);
                     setSelectedFile(null);
                 }}
+            />
+
+            <TakeQuizModal 
+                isOpen={isTakeQuizModalOpen}
+                onClose={() => setIsTakeQuizModalOpen(false)}
+                quiz={props.alldata}
+                onComplete={handleCompleteQuiz}
             />
         </>
     )

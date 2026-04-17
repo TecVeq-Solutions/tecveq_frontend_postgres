@@ -51,6 +51,8 @@ const Sidebar = () => {
     { key: "quiz", title: "Quizzes", icon: "quiz", route: "/teacher/quizzes" },
     { key: "attendence", title: "Attendance", icon: "quiz", route: "/teacher/attendence" },
     { key: "classroom", title: "Classroom", icon: "quiz", route: "/teacher/classroom" },
+    { key: "exams", title: "Examinations", icon: "graph", route: "/teacher/exams" },
+    { key: "leaves", title: "Leave Requests", icon: "announcement", route: "/teacher/leave-requests" },
   ];
 
   const Menubar = () => (

@@ -15,7 +15,8 @@ import {
 } from 'recharts';
 import moment from "moment";
 import LargeLoader from "../../utils/LargeLoader";
-import { getStudentCompleteProfile, addStudentNote } from "../../api/User/UserApi";
+import { getStudentCompleteProfile, addStudentNote, addDisciplineRecord } from "../../api/User/UserApi";
+
 import { sendQuickMessage } from "../../api/UserApis";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -40,7 +41,10 @@ const StudentProfileDashboard = () => {
 
     const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
     const [noteContent, setNoteContent] = useState("");
+    const [isDisciplineModalOpen, setIsDisciplineModalOpen] = useState(false);
+    const [disciplineData, setDisciplineData] = useState({ incident: "", actionTaken: "" });
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+
     const [messageText, setMessageText] = useState("");
 
     const addNoteMutation = useMutation({
@@ -53,6 +57,18 @@ const StudentProfileDashboard = () => {
         },
         onError: (err) => toast.error(err.message || "Failed to add note")
     });
+
+    const addDisciplineMutation = useMutation({
+        mutationFn: (data) => addDisciplineRecord({ studentID: studentId, ...data }),
+        onSuccess: () => {
+            queryClient.invalidateQueries(["studentCompleteProfile", studentId]);
+            toast.success("Discipline record added");
+            setDisciplineData({ incident: "", actionTaken: "" });
+            setIsDisciplineModalOpen(false);
+        },
+        onError: (err) => toast.error(err.message || "Failed to add record")
+    });
+
 
     const sendMessageMutation = useMutation({
         mutationFn: (text) => sendQuickMessage({ receiverId: data?.basicInfo?.guardianId, message: text }),
@@ -108,6 +124,36 @@ const StudentProfileDashboard = () => {
         document.body.removeChild(link);
     };
 
+    const handleDownloadTranscript = async () => {
+        try {
+            const res = await axios.get(`${BACKEND_URL}/gradebook/transcript/${studentId}`);
+            const transcript = res.data;
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += `Official Academic Transcript: ${transcript.studentName}\n`;
+            csvContent += `Roll No,${transcript.rollNo || 'N/A'}\n`;
+            csvContent += `Current Level,${transcript.currentLevel || 'N/A'}\n\n`;
+            csvContent += "ACADEMIC HISTORY\n";
+            csvContent += "Term,Level,Promotion Date,GPA,CGPA\n";
+            
+            transcript.history.forEach(h => {
+                csvContent += `"${h.term}","${h.level}","${moment(h.date).format('YYYY-MM-DD')}",${h.gpa.toFixed(2)},${h.cgpa.toFixed(2)}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${transcript.studentName}_Transcript.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast.success("Transcript downloaded successfully");
+        } catch (error) {
+            console.error("Failed to download transcript:", error);
+            toast.error("Failed to generate transcript");
+        }
+    };
+
     const { data, isLoading, error } = useQuery({
         queryKey: ["studentCompleteProfile", studentId],
         queryFn: () => getStudentCompleteProfile(studentId),
@@ -128,7 +174,8 @@ const StudentProfileDashboard = () => {
     const {
         basicInfo, attendance, assignments, quizzes, fees,
         notifications, leaves, discipline, certificates,
-        library, transport, notes, classes, performanceTrends, classAttendance
+        library, transport, notes, classes, performanceTrends, classAttendance,
+        institutionType
     } = data;
 
     const tabs = [
@@ -420,10 +467,15 @@ const StudentProfileDashboard = () => {
                     >
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Quick Actions</p>
                         {[
-                            { icon: <IoChatbubbleEllipses size={14} />, label: "Message Parent", bg: "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100", dot: "bg-indigo-400", onClick: () => setIsMessageModalOpen(true) },
+                            institutionType !== 'university' && { icon: <IoChatbubbleEllipses size={14} />, label: "Message Parent", bg: "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100", dot: "bg-indigo-400", onClick: () => setIsMessageModalOpen(true) },
                             { icon: <IoDocumentText size={14} />, label: "Download Report", bg: "bg-violet-50 border-violet-100 text-violet-700 hover:bg-violet-100", dot: "bg-violet-400", onClick: handleDownloadReport },
-                            { icon: <IoStar size={14} />, label: "Add Teacher Note", bg: "bg-amber-50 border-amber-100 text-amber-700 hover:bg-amber-100", dot: "bg-amber-400", onClick: () => setIsNoteModalOpen(true) }
-                        ].map(({ icon, label, bg, dot, onClick }) => (
+                            institutionType === 'university' && { icon: <IoLibrary size={14} />, label: "Download Transcript", bg: "bg-emerald-50 border-emerald-100 text-emerald-700 hover:bg-emerald-100", dot: "bg-emerald-400", onClick: handleDownloadTranscript },
+                            { icon: <IoStar size={14} />, label: "Add Teacher Note", bg: "bg-amber-50 border-amber-100 text-amber-700 hover:bg-amber-100", dot: "bg-amber-400", onClick: () => setIsNoteModalOpen(true) },
+                            (userData?.userType === 'admin' || userData?.userType === 'super_admin' || userData?.userType === 'teacher') && (
+                                { icon: <IoWarning size={14} />, label: "Report Incident", bg: "bg-red-50 border-red-100 text-red-700 hover:bg-red-100", dot: "bg-red-400", onClick: () => setIsDisciplineModalOpen(true) }
+                            )
+                        ].filter(Boolean).map(({ icon, label, bg, dot, onClick }) => (
+
                             <button
                                 key={label}
                                 onClick={onClick}
@@ -525,24 +577,25 @@ const StudentProfileDashboard = () => {
                                         </div>
                                     </div>
 
-                                    {/* Parent + Journey */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <GlassCard className="p-5">
-                                            <SectionHeader icon={<IoPerson size={13} />} title="Parent / Guardian" />
-                                            <div className="flex gap-4 items-center mb-4">
-                                                <div className="w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
-                                                    <img src={basicInfo.guardian?.profilePic || profilePlaceholder} className="w-full h-full object-cover" alt="" />
+                                        {institutionType !== 'university' && (
+                                            <GlassCard className="p-5">
+                                                <SectionHeader icon={<IoPerson size={13} />} title="Parent / Guardian" />
+                                                <div className="flex gap-4 items-center mb-4">
+                                                    <div className="w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
+                                                        <img src={basicInfo.guardian?.profilePic || profilePlaceholder} className="w-full h-full object-cover" alt="" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-gray-900 text-sm leading-tight">{basicInfo.guardian?.name || basicInfo.guardianName}</p>
+                                                        <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block">Guardian</span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-gray-900 text-sm leading-tight">{basicInfo.guardian?.name || basicInfo.guardianName}</p>
-                                                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block">Guardian</span>
+                                                <div className="space-y-0">
+                                                    <InfoRow label="Contact" value={basicInfo.guardian?.phoneNumber || basicInfo.guardianPhoneNumber} />
+                                                    <InfoRow label="Email" value={basicInfo.guardian?.email || basicInfo.guardianEmail} />
                                                 </div>
-                                            </div>
-                                            <div className="space-y-0">
-                                                <InfoRow label="Contact" value={basicInfo.guardian?.phoneNumber || basicInfo.guardianPhoneNumber} />
-                                                <InfoRow label="Email" value={basicInfo.guardian?.email || basicInfo.guardianEmail} />
-                                            </div>
-                                        </GlassCard>
+                                            </GlassCard>
+                                        )}
 
                                         {/* Quick stats summary */}
                                         <GlassCard className="p-5">
@@ -1122,6 +1175,38 @@ const StudentProfileDashboard = () => {
                     </button>
                 </div>
             </Modal>
+
+            <Modal isOpen={isDisciplineModalOpen} onClose={() => setIsDisciplineModalOpen(false)} title="Report Behavior Incident" accentColor="red">
+                <div className="space-y-4">
+                    <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Incident Details</label>
+                        <textarea
+                            className="w-full h-24 p-3.5 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-400 outline-none transition-all text-sm resize-none"
+                            placeholder="Describe what happened..."
+                            value={disciplineData.incident}
+                            onChange={(e) => setDisciplineData({ ...disciplineData, incident: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 block">Action Taken</label>
+                        <input
+                            type="text"
+                            className="w-full p-3.5 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-400 outline-none transition-all text-sm"
+                            placeholder="e.g. Warning issued, meeting with parent..."
+                            value={disciplineData.actionTaken}
+                            onChange={(e) => setDisciplineData({ ...disciplineData, actionTaken: e.target.value })}
+                        />
+                    </div>
+                    <button
+                        onClick={() => addDisciplineMutation.mutate(disciplineData)}
+                        disabled={addDisciplineMutation.isPending || !disciplineData.incident.trim()}
+                        className="w-full py-3.5 rounded-xl bg-red-600 text-white text-sm font-bold shadow-lg hover:bg-red-700 active:scale-[0.98] transition-all disabled:opacity-50"
+                    >
+                        {addDisciplineMutation.isPending ? "Recording..." : "Record Incident"}
+                    </button>
+                </div>
+            </Modal>
+
         </div>
     );
 };

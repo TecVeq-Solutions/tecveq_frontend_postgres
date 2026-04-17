@@ -60,7 +60,11 @@ const Sidebar = () => {
     { key: "subjects", title: "Subjects", icon: "subjects", route: "/admin/subjects" },
     { key: "classroom", title: "Classroom", icon: "classroom", route: "/admin/classrooms" },
     { key: "fees", title: "Fees", icon: "levels", route: "/admin/fees" },
+    { key: "exams", title: "Examinations", icon: "graph", route: "/admin/exams" },
+    { key: "leaveRequests", title: "Leave Requests", icon: "announcement", route: "/admin/leave-requests" },
+
     { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" }
+
   ];
 
   const { userData } = useUser();

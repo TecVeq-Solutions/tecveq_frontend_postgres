@@ -13,6 +13,7 @@ import { experience, qualification } from '../../../constants/teacher';
 import { emailPattern, namePattern, passwordPattern } from '../../../constants/pattern';
 import useClickOutside from '../../../hooks/useClickOutlise';
 import { useBlur } from '../../../context/BlurContext';
+import { useGetSettings } from '../../../api/Admin/SettingsApi';
 
 const CustomInput = ({ label, placeholder, type, required = false, name, defaultValue }) => {
     return (
@@ -47,7 +48,7 @@ const CustomInput = ({ label, placeholder, type, required = false, name, default
 };
 
 
-const Selectable = ({ label, role, setRole }) => {
+const Selectable = ({ label, role, setRole, settings }) => {
     return (
         <div className='flex flex-col text-start py-1'>
             <div className='flex flex-col gap-1'>
@@ -62,7 +63,9 @@ const Selectable = ({ label, role, setRole }) => {
                         localStorage.setItem('addUserFormData', JSON.stringify(formData));
                     }} className='border outline-none rounded-md border-black/20 px-4 w-full py-[8px]'>
                         <option value="student">Student</option>
-                        {/* <option value="parent">Parent</option> */}
+                        {settings?.institutionType !== 'university' && (
+                           <option value="parent">Parent</option>
+                        )}
                         <option value="teacher">Teacher</option>
                     </select>
                 </div>
@@ -162,6 +165,7 @@ const AddUserModal = ({ closeModal, refetch }) => {
 
 
     const { allLevels } = useAdmin();
+    const { settings } = useGetSettings();
     const [role, setRole] = useState(() => {
         const formData = JSON.parse(localStorage.getItem('addUserFormData') || '{}');
         return formData.role || "student";
@@ -323,7 +327,7 @@ const AddUserModal = ({ closeModal, refetch }) => {
                     <div className='flex flex-col bg-white h-full px-2 sm:px-10 py-4'>
                         <form onSubmit={handleSubmit}>
                             <div className=''>
-                                <Selectable label={"Occupation"} role={role} setRole={setRole} />
+                                <Selectable label={"Occupation"} role={role} setRole={setRole} settings={settings} />
                                 {role == "student" ?
                                     <>
                                         <CustomInput label={"Name"} type="text" placeholder={"Enter your Name"} required name="name" defaultValue={initialFormData.name} />

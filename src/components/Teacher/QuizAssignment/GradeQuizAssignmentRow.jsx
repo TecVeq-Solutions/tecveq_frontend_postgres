@@ -10,8 +10,9 @@ const GradeQuizAssignmentRow = React.memo((props) => {
 
 
   const handleChange = (field) => (event) => {
-    console.log("field data is : ", field, event.target.value)
-    props.setInputField(props.id, field, event.target.value);
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    console.log("field data is : ", field, value)
+    props.setInputField(props.id, field, value);
   };
 
 
@@ -176,17 +177,35 @@ const GradeQuizAssignmentRow = React.memo((props) => {
           <div
             className={`${props.header
               ? "hidden"
-              : "py-4 flex gap-4 items-center px-10 flex-1"
+              : "py-4 flex flex-col gap-4 px-10 flex-1 border-t border-gray-50 bg-gray-50/50"
               }`}
           >
-            <p>Feedback: </p>
-            <input
-              type="text"
-              placeholder="Feedback"
-              value={props.feedback}
-              onChange={handleChange('feedback')}
-              className="flex w-4/5 px-2 py-2 border rounded-lg outline-none border-black/20"
-            />
+            <div className="flex gap-4 items-center">
+              <p className="font-bold text-gray-500 text-sm">Feedback: </p>
+              <input
+                type="text"
+                placeholder="Enter detailed feedback..."
+                value={props.feedback || ""}
+                onChange={handleChange('feedback')}
+                className="flex w-4/5 px-4 py-2 border rounded-lg outline-none border-black/10 focus:ring-2 focus:ring-indigo-100"
+              />
+            </div>
+            
+            {!props.isQuiz && (
+            <div className="flex gap-2 items-center pl-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                 <input 
+                   type="checkbox" 
+                   checked={props.isPlagiarized || false}
+                   onChange={handleChange('isPlagiarized')}
+                   className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500 accent-red-600"
+                 />
+                 <span className={`text-sm font-bold ${props.isPlagiarized ? 'text-red-600' : 'text-gray-500'}`}>
+                   Flag as Plagiarized / Unoriginal Content
+                 </span>
+              </label>
+            </div>
+            )}
           </div>
           : <></>}
       </div>

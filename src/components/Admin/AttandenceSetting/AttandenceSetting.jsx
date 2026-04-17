@@ -1,40 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useAddHeadSettings, useGetHeadSettings, useUpdateHeadSettings } from '../../../api/Admin/SettingsApi';
+import { useGetSettings, useUpdateSettings } from '../../../api/Admin/SettingsApi';
 import { Link, useNavigate } from 'react-router-dom';
 
 const AttandenceSetting = () => {
 
-    const [isEnableHeadSetting, setIsEnableHeadSetting] = useState(false); // State for checkbox
-    const [settingId, setSettingId] = useState(null); // State to store ID
+    const [isEnableHeadSetting, setIsEnableHeadSetting] = useState(false);
+    
+    const { settings, isLoading: isGetLoading } = useGetSettings();
+    const { updateSettings, isLoading: isUpdateLoading } = useUpdateSettings();
 
-    // Fetch head settings
-    const { headSettings, isLoading: isGetHeadSettingLoading } = useGetHeadSettings();
-
-    // Mutations for add and update
-    const { addHeadSettings, isLoading: isAddHeadSettingLoading } = useAddHeadSettings();
-    const { updateHeadSettings, isLoading: isUpdateHeadSettingLoading } = useUpdateHeadSettings();
-
-    // Handle checkbox change
     const handleCheckboxChange = () => {
-        const newValue = !isEnableHeadSetting; // Toggle value
+        const newValue = !isEnableHeadSetting;
         setIsEnableHeadSetting(newValue);
-
-        if (settingId) {
-            // If setting exists, update it
-            updateHeadSettings({ settingId, enableHeadAttendance: newValue });
-        } else {
-            // Otherwise, add a new setting
-            addHeadSettings({ enableHeadAttendance: newValue });
-        }
+        updateSettings({ enableHeadAttendance: newValue });
     };
 
-    // Sync API data to component state
     useEffect(() => {
-        if (!isGetHeadSettingLoading && headSettings) {
-            setIsEnableHeadSetting(headSettings?.attendenceSetting?.enableHeadAttendance || false); // Set checkbox state
-            setSettingId(headSettings?.id || null); // Store setting ID if present
+        if (!isGetLoading && settings) {
+            setIsEnableHeadSetting(settings.enableHeadAttendance || false);
         }
-    }, [headSettings, isGetHeadSettingLoading]); // Watch for changes
+    }, [settings, isGetLoading]);
 
 
 

@@ -8,11 +8,12 @@ import LastDeliverables from "../../../components/Teacher/Dashboard/LastDelivera
 import { useBlur } from "../../../context/BlurContext";
 import { useTeacher } from "../../../context/TeacherContext";
 import { useSidebar } from "../../../context/SidebarContext"
-const Dashboard = () => {
+import TeacherGradingWidget from "../../../components/Teacher/Dashboard/TeacherGradingWidget";
 
+const Dashboard = () => {
   const { isBlurred } = useBlur();
   const { allAnnouncements } = useTeacher();
-  const { isSidebarOpen } = useSidebar(); // new
+  const { isSidebarOpen } = useSidebar(); 
 
   return (
     <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
@@ -39,7 +40,9 @@ const Dashboard = () => {
             <div className="flex-[6] flex w-full">
               <MyClasses />
             </div>
-            <div className="flex-[3.5] flex w-full"><LastDeliverables /> </div>
+            <div className="flex-[3.5] flex w-full">
+              <TeacherGradingWidget />
+            </div>
           </div>
         </div>
       </div>

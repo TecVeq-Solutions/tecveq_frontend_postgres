@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useBlur } from "../../../context/BlurContext";
 import { useAdmin } from "../../../context/AdminContext";
 import { deleteUser, updateUser } from "../../../api/Admin/UsersApi";
+import { useGetSettings } from "../../../api/Admin/SettingsApi";
 
 const ManageUsers = () => {
 
@@ -27,7 +28,7 @@ const ManageUsers = () => {
   const [isAddUserModal, setIsAddUserModal] = useState(false);
   const [isEditUserModal, setIsEditUserModal] = useState(false);
   const { adminUsersDataPending, adminUsersData, adminUsersRefecth } = useAdmin();
-
+  const { settings } = useGetSettings();
 
   const toggleRequestModal = () => {
     setRequestsModal(!requestsModal);
@@ -137,7 +138,9 @@ const ManageUsers = () => {
                         >
                           <option value="student" className="px-2 py-1">Student</option>
                           <option value="teacher" className="px-2 py-1">Teacher</option>
-                          <option value="parent" className="px-2 py-1">Parent</option>
+                          {settings?.institutionType !== 'university' && (
+                             <option value="parent" className="px-2 py-1">Parent</option>
+                          )}
                         </select>
                       </div>
 

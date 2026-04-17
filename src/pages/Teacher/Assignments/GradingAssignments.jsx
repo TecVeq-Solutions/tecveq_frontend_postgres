@@ -77,11 +77,12 @@ const GradingAssignments = () => {
     let objArray = [];
     let obj = {};
     gradingData.forEach((item) => {
-      if (item.marks !== "" || item.grade !== "" || item.feedback !== "") {
+      if (item.marks !== "" || item.grade !== "" || item.feedback !== "" || item.isPlagiarized) {
         obj = {
           grade: item.grade,
           marks: item.marks,
           feedback: item.feedback,
+          isPlagiarized: item.isPlagiarized || false,
           studentID: item.studentID.id
         }
         objArray.push(obj);
@@ -143,6 +144,7 @@ const GradingAssignments = () => {
           ...item,
           grade: item.submission?.grade || "",
           feedback: item.submission?.feedback || "",
+          isPlagiarized: item.submission?.isPlagiarized || false,
           marks: item.submission?.marks !== null && item.submission?.marks !== undefined ? item.submission.marks : ""
         }
       })
@@ -279,6 +281,7 @@ const GradingAssignments = () => {
                   setInputField={setInputField}
                   id={submission?.studentID?.id}
                   feedback={submission?.feedback}
+                  isPlagiarized={submission?.isPlagiarized}
                   name={submission?.studentID?.name}
                   marksObtained={submission?.marksObtained}
                   submission={submission?.submission?.submittedAt || "Not Submitted Yet"}
