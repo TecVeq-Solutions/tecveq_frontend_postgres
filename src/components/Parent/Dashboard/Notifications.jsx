@@ -71,10 +71,10 @@ const Notifications = ({ onclose, dashboard, data }) => {
           <div className="flex items-center gap-2 ml-10">
             <img src={pdf} alt="" className="w-12 h-12" />
             <div className="text-grey_700">
-              <a 
-                href={item.files[0]?.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href={item.files[0]?.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-sm font-medium hover:underline"
               >
                 {item.files[0]?.name || "Assignment File"}
@@ -184,10 +184,10 @@ const Notifications = ({ onclose, dashboard, data }) => {
               }
 
               return combined.slice(0, 15).map((item) => (
-                <Notification 
-                  key={item.id} 
-                  item={item} 
-                  isAssignment={item._isAssignment} 
+                <Notification
+                  key={item.id}
+                  item={item}
+                  isAssignment={item._isAssignment}
                 />
               ));
             })()

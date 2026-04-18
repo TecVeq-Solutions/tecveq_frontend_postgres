@@ -125,7 +125,7 @@ const MyCalendar = ({ data, isPending, refetch }) => {
           )
         }
       </div>
-      <div className="w-full h-[80vh] overflow-y-auto">
+      <div className="w-full h-[700px] sm:h-[800px] lg:h-[calc(100vh-200px)] min-h-[500px] overflow-x-auto overflow-y-hidden border border-grey/20 rounded-lg">
         <Calendar
           style={{}}
           formats={{ dayRangeHeaderFormat }}
@@ -139,7 +139,7 @@ const MyCalendar = ({ data, isPending, refetch }) => {
           startAccessor="start"
           endAccessor="end"
           onNavigate={handleNavigate}
-          className="w-[99%]"
+          className="w-full"
           dayLayoutAlgorithm="no-overlap"
         step={60}
         timeslots={1}

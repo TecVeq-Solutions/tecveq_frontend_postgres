@@ -78,7 +78,7 @@ export const SideTime = (props) => {
 
   return (
     <>
-      <div className="flex flex-col w-[130px]">
+      <div className="flex flex-col w-[110px]">
         {times.map((time, index) => {
           const startTime = moment.utc(time[0]).tz("Asia/Karachi");
           // Calculate end time based on slot duration or use next slot start

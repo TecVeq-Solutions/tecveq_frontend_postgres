@@ -17,22 +17,38 @@
 } */
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-
+  width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #bdbdbd;
-  border-radius: 4px;
-  border: 1px solid #f5f5f5;
+  background-color: #0b105340;
+  border-radius: 10px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-button {
-  display: none;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #0b105360;
+}
+
+/* Global scrollbar for all pages */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f7fe;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0b105320;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0b105340;
 }
 
 .custom-shadow {
@@ -62,23 +78,24 @@
   }
 } */
 .rbc-calendar {
-  height: 100vh !important;
-  min-height: unset !important;
+  height: 100% !important;
+  min-height: 500px !important;
 }
 /* mobile only */
 @media (max-width: 640px) {
   .rbc-calendar {
-    height: 160vh !important;
+    height: 100% !important;
   }
 
   .rbc-time-content {
-    height: 150vh !important;
+    height: auto !important;
   }
 }
 
 .rbc-time-content {
-  height: 120vh !important;
- /* overflow-y: auto !important; */
+  height: 100% !important;
+  flex: 1 1 0% !important;
+  overflow-y: auto !important;
 }
 
 .rbc-event {
@@ -97,6 +114,8 @@
 
 .rbc-time-view {
   height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
 }
 
 .rbc-time-content {
@@ -105,12 +124,13 @@
 
 .rbc-time-slot {
   min-height: 20px !important;
-  width: 20px !important;
-  /* Allow dynamic height based on time interval */
+  /* Allow dynamic width and height */
 }
 
 .rbc-time-gutter {
-  display: none !important;
+  display: block !important;
+  width: 110px !important;
+  min-width: 110px !important;
 }
 
 .rbc-time-header-cell {
@@ -143,9 +163,8 @@
 
 .rbc-time-slot {
   border: none !important;
-  width: 50px !important;
   min-height: 30px !important;
-  /* Allow flexible height for time slots */
+  /* Allow flexible width and height for time slots */
 }
 
 /*This is for the text in red boxes - rule moved below*/

@@ -34,9 +34,9 @@ const StudentReports = () => {
         <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
           <div className="flex flex-1">
             <div
-              className={`w-full h-screen lg:px-10 sm:px-10 px-3 flex-grow lg:ml-72`}
+              className={`w-full min-h-full lg:px-10 sm:px-10 px-3 flex-grow lg:ml-72`}
             >
-              <div className="h-screen md:pt-6">
+              <div className="min-h-full">
                 <Navbar heading={"Student Details"} />
                 <div className={`${isBlurred ? "blur" : ""}`}>
                   <div className="flex flex-row-reverse my-4 w-full">
@@ -65,7 +65,7 @@ const StudentReports = () => {
 
                     </div>
                   </div>
-                  <div className="mt-4 h-[70%] overflow-auto">
+                  <div className="mt-4 min-h-[400px]">
 
                     <DataRows
                       header={true}

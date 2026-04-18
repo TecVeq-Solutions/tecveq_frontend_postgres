@@ -33,23 +33,23 @@ const Notifications = ({ onclose, dashboard, data }) => {
     const [moredetails, setMoredetails] = useState(false);
 
     // Extract details based on whether it's an assignment or a generic notification
-    const teacherName = isAssignment 
+    const teacherName = isAssignment
       ? (item?.createdBy?.name || "Teacher")
       : (item?.userID?.name || "Teacher");
-    
-    const timeDisplay = isAssignment 
-      ? formatDate(item?.dueDate) 
+
+    const timeDisplay = isAssignment
+      ? formatDate(item?.dueDate)
       : formatDate(item?.createdAt);
-      
-    const message = isAssignment 
-      ? "Added an Assignment" 
+
+    const message = isAssignment
+      ? "Added an Assignment"
       : (item?.message || "Notification");
 
-    const subjectName = isAssignment 
+    const subjectName = isAssignment
       ? (item?.subjectID?.name || "Subject")
       : (item?.subjectName || "");
-      
-    const className = isAssignment 
+
+    const className = isAssignment
       ? (item?.classroomID?.name || "Class")
       : (item?.classroomName || "");
 
@@ -83,10 +83,10 @@ const Notifications = ({ onclose, dashboard, data }) => {
           <div className="flex items-center gap-2 ml-10">
             <img src={pdf} alt="" className="w-12 h-12" />
             <div className="text-grey_700">
-              <a 
-                href={item.files[0]?.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href={item.files[0]?.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-sm font-medium hover:underline"
               >
                 {item.files[0]?.name || "Assignment File"}

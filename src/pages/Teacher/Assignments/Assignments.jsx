@@ -78,7 +78,7 @@ const Assignments = () => {
                     <p className="px-2 py-1 text-sm sm:text-lg sm:px-4 sm:py-2 text-white">Create new +</p>
                   </div>
                 </div>
-                <div className="mt-8 h-[80%] w-full  overflow-x-auto">
+                <div className="mt-8 min-h-[400px] w-full  overflow-x-auto">
 
                   <QuizAssignmentRow
                     isQuiz={false}

@@ -1,186 +1,151 @@
-import React, { useState } from "react";
-import { IoIosLogOut } from "react-icons/io";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Custombutton from "./Custombutton";
 import logo from "../../../assets/logo.png";
-import webinar from "../../../assets/webinar.png";
-import meet from "../../../assets/meet.png";
-import { useNavigate } from "react-router-dom";
-import Loader from "../../../utils/Loader";
-import { logout } from "../../../api/User/UserApi";
+import { IoIosLogOut } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
+import { logout } from "../../../api/User/UserApi";
+import Loader from "../../../utils/Loader";
 import { useSidebar } from "../../../context/SidebarContext";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const [quizes, setQuizes] = useState(false);
-  const [timetable, setTimetable] = useState(false);
-  const [reports, setReports] = useState(false);
-  const [assignments, setAssignments] = useState(false);
-  const [fees, setFees] = useState(false);
-  const [dashboard, setDashboard] = useState(true);
   const [loading, setLoading] = useState(false);
   const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
+  const [activeButton, setActiveButton] = useState("dashboard");
 
-  const toggleSidebar = () => {
-    console.log("here");
-    setIsopen(!isopen);
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  useEffect(() => {
+    const stored = localStorage.getItem("activeButton");
+    if (stored) setActiveButton(stored);
+  }, []);
 
-  const handleDashboardClick = async () => {
-    setDashboard(true);
-    setQuizes(false);
-    setReports(false);
-    setAssignments(false);
-    setFees(false);
-    setTimetable(false);
+  const handleButtonClick = (buttonKey, route) => {
+    setActiveButton(buttonKey);
+    localStorage.setItem("activeButton", buttonKey);
     setIsSidebarOpen(false);
     setIsopen(false);
-    navigate("/parent/dashboard");
+    navigate(route);
   };
-
-  const handleReportsClick = async () => {
-    setDashboard(false);
-    setQuizes(false);
-    setReports(true);
-    setAssignments(false);
-    setFees(false);
-    setTimetable(false);
-    setIsSidebarOpen(false);
-    setIsopen(false);
-    navigate("/parent/reports");
-  };
-
-  const handleQuizzesClick = async () => {
-    setDashboard(false);
-    setQuizes(true);
-    setReports(false);
-    setAssignments(false);
-    setFees(false);
-    setTimetable(false);
-    setIsSidebarOpen(false);
-    setIsopen(false);
-    navigate("/parent/quizzes");
-  };
-
-  const handleAssignmentsClick = async () => {
-    setDashboard(false);
-    setQuizes(false);
-    setReports(false);
-    setAssignments(true);
-    setFees(false);
-    setTimetable(false);
-    setIsSidebarOpen(false);
-    setIsopen(false);
-    navigate("/parent/assignments");
-  };
-  
-  const handleFeesClick = async () => {
-    setDashboard(false);
-    setQuizes(false);
-    setReports(false);
-    setAssignments(false);
-    setFees(true);
-    setTimetable(false);
-    setIsSidebarOpen(false);
-    setIsopen(false);
-    navigate("/parent/fees");
-  };
-
 
   const handleLogoutClick = async () => {
     setLoading(true);
     localStorage.clear();
     const response = await logout();
-    if (response == "error") {
-      console.log("error loggin out")
-      navigate("/")
-    } else {
-      localStorage.clear()
-      navigate("/")
-    }
+    setIsSidebarOpen(false);
+    setIsopen(false);
+    navigate("/");
     setLoading(false);
   };
 
-  const Menubar = () => (
-    <div
-      className={`sm:w-72 w-full sm:h-screen h-full shadow-lg bg-[#0B1053]   px-4 md:px-8 flex flex-col justify-between z-50 relative`}
-    >
-      <div>
-        <div className="text-white flex justify-end items-center ">
-          <IoClose className="w-6 h-6 mt-3 block lg:hidden hover:scale-105 cursor-pointer" onClick={() => {
-            setIsopen(false)
-            setIsSidebarOpen(false)
-          }} />
-        </div>
+  const mainItems = [
+    { key: "dashboard",   title: "Dashboard",   icon: "home",  route: "/parent/dashboard" },
+    { key: "reports",     title: "Reports",     icon: "graph", route: "/parent/reports"   },
+  ];
 
-        <div className="flex justify-start">
-          <img className="sm:w-32 sm:h-10 w-5/12 h-5/12 mb-4 sm:mt-6" src={logo} alt="logo-TCA" />
+  const academicItems = [
+    { key: "assignments", title: "Assignments", icon: "book",  route: "/parent/assignments" },
+    { key: "quizzes",     title: "Quizzes",     icon: "quiz",  route: "/parent/quizzes"     },
+  ];
+
+  const financeItems = [
+    { key: "fees",        title: "Fees",        icon: "levels", route: "/parent/fees"        },
+  ];
+
+  const Menubar = () => (
+    <div className="flex flex-col w-64 h-screen bg-[#0B1053] text-white shadow-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-6 pb-5 border-b border-white/[0.08]">
+        <div>
+          <img className="h-7 w-auto" src={logo} alt="TCA Logo" />
+          <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">Parent Portal</p>
         </div>
-        <div className="flex flex-col gap-1 py-2 border-b border-b-black">
+        <IoClose
+          className="w-5 h-5 block lg:hidden text-white/50 hover:text-white cursor-pointer"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto custom-scrollbar">
+        <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 pb-2">Main</p>
+        {mainItems.map(({ key, title, icon, route }) => (
           <Custombutton
-            icon={"home"}
-            title={"Dashboard"}
-            active={dashboard}
-            onpress={handleDashboardClick}
+            key={key}
+            icon={icon}
+            title={title}
+            active={activeButton === key}
+            onpress={() => handleButtonClick(key, route)}
           />
+        ))}
+
+        <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 pt-4 pb-2">Academics</p>
+        {academicItems.map(({ key, title, icon, route }) => (
           <Custombutton
-            icon={"graph"}
-            title={"Reports"}
-            active={reports}
-            onpress={handleReportsClick}
+            key={key}
+            icon={icon}
+            title={title}
+            active={activeButton === key}
+            onpress={() => handleButtonClick(key, route)}
           />
+        ))}
+
+        <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 pt-4 pb-2">Finance</p>
+        {financeItems.map(({ key, title, icon, route }) => (
           <Custombutton
-            icon={"book"}
-            title={"Assignments"}
-            active={assignments}
-            onpress={handleAssignmentsClick}
+            key={key}
+            icon={icon}
+            title={title}
+            active={activeButton === key}
+            onpress={() => handleButtonClick(key, route)}
           />
-          <Custombutton
-            icon={"quiz"}
-            title={"Quizzes"}
-            active={quizes}
-            onpress={handleQuizzesClick}
-          />
-          <Custombutton
-            icon={"levels"}
-            title={"Fees"}
-            active={fees}
-            onpress={handleFeesClick}
-          />
-        </div>
-        {loading && <div className="flex flex-1"> <Loader /> </div>}
-        {!loading &&
+        ))}
+      </nav>
+
+      {/* Footer / Logout */}
+      <div className="px-3 py-3 border-t border-white/[0.08]">
+        {loading ? (
+          <div className="flex justify-center py-2"><Loader /></div>
+        ) : (
           <div
             onClick={handleLogoutClick}
-            className={`flex items-center gap-4 px-5 py-3 text-lg rounded-md cursor-pointer text-white`}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-150 group"
           >
-            <IoIosLogOut />
-            <p>Logout</p>
+            <IoIosLogOut size={17} className="flex-shrink-0" />
+            <span className="text-sm">Logout</span>
           </div>
-        }
+        )}
       </div>
     </div>
   );
 
   return (
     <div className="flex flex-col">
+      {/* Mobile hamburger */}
       <div
-        className="px-3 py-3 flex justify-end items-center cursor-pointer lg:hidden h-20"
-        onClick={toggleSidebar}
+        className="px-3 py-3 cursor-pointer lg:hidden h-16 flex items-center"
+        onClick={() => { setIsopen(!isopen); setIsSidebarOpen(!isSidebarOpen); }}
       >
-
-        <div className="flex justify-center items-center bg-[#0B1053] border-2 rounded-md w-8 h-8">
-          <div className="flex flex-col gap-2 py-2">
-            <p className="w-5 bg-white h-0.5"></p>
-            <p className="w-5 bg-white h-0.5"></p>
-            <p className="w-5 bg-white h-0.5"></p>
-          </div>
+        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5">
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-3.5 bg-white h-0.5 rounded-full block" />
         </div>
       </div>
-      <div className={`h-full lg:hidden ${isSidebarOpen ? "block" : "hidden"} fixed z-50`}>
-        <Menubar />
+
+      {/* Mobile overlay */}
+      <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
+          <Menubar />
+        </div>
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm -z-10"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
       </div>
+
+      {/* Desktop */}
       <div className="max-lg:hidden">
         <Menubar />
       </div>

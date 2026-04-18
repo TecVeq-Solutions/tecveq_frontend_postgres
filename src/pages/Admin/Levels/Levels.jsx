@@ -55,9 +55,9 @@ const Levels = () => {
                 <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
                     <div className="flex flex-1">
                         <div
-                            className={`w-full h-screen lg:px-10 sm:px-10 px-3 flex-grow lg:ml-72`}
+                            className={`w-full min-h-full lg:px-10 sm:px-10 px-3 flex-grow lg:ml-72`}
                         >
-                            <div className="min-h-screenn md:pt-6">
+                            <div className="min-h-full pb-10">
                                 <Navbar heading={"Level"} />
                                 <div className={`${isBlurred ? "blur" : ""}`}>
                                     <div className="py-2">

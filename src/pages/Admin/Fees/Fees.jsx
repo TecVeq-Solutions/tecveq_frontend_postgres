@@ -48,8 +48,8 @@ const Fees = () => {
     );
 
     return (
-        <div className="w-full bg-[#F9F9F9] font-poppins min-h-screen">
-            <div className={`lg:ml-72 lg:px-10 sm:px-6 px-3 flex-grow h-screen md:pt-4 ${isBlurred ? "blur" : ""}`}>
+        <div className="w-full bg-[#F9F9F9] font-poppins min-h-full pb-10">
+            <div className={`lg:ml-72 lg:px-10 sm:px-6 px-3 flex-grow min-h-full ${isBlurred ? "blur" : ""}`}>
                 <Navbar heading={"Fees Management"} />
                 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-6">

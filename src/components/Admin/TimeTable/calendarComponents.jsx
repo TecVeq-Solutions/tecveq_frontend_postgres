@@ -29,7 +29,7 @@ export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
       />
 
       <div
-        className="cursor-pointer rounded-lg sm:w-full w-72 transition-all duration-200 hover:shadow-md  text-[#0B1053] border-2 border-[#0B1053] mb-1 overflow-hidden"
+        className="cursor-pointer rounded-lg w-full transition-all duration-200 hover:shadow-md  text-[#0B1053] border-2 border-[#0B1053] mb-1 overflow-hidden"
         style={{ height: `${eventHeight - 4}px`, minHeight: `${eventHeight - 4}px` }}
         onClick={() => {
           console.log("Admin event clicked:", event);
@@ -67,7 +67,7 @@ export const SideTime = (props) => {
   const times = props.slotMetrics.groups;
 
   return (
-    <div className="flex flex-col w-[130px]">
+    <div className="flex flex-col w-[110px]">
       {times.map((time, index) => {
         const startTime = moment.utc(time[0]).tz("Asia/Karachi");
         // Calculate end time based on slot duration or use next slot start

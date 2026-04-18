@@ -1,125 +1,168 @@
 import React, { useEffect, useState } from "react";
-import { IoIosLogOut } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 import Custombutton from "./Custombutton";
 import logo from "../../../assets/logo.png";
 import webinar from "../../../assets/webinar.png";
 import meet from "../../../assets/meet.png";
-import { useNavigate } from "react-router-dom";
+import { IoIosLogOut } from "react-icons/io";
+import { IoClose } from "react-icons/io5";
 import { logout } from "../../../api/User/UserApi";
 import { useStudent } from "../../../context/StudentContext";
 import Loader from "../../../utils/Loader";
 import { useSidebar } from "../../../context/SidebarContext";
-import { IoClose } from "react-icons/io5";
-
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
-  const [activeTab, setActiveTab] = useState(() => localStorage.getItem("activeTab") || "dashboard");
+  const { meetingStart, setStudentLogedIn, setAllAnnouncements, setAllQuizes, setAllClasses, setAllAssignments } = useStudent();
+  const [activeButton, setActiveButton] = useState("dashboard");
 
-  const menuItems = [
-    { key: "dashboard", icon: "home", title: "Dashboard", path: "/student/dashboard" },
-    { key: "assignments", icon: "book", title: "Assignments", path: "/assignments" },
-    { key: "quizzes", icon: "quiz", title: "Quizzes", path: "/quizzes" },
-    { key: "reports", icon: "graph", title: "Reports", path: "/reports" },
-    { key: "timetable", icon: "time", title: "Time Table", path: "/timetable" },
-  ];
+  useEffect(() => {
+    const stored = localStorage.getItem("activeButton") || localStorage.getItem("activeTab");
+    if (stored) setActiveButton(stored);
+  }, []);
 
-  const handleMenuClick = (key, path) => {
-    setActiveTab(key);
-    localStorage.setItem("activeTab", key);
+  const handleButtonClick = (buttonKey, route) => {
+    setActiveButton(buttonKey);
+    localStorage.setItem("activeButton", buttonKey);
     setIsSidebarOpen(false);
     setIsopen(false);
-    navigate(path);
+    navigate(route);
   };
-
-  const { meetingStart, setStudentLogedIn, setAllAnnouncements, setAllQuizes, setAllClasses, setAllAssignments } = useStudent();
 
   const handleLogoutClick = async () => {
     setLoading(true);
     localStorage.clear();
-
     setAllQuizes([]);
     setAllClasses([]);
     setAllAssignments([]);
     setStudentLogedIn(false);
     setAllAnnouncements([]);
-
     setIsSidebarOpen(false);
     setIsopen(false);
-    const response = await logout();
+    await logout();
     navigate("/");
     setLoading(false);
   };
 
-  const toggleSidebar = () => setIsopen(!isopen);
+  const mainItems = [
+    { key: "dashboard",   title: "Dashboard",   icon: "home",  route: "/student/dashboard" },
+    { key: "timetable",   title: "Time Table",  icon: "time",  route: "/timetable"         },
+    { key: "reports",     title: "Reports",     icon: "graph", route: "/reports"           },
+  ];
+
+  const academicItems = [
+    { key: "assignments", title: "Assignments", icon: "book",  route: "/assignments"       },
+    { key: "quizzes",     title: "Quizzes",     icon: "quiz",  route: "/quizzes"           },
+  ];
 
   const Menubar = () => (
-    <div className="sm:w-72 w-75 h-lvh shadow-lg lg:mt-3 bg-[#0B1053] px-4 flex flex-col justify-between z-50">
-      <div className="py-5">
-        <div className="text-white flex justify-end items-center ">
-          <IoClose className="w-6 h-6 block sm:hidden hover:scale-105 cursor-pointer" onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+    <div className="flex flex-col w-64 h-screen bg-[#0B1053] text-white shadow-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-6 pb-5 border-b border-white/[0.08]">
+        <div>
+          <img className="h-7 w-auto" src={logo} alt="TCA Logo" />
+          <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">Student Portal</p>
         </div>
-        <div className="flex justify-start">
-          <img className="w-5/12 h-5/12 mb-4" src={logo} alt="logo-TCA" />
-        </div>
-        <div className="flex flex-col gap-1 py-2 border-b border-b-black">
-          {menuItems.map(({ key, icon, title, path }) => (
-            <Custombutton key={key} icon={icon} title={title} active={activeTab === key} onpress={() => handleMenuClick(key, path)} />
-          ))}
-        </div>
-        {loading ? <Loader /> : (
-          <div onClick={handleLogoutClick} className="flex items-center gap-4 px-5 py-3 text-lg rounded-md cursor-pointer text-white">
-            <IoIosLogOut />
-            <p>Logout</p>
-          </div>
-        )}
+        <IoClose
+          className="w-5 h-5 block lg:hidden text-white/50 hover:text-white cursor-pointer"
+          onClick={() => setIsSidebarOpen(false)}
+        />
       </div>
-      {meetingStart?.start && (
-        <div className="flex flex-col gap-1 h-1/3">
-          <div className="flex justify-center mb-4">
-            <img src={webinar} alt="sidebar images" className="w-2/3" />
-          </div>
-          <div className="flex flex-col gap-3 text-xs text-center text-[#0B1053]">
-            <p>Your <span className="font-bold">{meetingStart?.event?.subjectID?.name}</span> class is in progress.</p>
-            <p>You can instantly join from here.</p>
-            <div className="flex justify-center">
-              <a href={meetingStart?.event.meetLink} target="_blank" rel="noopener noreferrer">
-                <div className="flex items-center justify-center w-40 py-2 text-center rounded-md cursor-pointer bg-[#0B1053]">
-                  <img src={meet} alt="meet png" className="w-1/6" />
-                  <p className="text-sm text-white">Join Meeting</p>
-                </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto custom-scrollbar">
+        <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 pb-2">Main</p>
+        {mainItems.map(({ key, title, icon, route }) => (
+          <Custombutton
+            key={key}
+            icon={icon}
+            title={title}
+            active={activeButton === key}
+            onpress={() => handleButtonClick(key, route)}
+          />
+        ))}
+
+        <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 pt-4 pb-2">Academics</p>
+        {academicItems.map(({ key, title, icon, route }) => (
+          <Custombutton
+            key={key}
+            icon={icon}
+            title={title}
+            active={activeButton === key}
+            onpress={() => handleButtonClick(key, route)}
+          />
+        ))}
+
+        {/* Join Meeting Widget */}
+        {meetingStart?.start && (
+          <div className="mt-8 mx-2 p-4 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+            <div className="flex justify-center mb-3">
+              <img src={webinar} alt="Webinar" className="w-20 opacity-80" />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-[11px] text-white/50">Live Class in Progress</p>
+              <p className="text-sm font-medium text-white line-clamp-1">{meetingStart?.event?.subjectID?.name}</p>
+              <a 
+                href={meetingStart?.event.meetLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="mt-4 flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors border border-white/10 group"
+              >
+                <img src={meet} alt="Meet" className="w-4" />
+                <span className="text-xs font-semibold">Join Now</span>
               </a>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </nav>
+
+      {/* Footer / Logout */}
+      <div className="px-3 py-3 border-t border-white/[0.08]">
+        {loading ? (
+          <div className="flex justify-center py-2"><Loader /></div>
+        ) : (
+          <div
+            onClick={handleLogoutClick}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-150 group"
+          >
+            <IoIosLogOut size={17} className="flex-shrink-0" />
+            <span className="text-sm">Logout</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 
   return (
     <div className="flex flex-col">
-      <div className="px-3 cursor-pointer flex items-center lg:hidden h-20" onClick={() => {
-        toggleSidebar()
-        setIsSidebarOpen(!isSidebarOpen)
-      }}>
-        <div className="flex justify-center bg-[#0B1053] border-2 rounded-md w-9">
-          <div className="flex flex-col gap-2 py-2">
-            <p className="w-6 bg-white h-0.5"></p>
-            <p className="w-6 bg-white h-0.5"></p>
-            <p className="w-6 bg-white h-0.5"></p>
-          </div>
+      {/* Mobile hamburger */}
+      <div
+        className="px-3 py-3 cursor-pointer lg:hidden h-16 flex items-center"
+        onClick={() => { setIsopen(!isopen); setIsSidebarOpen(!isSidebarOpen); }}
+      >
+        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5">
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-3.5 bg-white h-0.5 rounded-full block" />
         </div>
       </div>
+
+      {/* Mobile overlay */}
       <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
           <Menubar />
         </div>
         {isSidebarOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 -z-10" onClick={() => setIsSidebarOpen(false)}></div>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm -z-10"
+            onClick={() => setIsSidebarOpen(false)}
+          />
         )}
       </div>
+
+      {/* Desktop */}
       <div className="max-lg:hidden">
         <Menubar />
       </div>

@@ -99,9 +99,9 @@ const Announcements = () => {
 
     return (
         isPending || isRefetching || announceDellMutate?.isPending ? <div className="flex flex-1"> <Loader /> </div> :
-            <div className='flex flex-1 bg-[#f9f9f9]/50 font-poppins'>
-                <div className={`flex-grow sm:w-full w-screen px-4 lg:px-10 sm:px-10 lg:ml-72`}>
-                    <div className=''>
+            <div className='flex flex-1 bg-[#f9f9f9]/50 font-poppins min-h-full'>
+                <div className={`flex-grow w-full px-4 lg:px-10 sm:px-10 lg:ml-72`}>
+                    <div className='min-h-full pb-10'>
                         <div className='flex'>
                             <Navbar heading={"Announcements"} />
                         </div>

@@ -84,7 +84,7 @@ const Quizzes = () => {
                     <p className="px-4 py-2 text-white">Create new +</p>
                   </div>
                 </div>
-                <div className="mt-8 h-[80%] overflow-auto">
+                <div className="mt-8 min-h-[400px]">
 
                   <QuizAssignmentRow
                     isQuiz={true}

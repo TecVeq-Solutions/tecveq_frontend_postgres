@@ -1,66 +1,56 @@
 import React from "react";
-import { BiBookContent } from "react-icons/bi";
-import { CiCalendarDate } from "react-icons/ci";
 import { GoHome } from "react-icons/go";
-import { LuCalendar } from "react-icons/lu";
-import { VscGraph } from "react-icons/vsc";
+import { VscGraph, VscLayers } from "react-icons/vsc";
+import { LuCalendar, LuBookOpen, LuUsers, LuLayoutDashboard } from "react-icons/lu";
+import { CiCalendarDate } from "react-icons/ci";
 import { IoIosSettings } from "react-icons/io";
 import { SiGoogleclassroom } from "react-icons/si";
 import { GiTeacher } from "react-icons/gi";
-import { MdAnnouncement } from "react-icons/md";
+import { MdAnnouncement, MdOutlineSubject } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
-import { SiLevelsdotfyi } from "react-icons/si";
 import { TbReport } from "react-icons/tb";
-import { MdOutlineSubject } from "react-icons/md";
 
+const iconMap = {
+  home: GoHome,
+  time: CiCalendarDate,
+  graph: VscGraph,
+  book: LuBookOpen,
+  quiz: LuCalendar,
+  teachers: GiTeacher,
+  announcement: MdAnnouncement,
+  manageUsers: FaUsers,
+  levels: VscLayers,
+  "attendence-reprt": TbReport,
+  "attendence-report": TbReport,
+  subjects: MdOutlineSubject,
+  classroom: LuLayoutDashboard,
+  setting: IoIosSettings,
+};
 
 const Custombutton = ({ title, active, onpress, icon }) => {
-  return (
-    <div>
-      <div
-        onClick={() => {
-          onpress();
-        }}
-        className={`flex items-center justify-start gap-4 text-lg px-3 w-56 py-2  rounded-md cursor-pointer ${active ? "bg-white opacity-90" : "transparent"
-          }`}
-      >
-        {icon == "home" ? (
-          <GoHome color={`${active ? "#6A00FF" : "white"}`} />
-        ) : icon == "time" ? (
-          <CiCalendarDate color={`${active ? "#6A00FF" : "white"}`} />
-        ) : icon == "graph" ? (
-          <VscGraph color={`${active ? "#6A00FF" : "white"}`} />
-        ) : icon == "book" ? (
-          <BiBookContent color={`${active ? "#6A00FF" : "white"}`} />
-        )
-          : icon == "setting" ? (
-            <IoIosSettings color={`${active ? "#6A00FF" : "white"}`} />
-          ): icon == "classroom" ? (
-            <SiGoogleclassroom color={`${active ? "#6A00FF" : "white"}`} />
-          )
-          : icon == "teachers" ? (
-            <GiTeacher color={`${active ? "#6A00FF" : "white"}`} />
-          )
-          : icon == "announcement" ? (
-            <MdAnnouncement color={`${active ? "#6A00FF" : "white"}`} />
-          )
-          : icon == "manageUsers" ? (
-            <FaUsers color={`${active ? "#6A00FF" : "white"}`} />
-          )
-          : icon == "levels" ? (
-            <SiLevelsdotfyi color={`${active ? "#6A00FF" : "white"}`} />
-          )
-          : icon == "attendence-report" ? (
-            <TbReport color={`${active ? "#6A00FF" : "white"}`} />
-          )
-          : icon == "subjects" ? (
-            <MdOutlineSubject color={`${active ? "#6A00FF" : "white"}`} />
-          ) : (
-            (icon = "quiz" ? <LuCalendar color={`${active ? "#6A00FF" : "white"}`} /> : "")
+  const Icon = iconMap[icon] || LuCalendar;
 
-          )}
-        <p className={`${active ? "text-[#6A00FF]" : "text-white"}`}>{title}</p>
-      </div>
+  return (
+    <div
+      onClick={onpress}
+      className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150 group
+        ${active ? "bg-white/10" : "hover:bg-white/[0.06]"}`}
+    >
+      {active && (
+        <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-[#e8e9f5] rounded-r-full" />
+      )}
+      <Icon
+        size={17}
+        className={`flex-shrink-0 transition-opacity ${active ? "opacity-100" : "opacity-50 group-hover:opacity-70"}`}
+        color="white"
+      />
+      <span
+        className={`text-sm transition-all ${
+          active ? "text-white font-medium" : "text-white/55 group-hover:text-white/75"
+        }`}
+      >
+        {title}
+      </span>
     </div>
   );
 };

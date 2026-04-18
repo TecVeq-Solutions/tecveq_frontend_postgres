@@ -106,8 +106,8 @@ const ManageUsers = () => {
       <>
         <div className="w-full bg-[#F9F9F9] font-poppins">
           <div className="flex flex-1">
-            <div className={`w-full h-screen lg:px-10 sm:px-6 px-3 flex-grow lg:ml-72`}>
-              <div className="h-screen md:pt-4">
+            <div className={`w-full min-h-full lg:px-10 sm:px-6 px-3 flex-grow lg:ml-72`}>
+              <div className="min-h-full">
                 <Navbar heading={"Manage Users"} />
                 <div className={`${isBlurred ? "blur" : ""}`}>
 
@@ -175,7 +175,7 @@ const ManageUsers = () => {
                   </div>
                   {/* ─── End Toolbar ─── */}
 
-                  <div className="my-2 h-[70%] overflow-x-auto overflow-y-auto">
+                  <div className="my-2 min-h-[400px] overflow-x-auto">
                     <DataRows
                       header={true}
                       role={"Role"}
