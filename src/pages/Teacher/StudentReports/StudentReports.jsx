@@ -6,7 +6,7 @@ import useClickOutside from "../../../hooks/useClickOutlise";
 import DataRows from "../../../components/Teacher/StudentReports/DataRows";
 
 import { FiFilter } from "react-icons/fi";
-import { IoSearch } from "react-icons/io5";
+import { IoClose, IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 import { useBlur } from "../../../context/BlurContext";
@@ -26,104 +26,115 @@ const FilterPopup = ({
   setClassroom,
 }) => {
   const ref = useRef(null);
-
   useClickOutside(ref, () => setopen(false));
   const { allClassrooms, allSubjects } = useTeacher();
 
-
-
-  console.log(classroom, "all classroom");
-
-
-  const {
-    data: teacherSubjectOfClassroom,
-
-  } = useQuery({
-    queryKey: ["teacherSubjectsOfClassrooms", classroom?.id,],
-    queryFn: async () => {
-
-      return await getTeacherSubjectsOfClassroom({ classroomIDs: [classroom.id] });
-    },
+  const { data: teacherSubjectOfClassroom } = useQuery({
+    queryKey: ["teacherSubjectsOfClassrooms", classroom?.id],
+    queryFn: async () => await getTeacherSubjectsOfClassroom({ classroomIDs: [classroom.id] }),
     enabled: !!classroom?.id,
   });
 
-  console.log(teacherSubjectOfClassroom, "teacherSubjectOfClassroom");
-
-
+  if (!open) return null;
 
   return (
     <div
       ref={ref}
-      className={`absolute z-10 top-40 bg-white p-8 w-[400px] text-black rounded-xl sm:right-48 ${open ? "" : "hidden"
-        }`}
+      className="absolute z-20 top-44 right-0 sm:right-12 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
     >
-      <div className="flex gap-2">
-        <div className="flex flex-col w-full gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex w-[fit] gap-2 items-center">
-              <p className="p-3 text-xl font-semibold cursor-text editingName">
-                Filter
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <img
-                src={IMAGES.CloseIcon}
-                className="w-[15px] h-[15px] cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setopen(false);
-                }}
-              />
-            </div>
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+              stroke="#6A00FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col flex-1 gap-1">
-              <p className="text-xs font-semibold text-grey_700">Class</p>
-              <div className="flex justify-between border-[1.5px] py-2 px-4 rounded-lg w-full items-center border-grey/50">
-                <select
-                  value={JSON.stringify(classroom)}
-                  onChange={(e) => setClassroom(JSON.parse(e.target.value))}
-                  className="w-full outline-none cursor-pointer"
-                >
-                  <option value="">Select Class</option>
-                  {allClassrooms?.map((item) => (
-                    <option key={item.id} value={JSON.stringify(item)}>{item.name}</option>
-                  ))}
-                </select>
+          <span className="text-sm font-semibold text-gray-800">Filter</span>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); setopen(false); }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+        >
+          <IoClose size={16} />
+        </button>
+      </div>
 
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col flex-1 gap-1">
-              <p className="text-xs font-semibold text-grey_700">Subject</p>
-              <div className="flex justify-between border-[1.5px] py-2 px-4 rounded-lg w-full items-center border-grey/50">
-                <select
-                  value={JSON.stringify(subject)}
-                  onChange={(e) => setSubject(JSON.parse(e.target.value))}
-                  className="w-full outline-none cursor-pointer"
-                >
-                  <option value="">Select Subject</option>
-                  {teacherSubjectOfClassroom?.subjects?.map((item) => (
-                    <option key={item.id} value={JSON.stringify(item)}>{item.subjectName}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3"></div>
-          <div className="flex items-center gap-3">
-            <div
-              onClick={() => {
-                applyFilter();
-                setopen(false);
-              }}
-              className="flex items-center justify-center w-full py-2 text-center rounded-md cursor-pointer bg-[#6A00FF]"
+      {/* Fields */}
+      <div className="flex flex-col gap-4 px-5 py-4">
+
+        {/* Classroom */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            Classroom
+          </label>
+          <div className="relative">
+            <select
+              value={JSON.stringify(classroom)}
+              onChange={(e) => setClassroom(JSON.parse(e.target.value))}
+              className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 pr-9 text-sm text-gray-700 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition-all cursor-pointer"
             >
-              <p className="text-sm text-white">Apply</p>
-            </div>
+              <option value="">Select classroom</option>
+              {allClassrooms?.map((item) => (
+                <option key={item.id} value={JSON.stringify(item)}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+            <svg
+              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
+              width="13" height="13" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </div>
         </div>
+
+        {/* Subject */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            Subject
+          </label>
+          <div className="relative">
+            <select
+              value={JSON.stringify(subject)}
+              onChange={(e) => setSubject(JSON.parse(e.target.value))}
+              disabled={!classroom?.id}
+              className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 pr-9 text-sm text-gray-700 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="">
+                {!classroom?.id ? "Select a classroom first" : "Select subject"}
+              </option>
+              {teacherSubjectOfClassroom?.subjects?.map((item) => (
+                <option key={item.id} value={JSON.stringify(item)}>
+                  {item.subjectName}
+                </option>
+              ))}
+            </select>
+            <svg
+              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
+              width="13" height="13" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+          {!classroom?.id && (
+            <p className="text-[10px] text-gray-400 px-0.5">
+              Choose a classroom to load subjects
+            </p>
+          )}
+        </div>
+
+        {/* Apply Button */}
+        <button
+          onClick={() => { applyFilter(); setopen(false); }}
+          className="w-full py-2.5 rounded-xl bg-[#6A00FF] hover:bg-[#5800D6] text-white text-sm font-semibold shadow-md shadow-purple-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+        >
+          Apply Filter
+        </button>
       </div>
     </div>
   );

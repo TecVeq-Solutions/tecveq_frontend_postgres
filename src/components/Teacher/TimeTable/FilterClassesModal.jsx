@@ -1,37 +1,36 @@
 import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
-import FilterButton from "./FilterButton";
 import IMAGES from "../../../assets/images";
 
 import { FiClock } from "react-icons/fi";
 import { GoDotFill } from "react-icons/go";
-import { MdKeyboardArrowLeft } from "react-icons/md";
-import { MdKeyboardArrowRight } from "react-icons/md";
-import { useTeacher } from "../../../context/TeacherContext";
-import moment from "moment";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
+import { Calendar, SlidersHorizontal } from "lucide-react";
+import moment from "moment";
 import useClickOutside from "../../../hooks/useClickOutlise";
 
-
-const FilterClassesModal = ({ setAddModalOpen, setaddModalOpen, classData, isPending, }) => {
-
-  
-
-  const [selectedDate, setSelectedDate] = useState(new Date(Date.now()).toDateString());
-  const [filteredclasses, setFilteredClasses] = useState([]);
-
-  const [filterEndDate, setFilterEndDate] = useState();
+const FilterClassesModal = ({ setAddModalOpen, setaddModalOpen, classData, isPending }) => {
+  const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
+  const [filteredClasses, setFilteredClasses] = useState([]);
+  const [filterEndDate, setFilterEndDate] = useState("");
+  const [filterStartDate, setFilterStartDate] = useState("");
   const [filterActive, setFilterActive] = useState(false);
-  const [filterStartDate, setFilterSatrtDate] = useState();
 
   const filterClasses = () => {
-    console.log("selected Date is : ", selectedDate);
-    let arr = [];
-    arr = classData && classData.filter((item) => new Date(item.startTime).getDate() == new Date(selectedDate).getDate());
-    if (filterActive) {
-      arr = classData && classData.filter((item) => new Date(item.startTime).getDate() >= new Date(filterStartDate).getDate() && new Date(item.startTime).getDate() <= new Date(filterEndDate).getDate());
+    if (!classData) return setFilteredClasses([]);
+
+    let arr;
+    if (filterActive && filterStartDate && filterEndDate) {
+      arr = classData.filter((item) => {
+        const d = new Date(item.startTime).getDate();
+        return d >= new Date(filterStartDate).getDate() && d <= new Date(filterEndDate).getDate();
+      });
+    } else {
+      arr = classData.filter(
+        (item) => new Date(item.startTime).toDateString() === new Date(selectedDate).toDateString()
+      );
     }
-    console.log("filtererd are is : ", arr);
     setFilteredClasses(arr);
   };
 
@@ -39,231 +38,239 @@ const FilterClassesModal = ({ setAddModalOpen, setaddModalOpen, classData, isPen
     filterClasses();
   }, [selectedDate, classData, filterActive]);
 
-  const EventComponet = ({ item }) => {
-    return (
-      <div className={`flex flex-col text-xs gap-1 px-2 py-2 rounded-lg w-72`}>
-        <div className="flex gap-2">
-          <div className="">
-            <img src={IMAGES.MathIcon} alt="" className="w-10 h-10 rounded-md" />
-          </div>
-          <div className="flex flex-col justify-between">
-            <div className="flex justify-between">
-              <p className="text-sm font-semibold">{item.subjectID.name}</p>
-              <p className="text-[#0B1053]">Class {item.classroom.name}</p>
-            </div>
-            <div className="flex gap-2 text-xs font-light">
-              <p className="flex items-center gap-1">
-                <FiClock />
-                {moment(item.startTime).format("DD-MM-YYYY")}
-              </p>
-              <p className="flex items-center gap-1">
-                <FiClock />
-                {moment(item.startTime).format("h:mm a")}-{moment(item.endTime).format("h:mm a")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  const handleApplyFilters = () => {
+    if (filterStartDate && filterEndDate) {
+      setFilterActive(true);
+    }
   };
 
-  const CustomCalender = ({ setSelectedDateFromChild, selectedDateFromChild, classesArray }) => {
-    const [selectedDate, setSelectedDate] = useState(dayjs());
+  const handleClearFilters = () => {
+    setFilterActive(false);
+    setFilterStartDate("");
+    setFilterEndDate("");
+  };
 
-    const [dateForEvent, setDateForEvent] = useState("");
+  const ref = useRef(null);
+  useClickOutside(ref, () => setAddModalOpen(false));
+
+  /* ── Event Card ── */
+  const EventCard = ({ item }) => (
+    <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
+      <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 overflow-hidden">
+        <img src={IMAGES.MathIcon} alt="" className="w-8 h-8 object-cover rounded-lg" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-gray-800 truncate">{item.subjectID?.name}</p>
+          <span className="text-[10px] font-medium text-[#0B1053] bg-indigo-50 px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap">
+            {item.classroom?.name}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 mt-1">
+          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+            <Calendar size={11} />
+            {moment(item.startTime).format("DD MMM YYYY")}
+          </span>
+          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+            <FiClock size={11} />
+            {moment(item.startTime).format("h:mm a")} – {moment(item.endTime).format("h:mm a")}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ── Calendar ── */
+  const CustomCalendar = ({ setSelectedDateFromChild, selectedDateFromChild, classesArray }) => {
+    const [currentMonth, setCurrentMonth] = useState(dayjs());
 
     const renderDays = () => {
-      const startOfMonth = selectedDate.startOf("month");
-      const endOfMonth = selectedDate.endOf("month");
-
-      const days = [];
-
-      // Calculate the starting day of the week (0 = Sunday, 1 = Monday)
+      const startOfMonth = currentMonth.startOf("month");
       let currentDay = startOfMonth.startOf("week");
-
-      // Fill days for a complete 6-week grid (42 days)
+      const days = [];
       for (let i = 0; i < 42; i++) {
         days.push(currentDay);
         currentDay = currentDay.add(1, "day");
       }
 
-      // Render days
       return days.map((day) => {
         const formattedDate = day.format("YYYY-MM-DD");
-        const isCurrentMonth = day.month() === selectedDate.month();
+        const isCurrentMonth = day.month() === currentMonth.month();
         const isToday = day.isSame(new Date(), "day");
+        const isSelected = !filterActive && selectedDateFromChild === formattedDate;
+        const isRangeEdge =
+          filterActive &&
+          (new Date(formattedDate).toDateString() === new Date(filterStartDate).toDateString() ||
+            new Date(formattedDate).toDateString() === new Date(filterEndDate).toDateString());
+        const isInRange =
+          filterActive &&
+          filterStartDate &&
+          filterEndDate &&
+          new Date(formattedDate) > new Date(filterStartDate) &&
+          new Date(formattedDate) < new Date(filterEndDate);
 
-        const eventsForDay = classesArray
-          ? classesArray.filter(
-            (event) =>
-              new Date(event.startTime).toDateString() ===
-              new Date(formattedDate).toDateString()
-          )
-          : [];
+        const hasEvents = classesArray?.some(
+          (event) => new Date(event.startTime).toDateString() === new Date(formattedDate).toDateString()
+        );
 
         return (
           <div
             key={formattedDate}
-            className={`text-center text-[12px] cursor-pointer hover:bg-gray-200 ${isToday ? "bg-yellow_green_light w-10 h-10 rounded-full text-white" : "text-black"} ${!isCurrentMonth ? "text-gray-400" : ""}`}
             onClick={() => {
-              setSelectedDate(day);
-              setDateForEvent(formattedDate);
+              setCurrentMonth(day);
               setSelectedDateFromChild(formattedDate);
             }}
+            className={`relative flex flex-col items-center justify-center w-9 h-9 rounded-full cursor-pointer text-xs transition-all mx-auto
+              ${isToday && !isSelected && !isRangeEdge ? "ring-2 ring-[#0B1053]/20 font-semibold" : ""}
+              ${isSelected || isRangeEdge ? "bg-[#0B1053] text-white" : ""}
+              ${isInRange ? "bg-indigo-50 text-[#0B1053]" : ""}
+              ${!isCurrentMonth ? "text-gray-300" : isSelected || isRangeEdge ? "text-white" : "text-gray-700"}
+              ${!isSelected && !isRangeEdge ? "hover:bg-gray-100" : ""}
+            `}
           >
-            <div
-              className={`flex flex-col w-10 h-10 items-center px-5 py-1 rounded-full ${!filterActive && selectedDateFromChild == formattedDate
-                ? "bg-[#0B1053] text-white"
-                : ""
-                } ${filterActive &&
-                  (new Date(formattedDate).toDateString() ===
-                    new Date(filterStartDate).toDateString() ||
-                    new Date(formattedDate).toDateString() ===
-                    new Date(filterEndDate).toDateString())
-                  ? "bg-[#0B1053] text-white"
-                  : ""
-                } group hover:bg-[#0B1053] hover:text-white`}
-            >
-              <div className="text-sm">{day.format("D")}</div>
-
-              {eventsForDay.length > 0 && (
-                <GoDotFill
-                  size={10}
-                  className="text-[#0B1053] group-hover:text-white"
-                />
-              )}
-            </div>
+            <span>{day.format("D")}</span>
+            {hasEvents && (
+              <span className={`absolute bottom-0.5 w-1 h-1 rounded-full ${isSelected || isRangeEdge ? "bg-white" : "bg-[#0B1053]"}`} />
+            )}
           </div>
         );
       });
     };
 
     return (
-      <div className="text-black">
-        <div className="flex items-center justify-between mb-4">
-          <p
-            className=""
-            onClick={() => setSelectedDate(selectedDate.subtract(1, "month"))}
+      <div>
+        {/* Month Nav */}
+        <div className="flex items-center justify-between mb-4 px-1">
+          <button
+            onClick={() => setCurrentMonth((m) => m.subtract(1, "month"))}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
           >
-            <MdKeyboardArrowLeft className="" size={20} />
-          </p>
-          <h2 className="text-sm">{selectedDate.format("MMMM YYYY")}</h2>
-          <p
-            className=""
-            onClick={() => setSelectedDate(selectedDate.add(1, "month"))}
+            <MdKeyboardArrowLeft size={18} />
+          </button>
+          <p className="text-sm font-semibold text-gray-800">{currentMonth.format("MMMM YYYY")}</p>
+          <button
+            onClick={() => setCurrentMonth((m) => m.add(1, "month"))}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
           >
-            <MdKeyboardArrowRight className="" size={20} />
-          </p>
+            <MdKeyboardArrowRight size={18} />
+          </button>
         </div>
-        <div className="flex w-full gap-2 my-3 text-xs">
-          <div className="flex justify-around flex-1 w-full gap-1">
-            <div className="flex px-4 py-2 border rounded-lg border-grey/50">
-              <input type="date" value={filterStartDate} onChange={(e) => setFilterSatrtDate(e.target.value)} placeholder="Jan 19, 2024" className={"w-24 outline-none "} />
-            </div>
-            <p className="flex items-center">-</p>
-            <div className="flex px-4 py-2 border rounded-lg border-grey/50">
-              <input type="date" value={filterEndDate} onChange={(e) => setFilterEndDate(e.target.value)} placeholder="Jan 19, 2024" className={"w-24 outline-none "} />
-            </div>
-          </div>
-        </div>
-        <div className="relative grid grid-cols-7 gap-2">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div key={day} className="px-3 font-semibold text-[10px]">
-              {day}
-            </div>
+
+        {/* Weekday Headers */}
+        <div className="grid grid-cols-7 mb-2">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+            <p key={d} className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider py-1">
+              {d}
+            </p>
           ))}
+        </div>
+
+        {/* Days Grid */}
+        <div className="grid grid-cols-7 gap-y-1">
           {renderDays()}
         </div>
       </div>
     );
   };
 
-  const ButtonComponent = ({ title, color, bgcolor, clickHandler }) => {
-    return (
-      <div className="flex-1 mx-1 my-1">
-        <div
-          onClick={clickHandler}
-          className={`px-6 w-[19/20] justify-center flex py-1 border rounded-lg cursor-pointer border-grey/50 ${bgcolor == "ghost" ? "bg-[#6A00FF]" : "bg-white"
-            }`}
-        >
-          <p className={`${color == "white" ? "text-white" : "text-black"}`}>
-            {title}
-          </p>
-        </div>
-      </div>
-    );
-  };
-
-  const handleApplyFilters = () => {
-    console.log("start date is : ", filterStartDate);
-    console.log("end date is : ", filterEndDate);
-    setFilterActive(true);
-  }
-
-
-  const ref = useRef(null);
-
-  useClickOutside(ref, () => {
-    setAddModalOpen(false);
-
-  });
-
   return (
-    <div className="flex flex-col flex-1 bg-white rounded-md lg:w-96" ref={ref}>
+    <div
+      ref={ref}
+      className="flex flex-col bg-white rounded-2xl shadow-xl border border-gray-100 w-96 overflow-hidden"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+            <SlidersHorizontal size={15} className="text-[#0B1053]" />
+          </div>
+          <span className="text-base font-semibold text-gray-800">Filter Classes</span>
+        </div>
+        <button
+          onClick={() => setAddModalOpen(false)}
+          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+        >
+          <IoClose size={18} />
+        </button>
+      </div>
 
-      <div className="flex justify-between px-5 pb-4 border-b border-b-black/10">
-        <p className="text-xl font-medium">Filter Classes</p>
-        <IoClose
-          onClick={() => {
-            // onclose();
-            setAddModalOpen(false);
-          }}
-          className="cursor-pointer"
+      <div className="flex flex-col gap-4 p-5 overflow-y-auto max-h-[85vh] custom-scrollbar">
+
+        {/* Calendar */}
+        <CustomCalendar
+          classesArray={classData}
+          selectedDateFromChild={selectedDate}
+          setSelectedDateFromChild={setSelectedDate}
         />
 
-      </div>
-
-
-      <div className="flex flex-col flex-1 gap-2">
-        <div className="flex flex-col gap-1 p-3 bg-white rounded-lg">
-          <div className="flex-1 p-2 ">
-            <CustomCalender
-              classesArray={classData}
-              selectedDateFromChild={selectedDate}
-              setSelectedDateFromChild={setSelectedDate}
+        {/* Date Range Filter */}
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date Range</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={filterStartDate}
+              onChange={(e) => setFilterStartDate(e.target.value)}
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 outline-none focus:border-[#0B1053] focus:ring-2 focus:ring-indigo-50 transition-all"
+            />
+            <span className="text-gray-400 text-sm font-medium shrink-0">→</span>
+            <input
+              type="date"
+              value={filterEndDate}
+              onChange={(e) => setFilterEndDate(e.target.value)}
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 outline-none focus:border-[#0B1053] focus:ring-2 focus:ring-indigo-50 transition-all"
             />
           </div>
-          <div className="flex flex-1 gap-4 py-4 border-t border-b border-t-grey/50 border-b-grey/50">
-            <ButtonComponent
-              title={"Cancel"}
-              bgcolor={""}
-              color={""}
-              clickHandler={() => {
-                setFilterActive(false);
-                setaddModalOpen(false);
-              }}
-            />
-            <ButtonComponent
-              title={"Apply"}
-              color={"white"}
-              bgcolor={"ghost"}
-              clickHandler={handleApplyFilters}
-            />
+          {filterActive && (
+            <button
+              onClick={handleClearFilters}
+              className="self-end text-[11px] text-gray-400 hover:text-red-500 transition-colors underline underline-offset-2"
+            >
+              Clear filter
+            </button>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => { handleClearFilters(); setaddModalOpen(false); }}
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleApplyFilters}
+            className="flex-1 py-2.5 rounded-xl bg-[#6A00FF] hover:bg-[#5800D6] text-white text-sm font-semibold shadow-md shadow-purple-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+          >
+            Apply Filter
+          </button>
+        </div>
+
+        {/* Classes List */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-gray-700 uppercase tracking-widest">
+              {filterActive ? "Filtered" : "Classes"}
+            </p>
+            {filteredClasses.length > 0 && (
+              <span className="text-[10px] font-semibold bg-indigo-50 text-[#0B1053] px-2 py-0.5 rounded-full">
+                {filteredClasses.length} {filteredClasses.length === 1 ? "class" : "classes"}
+              </span>
+            )}
           </div>
 
-          <div className="flex flex-col flex-1 gap-1">
-            <div className="flex flex-col items-center">
-              <p className="flex justify-center text-xl font-semibold">
-                Classes
-              </p>
-              {filteredclasses && filteredclasses.length > 0
-                ? ""
-                : "No Shcedualed classes at this date"}
+          {filteredClasses.length > 0 ? (
+            filteredClasses.map((item, i) => <EventCard item={item} key={i} />)
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 gap-2">
+              <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center">
+                <Calendar size={22} className="text-gray-300" />
+              </div>
+              <p className="text-sm text-gray-400 font-medium">No classes on this date</p>
+              <p className="text-xs text-gray-300">Try selecting a different day</p>
             </div>
-            {filteredclasses && filteredclasses?.map((item) => (
-              <EventComponet item={item} key={item} />
-            ))}
-          </div>
+          )}
         </div>
       </div>
     </div>

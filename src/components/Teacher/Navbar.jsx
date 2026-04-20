@@ -63,8 +63,8 @@ const Navbar = ({ heading }) => {
 
   return (
     <>
-      <div className="flex flex-1 h-20">
-        <div className={`ml-10 sm:ml-0 space-x-3 flex justify-between  md:justify-between flex-1 pl-2 pr-0 sm:px-4 ${isBlurred ? "blur" : ""}`}>
+      <div className="flex w-full h-fit">
+        <div className={` h-fit ml-10 sm:ml-0 py-5 space-x-3 flex justify-between  md:justify-between flex-1 pl-2 pr-0 sm:px-4 ${isBlurred ? "blur" : ""}`}>
           <div className="flex flex-col items-start justify-center">
             {heading ?
               <div className="md:ml-14">

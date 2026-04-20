@@ -1,47 +1,39 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Loader from "../../../utils/Loader";
 import IMAGES from "../../../assets/images";
 
 import { toast } from "react-toastify";
 import { FiUploadCloud, FiEdit } from "react-icons/fi";
-import { IoCloseCircle } from "react-icons/io5";
+import { IoClose, IoCloseCircle } from "react-icons/io5";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { uploadFile } from "../../../utils/FileUpload";
 import { handleProfileImageUpdate } from "../../../utils/Admin/profileImageUtils";
 import { useBlur } from "../../../context/BlurContext";
 import { useUser } from "../../../context/UserContext";
 import { useTeacher } from "../../../context/TeacherContext";
 import { createQuiz, editQuiz } from "../../../api/Teacher/Quiz";
-import { createAssignment, editAssignment, } from "../../../api/Teacher/Assignments";
+import { createAssignment, editAssignment } from "../../../api/Teacher/Assignments";
 import useClickOutside from "../../../hooks/useClickOutlise";
 import { getTeacherSubjectsOfClassroom } from "../../../api/Teacher/TeacherSubjectApi";
+import { BookOpen, ClipboardList, ChevronDown, X } from "lucide-react";
 
+const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch, data }) => {
 
-const CreateQuizAssignmentModal = ({
-  open,
-  setopen,
-  isQuiz,
-  isEditTrue,
-  refetch,
-  data
-}) => {
   const { userData } = useUser();
   const { allClassrooms } = useTeacher();
   const ref = useRef(null);
   const { toggleBlur } = useBlur();
 
-  useClickOutside(ref, () => {
-    setopen(false)
-    if (open) {
-      toggleBlur();
-    }
-  });
+  useClickOutside(ref, () => { setopen(false); if (open) toggleBlur(); });
 
   const [QADate, setQADate] = useState(isEditTrue && data?.dueDate ? data.dueDate.split("T")[0] : "");
   const [QATime, setQATime] = useState(isEditTrue && data?.dueDate ? data.dueDate.split("T")[1]?.slice(0, 5) : "");
-
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState(isEditTrue && data?.files?.[0]?.url ? data.files[0].url : "");
+  const [selectedClassroom, setSelectedClassroom] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState("");
 
   const [quizAssignmentDataObj, setQuizAssignmentDataObj] = useState({
     canSubmitAfterTime: false,
@@ -52,276 +44,64 @@ const CreateQuizAssignmentModal = ({
     totalMarks: isEditTrue ? data?.totalMarks : 0,
     classroomID: isEditTrue ? data?.classroomID : "",
     files: "",
-  })
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [uploadedFileUrl, setUploadedFileUrl] = useState(isEditTrue && data?.files?.[0]?.url ? data.files[0].url : "");
-  const [selectedClassroom, setSelectedClassroom] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState("");
+  });
 
-
-  // Just updating the key parts of your component. Keep the rest of your original code structure.
+  const updateObj = (key, value) => setQuizAssignmentDataObj((p) => ({ ...p, [key]: value }));
 
 
 
-  console.log(selectedClassroom, "selected classroom");
-  console.log(selectedSubject, "selected subject");
-
-
-
-
-  const handleCreateAssignment = async () => {
-    setLoading(true);
-
-    const hasText = !!quizAssignmentDataObj?.text?.trim();
-    const hasFile = !!selectedFile?.name || !!uploadedFileUrl;
-    if (!hasText && !hasFile) {
-      toast.error("Please provide text or a file.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // 1) Use uploaded file URL from state
-      let filesArr = [];
-      if (uploadedFileUrl) {
-        filesArr.push({ name: selectedFile?.name || data?.files?.[0]?.name || "File", url: uploadedFileUrl });
-      }
-
-      if (isEditTrue) {
-        const payload = {
-          ...quizAssignmentDataObj,
-          dueDate: QADate && QATime
-            ? new Date(`${QADate}T${QATime}`).toISOString()
-            : data?.dueDate || new Date().toISOString(),
-          files: filesArr,
-          id: data?.id,
-        };
-        assignmentUpdateMutate.mutate(payload);
-        return;
-      }
-
-      // 2) compute dueDate
-      const dueDate = QADate && QATime
-        ? new Date(`${QADate}T${QATime}`).toISOString()
-        : new Date().toISOString();
-
-      // 3) loop sequentially
-      for (const classroom of selectedClassroom) {
-        const classroomID = classroom.id;
-
-        // pick the right subject for this teacher + classroom
-        let subjectID = selectedSubject;
-        // const teachEntry = classroom.teachers.find(
-        //   t => t.teacher === userData.id
-        // );
-        // if (teachEntry) subjectID = teachEntry.subject;
-
-        const payload = {
-          ...quizAssignmentDataObj,
-          classroomID,
-          subjectID,
-          files: filesArr,
-          dueDate
-        };
-
-        // direct API call (so each gets its own request)
-        await createAssignment(payload);
-      }
-
-      toast.success("Assignments created for all selected classrooms!");
-      toggleBlur();
-      setopen(false)
-      await refetch();
-
-    } catch (err) {
-      console.error("Error during assignment creation:", err);
-      // If you want to see exactly which classroom failed:
-      // console.error(err.config.data, err.response?.status);
-      toast.error("Something went wrong creating the assignments.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-
-
-  const handleCreateQuiz = async () => {
-    setLoading(true);
-
-    const hasText = !!quizAssignmentDataObj?.text?.trim();
-    const hasFile = !!selectedFile?.name || !!uploadedFileUrl;
-
-    if (!hasText && !hasFile) {
-      toast.error("Please provide either text or a file before creating the quiz.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      let filesArr = [];
-
-      if (uploadedFileUrl) {
-        filesArr.push({ name: selectedFile?.name || data?.files?.[0]?.name || "File", url: uploadedFileUrl });
-      }
-
-      const dueDate = QADate && QATime
-        ? new Date(`${QADate}T${QATime}`).toISOString()
-        : new Date().toISOString();
-
-      if (isEditTrue) {
-        const sendingObj = {
-          ...quizAssignmentDataObj,
-          dueDate,
-          files: filesArr,
-          id: data?.id,
-        };
-
-        quizEditMutate.mutate(sendingObj);
-      } else {
-        // Loop through all selected classrooms for quiz creation
-        for (const classroom of selectedClassroom) {
-          const classroomID = classroom.id;
-
-          let subjectID = selectedSubject;
-
-          // (Optional) Dynamic subject detection based on teacher
-          // const teachEntry = classroom.teachers.find(
-          //   t => t.teacher === userData.id
-          // );
-          // if (teachEntry) subjectID = teachEntry.subject;
-
-          const sendingObj = {
-            ...quizAssignmentDataObj,
-            classroomID,
-            subjectID,
-            files: filesArr,
-            dueDate
-          };
-
-          await createQuiz(sendingObj); // replace with your direct API or mutation call
-        }
-
-        toast.success("Quizzes created for all selected classrooms!");
-        toggleBlur();
-        setopen(false);
-        await refetch();
-      }
-    } catch (err) {
-      console.error("Error during quiz creation:", err);
-      toast.error("Something went wrong while creating the quiz.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-
+  /* ── Queries & Mutations (unchanged logic) ── */
+  const { data: teacherSubjectOfClassroom } = useQuery({
+    queryKey: ["teacherSubjectsOfClassrooms", selectedClassroom.map((c) => c.id)],
+    queryFn: async () => await getTeacherSubjectsOfClassroom({ classroomIDs: selectedClassroom.map((c) => c.id) }),
+    enabled: selectedClassroom.length > 0,
+  });
 
   const assignmentUpdateMutate = useMutation({
     mutationFn: async (dataobj) => {
       const id = dataobj?.id || data?.id;
-      if (!id) {
-        throw new Error("Assignment ID is missing");
-      }
+      if (!id) throw new Error("Assignment ID is missing");
       const { id: _, ...payload } = dataobj;
       return await editAssignment(payload, id);
     },
-    onSuccess: async (responseData) => {
-      console.log("Assignment updated successfully", responseData);
-      await refetch();
-      toast.success("Assignment updated successfully");
-      toggleBlur();
-      setopen(false);
-    },
-    onError: (error) => {
-      console.error("Assignment update error:", error);
-      toast.error(error?.message || "Failed to update assignment. Please try again.");
-    }
+    onSuccess: async () => { await refetch(); toast.success("Assignment updated"); toggleBlur(); setopen(false); },
+    onError: (e) => toast.error(e?.message || "Failed to update assignment"),
   });
-
 
   const assignmentCreateMutate = useMutation({
-    mutationFn: async (data) => await createAssignment(data),
-    onSuccess: async (responseData) => {
-      console.log("Assignment created successfully", responseData);
-      await refetch();
-      toast.success("Assignment created successfully");
-      toggleBlur();
-      setopen(false);
-    },
-    onError: (error) => {
-      console.error("Assignment creation error:", error);
-      toast.error(error?.message || "Failed to create assignment. Please try again.");
-    }
+    mutationFn: async (d) => await createAssignment(d),
+    onSuccess: async () => { await refetch(); toast.success("Assignment created"); toggleBlur(); setopen(false); },
+    onError: (e) => toast.error(e?.message || "Failed to create assignment"),
   });
-
 
   const quizEditMutate = useMutation({
     mutationFn: async (dataobj) => {
       const id = dataobj?.id || data?.id;
-      if (!id) {
-        throw new Error("Quiz ID is missing");
-      }
+      if (!id) throw new Error("Quiz ID is missing");
       const { id: _, ...payload } = dataobj;
       return await editQuiz(payload, id);
     },
-    onSuccess: async (responseData) => {
-      console.log("Quiz updated successfully", responseData);
-      await refetch();
-      toast.success("Quiz updated successfully");
-      toggleBlur();
-      setopen(false);
-    },
-    onError: (error) => {
-      console.error("Quiz update error:", error);
-      toast.error(error?.message || "Failed to update quiz. Please try again.");
-    }
+    onSuccess: async () => { await refetch(); toast.success("Quiz updated"); toggleBlur(); setopen(false); },
+    onError: (e) => toast.error(e?.message || "Failed to update quiz"),
   });
 
   const quizCreateMutate = useMutation({
-    mutationFn: async (data) => await createQuiz(data),
-    onSuccess: async (responseData) => {
-      console.log("Quiz created successfully", responseData);
-      await refetch();
-      toast.success("Quiz created successfully");
-      toggleBlur();
-      setopen(false);
-    },
-    onError: (error) => {
-      console.error("Quiz creation error:", error);
-      toast.error(error?.message || "Failed to create quiz. Please try again.");
-    }
+    mutationFn: async (d) => await createQuiz(d),
+    onSuccess: async () => { await refetch(); toast.success("Quiz created"); toggleBlur(); setopen(false); },
+    onError: (e) => toast.error(e?.message || "Failed to create quiz"),
   });
 
-
-  const {
-    data: teacherSubjectOfClassroom,
-    isSuccess: teacherIsSuccess,
-    isPending: teacherSubjectPending
-  } = useQuery({
-    queryKey: ["teacherSubjectsOfClassrooms", selectedClassroom.map(c => c.id)],
-    queryFn: async () => {
-      const classroomIDs = selectedClassroom.map(c => c.id);
-      return await getTeacherSubjectsOfClassroom({ classroomIDs });
-    },
-    enabled: selectedClassroom.length > 0,
-  });
-
-
-
-
-
+  const isSubmitting =
+    loading ||
+    quizCreateMutate?.isPending ||
+    quizEditMutate?.isPending ||
+    assignmentCreateMutate?.isPending ||
+    assignmentUpdateMutate?.isPending;
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setSelectedFile(file);
-
     if (file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onloadend = () => setPreviewUrl(reader.result);
@@ -329,339 +109,350 @@ const CreateQuizAssignmentModal = ({
     } else {
       setPreviewUrl(null);
     }
-
-    // Start Cloudinary upload immediately for all file types
-    await handleProfileImageUpdate(file, (url) => {
-      console.log("Uploaded File URL:", url);
-      setUploadedFileUrl(url);
-    }, setLoading);
+    await handleProfileImageUpdate(file, (url) => setUploadedFileUrl(url), setLoading);
   };
 
-  const handleRemoveFile = () => {
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    setUploadedFileUrl("");
+  const handleRemoveFile = () => { setSelectedFile(null); setPreviewUrl(null); setUploadedFileUrl(""); };
+
+  const handleSubmit = () => {
+    if (isSubmitting) return;
+    isQuiz ? handleCreateQuiz() : handleCreateAssignment();
   };
 
+  const handleCreateAssignment = async () => {
+    setLoading(true);
+    if (!quizAssignmentDataObj?.text?.trim() && !selectedFile?.name && !uploadedFileUrl) {
+      toast.error("Please provide text or a file."); setLoading(false); return;
+    }
+    try {
+      const filesArr = uploadedFileUrl ? [{ name: selectedFile?.name || data?.files?.[0]?.name || "File", url: uploadedFileUrl }] : [];
+      const dueDate = QADate && QATime ? new Date(`${QADate}T${QATime}`).toISOString() : new Date().toISOString();
+      if (isEditTrue) { assignmentUpdateMutate.mutate({ ...quizAssignmentDataObj, dueDate, files: filesArr, id: data?.id }); return; }
+      for (const classroom of selectedClassroom) {
+        await createAssignment({ ...quizAssignmentDataObj, classroomID: classroom.id, subjectID: selectedSubject, files: filesArr, dueDate });
+      }
+      toast.success("Assignments created!"); toggleBlur(); setopen(false); await refetch();
+    } catch { toast.error("Something went wrong."); } finally { setLoading(false); }
+  };
 
+  const handleCreateQuiz = async () => {
+    setLoading(true);
+    if (!quizAssignmentDataObj?.text?.trim() && !selectedFile?.name && !uploadedFileUrl) {
+      toast.error("Please provide text or a file."); setLoading(false); return;
+    }
+    try {
+      const filesArr = uploadedFileUrl ? [{ name: selectedFile?.name || data?.files?.[0]?.name || "File", url: uploadedFileUrl }] : [];
+      const dueDate = QADate && QATime ? new Date(`${QADate}T${QATime}`).toISOString() : new Date().toISOString();
+      if (isEditTrue) { quizEditMutate.mutate({ ...quizAssignmentDataObj, dueDate, files: filesArr, id: data?.id }); return; }
+      for (const classroom of selectedClassroom) {
+        await createQuiz({ ...quizAssignmentDataObj, classroomID: classroom.id, subjectID: selectedSubject, files: filesArr, dueDate });
+      }
+      toast.success("Quizzes created!"); toggleBlur(); setopen(false); await refetch();
+    } catch { toast.error("Something went wrong."); } finally { setLoading(false); }
+  };
 
+  /* ── Shared input class ── */
+  const inputCls = "w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-50 transition-all";
+
+  if (!open) return null;
 
   return (
-    <div
-      className={`fixed z-10 mt-10 bg-white max-h-[85vh] overflow-y-auto custom-scrollbar  p-8 w-[90%] ml-[5%] md:w-[600px] px-5 sm:px-16 text-black rounded-xl md:ml-96 ${open ? "" : "hidden"
-        }`}
-
-      ref={ref}
-
-    >
-      <div className="flex gap-2">
-        <div className="flex flex-col w-full gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex justify-center flex-1 w-[fit] gap-2 items-center">
-              <p className="text-xl sm:text-2xl font-medium sm:font-semibold cursor-text">
-                Create new {isQuiz ? "Quiz" : "Assignment"}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div
+        ref={ref}
+        className="relative bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"
+      >
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isQuiz ? "bg-purple-50" : "bg-blue-50"}`}>
+              {isQuiz
+                ? <ClipboardList size={17} className="text-[#6A00FF]" />
+                : <BookOpen size={17} className="text-blue-600" />
+              }
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-800">
+                {isEditTrue ? "Edit" : "Create"} {isQuiz ? "Quiz" : "Assignment"}
+              </p>
+              <p className="text-[11px] text-gray-400 mt-0.5">
+                Fill in the details below
               </p>
             </div>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <img
-                src={IMAGES.CloseIcon}
-                className="w-[15px] h-[15px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setopen(false);
-                  toggleBlur()
-                }}
-              />
-            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: "4px" }}>
-              <p style={{ fontSize: "12px", fontWeight: "600", color: "#4B5563" }}>Select Classroom</p>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  // padding: "4px 16px",
-                  borderRadius: "8px",
-                  width: "100%",
-                  alignItems: "center",
-                  // border: "1px solid #d1d5db",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <div style={{ position: "relative", width: "100%" }}>
-                  <div
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    style={{
-                      border: "1px solid #d1d5db",
-                      borderRadius: "8px",
-                      padding: "8px 12px",
-                      backgroundColor: "#fff",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      color: "#1f2937",
-                    }}
-                  >
-                    {selectedClassroom.length > 0
-                      ? selectedClassroom.map(item => item.name).join(", ")
-                      : "Select Classroom"}
-                  </div>
+          <button
+            onClick={() => { setopen(false); toggleBlur(); }}
+            className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+          >
+            <IoClose size={18} />
+          </button>
+        </div>
 
-                  {dropdownOpen && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        width: "100%",
-                        maxHeight: "200px",
-                        overflowY: "auto",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "8px",
-                        backgroundColor: "#fff",
-                        marginTop: "4px",
-                        zIndex: 10,
-                      }}
-                    >
-                      {allClassrooms?.map(item => {
-                        const isChecked = selectedClassroom.some(selected => selected.id === item.id);
-                        return (
-                          <label
-                            key={item.id}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              padding: "8px 12px",
-                              cursor: "pointer",
-                              fontSize: "14px",
-                              backgroundColor: isChecked ? "#f0f9ff" : "#fff",
+        {/* ── Body ── */}
+        <div className="flex flex-col gap-5 px-6 py-5 overflow-y-auto custom-scrollbar">
+
+          {/* Classroom Multi-select */}
+          <Field label="Classroom">
+            <div className="relative">
+              <div
+                onClick={() => setDropdownOpen((p) => !p)}
+                className={`${inputCls} flex items-center justify-between cursor-pointer pr-9`}
+              >
+                <span className={selectedClassroom.length > 0 ? "text-gray-800" : "text-gray-400"}>
+                  {selectedClassroom.length > 0
+                    ? selectedClassroom.map((c) => c.name).join(", ")
+                    : "Select classrooms"}
+                </span>
+                <ChevronDown
+                  size={14}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                />
+              </div>
+
+              {dropdownOpen && (
+                <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                  <div className="max-h-48 overflow-y-auto divide-y divide-gray-50">
+                    {allClassrooms?.map((item) => {
+                      const checked = selectedClassroom.some((c) => c.id === item.id);
+                      return (
+                        <label
+                          key={item.id}
+                          className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm transition-colors
+                            ${checked ? "bg-purple-50 text-purple-700 font-medium" : "text-gray-700 hover:bg-gray-50"}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              setSelectedClassroom((prev) =>
+                                prev.some((c) => c.id === item.id)
+                                  ? prev.filter((c) => c.id !== item.id)
+                                  : [...prev, item]
+                              );
                             }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => {
-                                const exists = selectedClassroom.some(c => c.id === item.id);
-                                if (exists) {
-                                  setSelectedClassroom(prev =>
-                                    prev.filter(c => c.id !== item.id)
-                                  );
-                                } else {
-                                  setSelectedClassroom(prev => [...prev, item]);
-                                }
-                              }}
-                              style={{ marginRight: "8px" }}
-                            />
-                            {item.name}
-                          </label>
-                        );
-                      })}
+                            className="accent-purple-600 w-3.5 h-3.5"
+                          />
+                          {item.name}
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {/* Selected pills */}
+                  {selectedClassroom.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 px-4 py-2.5 border-t border-gray-100 bg-gray-50">
+                      {selectedClassroom.map((c) => (
+                        <span key={c.id} className="inline-flex items-center gap-1 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                          {c.name}
+                          <button onClick={() => setSelectedClassroom((p) => p.filter((x) => x.id !== c.id))}>
+                            <X size={10} />
+                          </button>
+                        </span>
+                      ))}
                     </div>
                   )}
                 </div>
-
-              </div>
-            </div>
-          </div>
-
-
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col flex-1 gap-1">
-              <p className="text-xs font-semibold text-grey_700">Select Subject</p>
-              <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
-                <select
-                  value={selectedSubject}
-                  onChange={(e) => setSelectedSubject(e.target.value)}
-                  className="text-sm outline-none text-custom-gray-3 w-full"
-                >
-                  <option value="">Select Subject</option>
-                  {teacherSubjectOfClassroom?.subjects?.map((item) => (
-                    <option key={item.subjectId} value={item.subjectId}>
-                      {item.subjectName}
-                    </option>
-                  ))}
-                </select>
-
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col flex-1 gap-1">
-              <p className="text-xs font-semibold text-grey_700">Title</p>
-              <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
-                <input
-                  className="text-sm outline-none text-custom-gray-3 w-full"
-                  placeholder="Enter title"
-                  value={quizAssignmentDataObj.title}
-                  onChange={(e) => setQuizAssignmentDataObj({ ...quizAssignmentDataObj, title: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col flex-1 gap-1">
-              <p className="text-xs font-semibold text-grey_700">{isQuiz ? "Text Quiz" : "Text Assignment"}</p>
-              <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
-                <textarea
-                  className="text-sm outline-none text-custom-gray-3 w-full"
-                  placeholder="Enter title"
-                  value={quizAssignmentDataObj.text}
-                  onChange={(e) => setQuizAssignmentDataObj({ ...quizAssignmentDataObj, text: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col flex-1 gap-1">
-              <p className="text-xs font-semibold text-grey_700">Total Makrs</p>
-              <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
-                <input
-                  className="text-sm outline-none text-custom-gray-3 w-full"
-                  placeholder="Enter marks"
-                  value={quizAssignmentDataObj.totalMarks}
-                  onChange={(e) => setQuizAssignmentDataObj({ ...quizAssignmentDataObj, totalMarks: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col flex-1 gap-1">
-            <p className="text-xs font-semibold text-grey_700">Deadline</p>
-            <div className="flex items-center gap-3 ">
-              <div className="flex flex-col flex-1 gap-1 ">
-                <div className="flex items-center flex-1 justify-between gap-3 px-3 py-1 border-[1.5px] rounded-lg border-grey/30">
-                  <input
-                    id="date"
-                    type="date"
-                    className="text-sm outline-none text-custom-gray-3 w-full"
-                    placeholder="Enter date"
-                    value={QADate}
-                    onChange={(e) => setQADate(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col flex-1 gap-1">
-                <div className="flex flex-1 items-center justify-between gap-3 px-3 py-1 border-[1.5px] rounded-lg border-grey/30">
-                  <input
-                    type="time"
-                    className="text-sm outline-none text-custom-gray-3 w-full"
-                    placeholder="Enter time"
-                    value={QATime}
-                    onChange={(e) => setQATime(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          {isQuiz &&
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col flex-1 gap-1">
-                <p className="text-xs font-semibold text-grey_700">Can Submit after deadline</p>
-                <div className="flex justify-between border-[1px] py-1 px-4 rounded-lg w-full items-center border-grey/50">
-                  <select
-                    value={quizAssignmentDataObj.canSubmitAfterTime}
-                    className="text-sm outline-none text-custom-gray-3 w-full"
-                    onChange={(e) => { setQuizAssignmentDataObj({ ...quizAssignmentDataObj, canSubmitAfterTime: e.target.value }) }} >
-                    <option value={false}>No</option>
-                    <option value={true}>Yes</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          }
-          <div className="flex flex-1 border-2 rounded-lg border-[#00000010] py-6 px-16">
-            <div className="flex flex-col items-center justify-center flex-1 gap-2">
-              {/* Upload Button */}
-              <label htmlFor="assignmentQuiz">
-                <div className="flex p-4 rounded-lg shadow-sm border border-[#00000010] cursor-pointer">
-                  <FiUploadCloud />
-                </div>
-              </label>
-
-              {/* Hidden Input */}
-              <input
-                type="file"
-                id="assignmentQuiz"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-
-              {/* Upload Instructions */}
-              <div className="flex">
-                <p className="flex flex-wrap items-center justify-center text-sm text-center">
-                  <span className="text-[#0B1053] font-medium">Click to upload </span>
-                  <span>or drag and drop Files</span>
-                  <span> PNG, JPG, Word or PDF</span>
-                </p>
-              </div>
-
-              {/* Preview Section */}
-              {selectedFile && (
-                <div className="mt-2 text-center">
-                  {previewUrl ? (
-                    <div className="relative inline-block">
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg mx-auto"
-                      />
-                      <label htmlFor="assignmentQuiz" className="absolute bottom-0 right-0 p-1 bg-white rounded-full shadow-md cursor-pointer hover:bg-gray-100">
-                        <FiEdit size={14} className="text-[#6A00FF]" />
-                      </label>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-600">{selectedFile?.name}</p>
-                  )}
-                  <p
-                    onClick={handleRemoveFile}
-                    className="text-red-500 text-xs mt-1 cursor-pointer hover:underline"
-                  >
-                    Remove File
-                  </p>
-                </div>
-              )}
-
-              {/* Existing File for Edit (if no new file selected) */}
-              {isEditTrue && !selectedFile && data?.files?.length > 0 && uploadedFileUrl && (
-                <div className="flex justify-between px-2 py-2 border rounded-lg w-60 border-black/20">
-                  <div className="flex items-center gap-2">
-                    <img src={IMAGES.pdf} alt="pdf icon" className="w-8 h-8" />
-                    <div className="text-xs truncate">
-                      <p className="truncate w-32">{data.files[0].name}</p>
-                      <p>Existing File</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="assignmentQuiz" className="cursor-pointer hover:text-[#6A00FF]">
-                      <FiEdit size={16} />
-                    </label>
-                    <p onClick={handleRemoveFile} className="cursor-pointer text-red-500 hover:text-red-700">
-                      <IoCloseCircle size={16} />
-                    </p>
-                  </div>
-                </div>
               )}
             </div>
-          </div>
-          {(loading || quizCreateMutate.isPending || quizEditMutate.isPending || assignmentCreateMutate.isPending || assignmentUpdateMutate.isPending) && <div><Loader /> </div>}
-          {
-            (!loading && !quizCreateMutate.isPending && !quizEditMutate.isPending && !assignmentCreateMutate.isPending && !assignmentUpdateMutate.isPending) &&
-            <div className="flex items-center gap-3">
-              <div
-                onClick={() => {
-                  if (loading) return; // Prevent submission while uploading
-                  isQuiz ? handleCreateQuiz() : handleCreateAssignment()
-                }}
-                className={`flex items-center justify-center w-full py-2 text-center rounded-md cursor-pointer ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#6A00FF]"}`}
+          </Field>
+
+          {/* Subject */}
+          <Field label="Subject">
+            <div className="relative">
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                disabled={selectedClassroom.length === 0}
+                className={`${inputCls} appearance-none pr-9 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <p className="text-sm text-white">{isEditTrue ? "Update" : "Create"}</p>
-              </div>
+                <option value="">{selectedClassroom.length === 0 ? "Select a classroom first" : "Select subject"}</option>
+                {teacherSubjectOfClassroom?.subjects?.map((item) => (
+                  <option key={item.subjectId} value={item.subjectId}>{item.subjectName}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             </div>
-          }
+            {selectedClassroom.length === 0 && (
+              <p className="text-[10px] text-gray-400 px-0.5">Choose a classroom first to load subjects</p>
+            )}
+          </Field>
+
+          {/* Title */}
+          <Field label="Title">
+            <input
+              type="text"
+              placeholder="Enter title"
+              value={quizAssignmentDataObj.title}
+              onChange={(e) => updateObj("title", e.target.value)}
+              className={inputCls}
+            />
+          </Field>
+
+          {/* Text */}
+          <Field label={isQuiz ? "Quiz Description" : "Assignment Description"}>
+            <textarea
+              rows={3}
+              placeholder="Write description or instructions..."
+              value={quizAssignmentDataObj.text}
+              onChange={(e) => updateObj("text", e.target.value)}
+              className={`${inputCls} resize-none`}
+            />
+          </Field>
+
+          {/* Total Marks */}
+          <Field label="Total Marks">
+            <input
+              type="number"
+              placeholder="e.g. 100"
+              value={quizAssignmentDataObj.totalMarks}
+              onChange={(e) => updateObj("totalMarks", e.target.value)}
+              className={inputCls}
+            />
+          </Field>
+
+          {/* Deadline */}
+          <Field label="Deadline">
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                type="date"
+                value={QADate}
+                onChange={(e) => setQADate(e.target.value)}
+                className={inputCls}
+              />
+              <input
+                type="time"
+                value={QATime}
+                onChange={(e) => setQATime(e.target.value)}
+                className={inputCls}
+              />
+            </div>
+          </Field>
+
+          {/* Allow late submit (quiz only) */}
+          {isQuiz && (
+            <Field label="Allow submission after deadline">
+              <div className="relative">
+                <select
+                  value={quizAssignmentDataObj.canSubmitAfterTime}
+                  onChange={(e) => updateObj("canSubmitAfterTime", e.target.value)}
+                  className={`${inputCls} appearance-none pr-9 cursor-pointer`}
+                >
+                  <option value={false}>No</option>
+                  <option value={true}>Yes</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+            </Field>
+          )}
+
+          {/* File Upload */}
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Attachment</label>
+            <label
+              htmlFor="assignmentQuiz"
+              className="flex flex-col items-center justify-center gap-3 px-6 py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:border-purple-300 hover:bg-purple-50/30 transition-all cursor-pointer group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 group-hover:border-purple-200 flex items-center justify-center shadow-sm transition-colors">
+                <FiUploadCloud size={18} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-600">
+                  <span className="text-purple-600">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">PNG, JPG, Word or PDF</p>
+              </div>
+            </label>
+            <input type="file" id="assignmentQuiz" className="hidden" onChange={handleFileChange} />
+
+            {/* New file preview */}
+            {selectedFile && (
+              <div className="flex items-center justify-between px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl">
+                <div className="flex items-center gap-3">
+                  {previewUrl ? (
+                    <img src={previewUrl} alt="Preview" className="w-10 h-10 object-cover rounded-lg" />
+                  ) : (
+                    <div className="w-10 h-10 bg-white rounded-lg border border-purple-100 flex items-center justify-center">
+                      <img src={IMAGES.pdf} alt="file" className="w-6 h-6" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs font-medium text-gray-700 truncate max-w-[180px]">{selectedFile.name}</p>
+                    <p className="text-[10px] text-gray-400">Ready to upload</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="assignmentQuiz" className="p-1.5 rounded-lg hover:bg-white cursor-pointer transition-colors">
+                    <FiEdit size={13} className="text-purple-500" />
+                  </label>
+                  <button onClick={handleRemoveFile} className="p-1.5 rounded-lg hover:bg-white transition-colors">
+                    <IoCloseCircle size={15} className="text-red-400" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Existing file (edit mode) */}
+            {isEditTrue && !selectedFile && data?.files?.length > 0 && uploadedFileUrl && (
+              <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
+                <div className="flex items-center gap-3">
+                  {uploadedFileUrl && /\.(jpeg|jpg|gif|png|webp|avif|svg)(?:\?.*)?$/i.test(uploadedFileUrl) ? (
+                    <img src={uploadedFileUrl} alt="preview" className="w-10 h-10 object-cover rounded-lg" />
+                  ) : (
+                    <div className="w-10 h-10 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
+                      <img src={IMAGES.pdf} alt="pdf" className="w-6 h-6" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs font-medium text-gray-700 truncate max-w-[180px]">{data.files[0].name}</p>
+                    <p className="text-[10px] text-gray-400">Existing file</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="assignmentQuiz" className="p-1.5 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+                    <FiEdit size={13} className="text-gray-500" />
+                  </label>
+                  <button onClick={handleRemoveFile} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                    <IoCloseCircle size={15} className="text-red-400" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Footer ── */}
+        <div className="px-6 py-4 border-t border-gray-100 shrink-0 bg-white">
+          {isSubmitting ? (
+            <div className="flex justify-center py-1"><Loader /></div>
+          ) : (
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setopen(false); toggleBlur(); }}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="flex-1 py-2.5 rounded-xl bg-[#6A00FF] hover:bg-[#5800D6] text-white text-sm font-semibold shadow-md shadow-purple-200 transition-all hover:-translate-y-0.5 active:translate-y-0"
+              >
+                {isEditTrue ? "Save Changes" : `Create ${isQuiz ? "Quiz" : "Assignment"}`}
+              </button>
+            </div>
+          )}
         </div>
       </div>
-    </div >
+    </div>
   );
 };
+
+/* ── Tiny reusable field wrapper ── */
+const Field = ({ label, children }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-0.5">
+      {label}
+    </label>
+    {children}
+  </div>
+);
 
 export default CreateQuizAssignmentModal;
