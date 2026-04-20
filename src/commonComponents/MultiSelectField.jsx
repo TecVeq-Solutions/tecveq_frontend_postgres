@@ -47,26 +47,42 @@ const MultiSelectField = ({ options, placeholder, onChange, onSelect }) => {
           />
           <span className="ml-2  font-medium text-sm h-fit">Select All 🗂️</span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-start justify-items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2">
           {options.map((option) => (
-            <div key={option.id} className="flex items-center p-2">
-              <input
-                type="checkbox"
-                checked={selectedOptions.includes(option)}
-                onChange={() => handleCheckboxChange(option)}
-                className="form-checkbox w-3.5 h-3.5"
-              />
-              <p className="bg-[#00000005] px-2 py-1 rounded-sm lg:text-xs flex items-center gap-1 font-medium ml-2">
-                <img
-                  src={option.profilePic || IMAGES.ProfilePic}
-                  alt=""
-                  className="w-8 h-8  object-cover rounded-full"
+            <div 
+              key={option.id} 
+              className="flex items-center gap-4 p-3 bg-gray-50/80 hover:bg-white hover:shadow-lg hover:border-blue-300 rounded-2xl transition-all border border-transparent group cursor-pointer"
+              onClick={() => handleCheckboxChange(option)}
+            >
+              <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="checkbox"
+                  checked={selectedOptions.includes(option)}
+                  onChange={() => handleCheckboxChange(option)}
+                  className="form-checkbox w-4 h-4 text-[#6A00FF] rounded-lg border-gray-300 focus:ring-[#6A00FF] cursor-pointer transition-all"
                 />
-                {option.name}
-                <span className="font-normal text-[#00000040]">
-                  {option?.qualification}
-                </span>
-              </p>
+              </div>
+              
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md bg-gray-200">
+                  <img
+                    src={option.profilePic || IMAGES?.ProfilePic}
+                    alt={option.name || "Student"}
+                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                    onError={(e) => { e.target.src = IMAGES?.ProfilePic }}
+                  />
+                </div>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-sm font-bold text-gray-900 leading-snug break-words">
+                    {option.name || "No Name"}
+                  </span>
+                  {option?.qualification && (
+                    <span className="text-[10px] text-gray-500 font-medium mt-1">
+                      {option.qualification}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
         </div>

@@ -63,7 +63,7 @@ const TimeTable = () => {
                 <Navbar heading={"Time Table"} />
               </div>
               <div
-                className={`flex flex-col md:px-10 lg:px-0 w-full gap-3 sm:gap-5 py-2 flex-1 ${isBlurred ? "blur" : ""
+                className={`flex flex-col   md:px-10 lg:px-0 w-full gap-3 sm:gap-5 pt-6 pb-2 flex-1 ${isBlurred ? "blur" : ""
                   }`}
               >
                 <div className={`flex flex-1 gap-2 sm:gap-4 bg-white w-full relative ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}>

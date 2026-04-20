@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Loader from "../../../utils/Loader";
 import Navbar from "../../../components/Teacher/Navbar";
 import DataRow from "../../../components/Teacher/Attendence/Submission/DataRow";
 
-import { BiSearch } from "react-icons/bi";
+import { BiSearch, BiUserCheck } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBlur } from "../../../context/BlurContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,191 +11,174 @@ import { markAttendence } from "../../../api/Teacher/Attendence";
 import { toast } from "react-toastify";
 
 const MarkAttendence = () => {
-
     const queryClient = useQueryClient();
     const location = useLocation();
-    const { isBlurred, toggleBlur } = useBlur();
-    const [classData, setClassData] = useState();
-    const [searchText, setSearchText] = useState("");
-
+    const { isBlurred } = useBlur();
     const navigate = useNavigate();
 
-    const [attendeceData, setAttendenceData] = useState([{ studentID: "no id", isPresent: true }]);
-
-    console.log(attendeceData, "all attendence")
+    const [classData, setClassData] = useState(null);
+    const [searchText, setSearchText] = useState("");
+    const [attendeceData, setAttendenceData] = useState([]);
 
     const attendenceMutation = useMutation({
-
-
-        mutationKey: ["mark-attendence"], mutationFn: async () => {
-            const result = await markAttendence(attendeceData, location?.state?.id, location?.state?.
-                classroomID, location?.state?.startTime
+        mutationKey: ["mark-attendence"],
+        mutationFn: async () => {
+            return await markAttendence(
+                attendeceData, 
+                location?.state?.id, 
+                location?.state?.classroomID, 
+                location?.state?.startTime
             );
-            return result;
         },
         onSettled: (data, error) => {
-            if (error) console.log(error, "error is accurs");
             if (!error) {
                 toast.success(`Attendance ${location.state.attendance?.length > 0 ? "updated" : "submitted"} successfully!`);
-                // Invalidate all relevant queries for all roles to ensure reports "progress"
-                queryClient.invalidateQueries(["assignment"]);
-                queryClient.invalidateQueries(["quiz"]);
-                queryClient.invalidateQueries(["reports"]);
-                queryClient.invalidateQueries(["report"]);
-                queryClient.invalidateQueries(["studentReports"]);
-                queryClient.invalidateQueries(["teacherStudets"]);
-                queryClient.invalidateQueries(["student-assignments-quizes"]);
-                queryClient.invalidateQueries(["fetchAttandenceGet"]);
+                queryClient.invalidateQueries(["fetchAttandenceGet", "reports"]);
                 navigate("/teacher/attendence");
-                console.log(" data is: ", data);
             } else {
-                // toast.error handled globally by axios interceptor
+                console.error("Attendance Error:", error);
             }
         }
-    })
+    });
 
     useEffect(() => {
-        console.log("Location state in MarkAttendence:", location.state);
         if (location.state) {
-            console.log("Processing class data for attendance...");
-
             const existingAttendance = location.state.attendance || [];
-            let temparray = [];
-
             const subjectId = location.state?.subject?.id || location.state?.subjectID?.id || location.state?.subjectID;
-            const matchedStudentsList = (location.state?.classroom?.students || location.state?.classroom?.studentDetails || location.state?.classroom?.studentdetails || []).filter(student =>
-                student.subjects?.includes(subjectId)
-            );
+            
+            const students = (location.state?.classroom?.students || 
+                              location.state?.classroom?.studentDetails || 
+                              location.state?.classroom?.studentdetails || [])
+                              .filter(student => student.subjects?.includes(subjectId));
 
-            if (existingAttendance.length > 0) {
-                console.log("Existing attendance found, pre-filling data:", existingAttendance);
-                temparray = matchedStudentsList.map(student => {
-                    const studentData = existingAttendance.find(
-                        item => (item.studentID.id || item.studentID) === student.id
-                    );
-                    if (studentData) {
-                        return {
-                            studentID: studentData.studentID.id || studentData.studentID,
-                            isPresent: studentData.isPresent,
-                            late: studentData.late || false
-                        };
-                    } else {
-                        return { studentID: student.id, isPresent: true, late: false };
-                    }
-                });
-            } else {
-                console.log("No existing attendance, defaulting all present.");
-                temparray = matchedStudentsList.map(student => ({
-                    studentID: student.id,
-                    isPresent: true,
-                    late: false
-                }));
-            }
+            const initialData = students.map(student => {
+                const existing = existingAttendance.find(
+                    item => (item.studentID.id || item.studentID) === student.id
+                );
+                return existing ? {
+                    studentID: existing.studentID.id || existing.studentID,
+                    isPresent: existing.isPresent,
+                    late: existing.late || false
+                } : { studentID: student.id, isPresent: true, late: false };
+            });
 
-            setAttendenceData(temparray);
-            setClassData(location?.state);
+            setAttendenceData(initialData);
+            setClassData(location.state);
         }
-    }, [location])
+    }, [location]);
 
-    console.log(classData, "class dta si");
+    // Optimized filtering logic
+    const filteredStudents = useMemo(() => {
+        const subjectId = classData?.subject?.id || classData?.subjectID?.id || classData?.subjectID;
+        const students = (classData?.classroom?.students || 
+                          classData?.classroom?.studentDetails || 
+                          classData?.classroom?.studentdetails || [])
+                          .filter(student => student.subjects?.includes(subjectId));
 
+        if (!searchText) return students;
+        return students.filter(s => s.name.toLowerCase().includes(searchText.toLowerCase()));
+    }, [classData, searchText]);
 
-
-    const subjectIdCheck = classData?.subject?.id || classData?.subjectID?.id || classData?.subjectID;
-
-    const matchedStudents = (classData?.classroom?.students || classData?.classroom?.studentDetails || classData?.classroom?.studentdetails || []).filter(student =>
-        student.subjects?.includes(subjectIdCheck)
-    );
-
-    // Example output:
-    console.log(matchedStudents, "hhhhhhhhhhh");
-
+    if (!classData) return <div className="flex justify-center items-center h-screen"><Loader /></div>;
 
     return (
-        false ? <div className="flex justify-start flex-1"> <Loader /> </div> :
-            <>
-                <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
-                    <div className="flex flex-1">
-                        <div
-                            className={`w-full h-screen flex-grow lg:ml-72`}
-                        >
-                            <div className="h-screen pt-1">
-                                <Navbar heading={"Mark Attendence"} />
-                                <div className={`px-3 lg:px-20 sm:px-10 ${isBlurred ? "blur" : ""}`}>
-                                    <div className="py-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="">
-                                                <p className="text-black/60"></p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-3xl">
-                                                    <BiSearch />
-                                                    <input
-                                                        type="text"
-                                                        value={searchText}
-                                                        placeholder="Search"
-                                                        className="outline-none b"
-                                                        onChange={(e) => setSearchText(e.target.value)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="mt-8 h-[80%] overflow-auto  ">
-                                        <DataRow
-                                            isQuiz={true}
-                                            header={true}
-                                            index={"Sr. No"}
-                                            classname={"Name"}
-                                            bgColor={"#F9F9F9"}
-                                            students={"Students"}
-                                            teachers={"Teachers"}
-                                        />
-                                        {matchedStudents?.map((cls, index) =>
+        <div className="flex min-h-screen bg-[#F3F4F6] font-poppins">
+            <div className="flex-1 lg:ml-72 flex flex-col">
+                <Navbar heading="Mark Attendance" />
 
-                                        (
+                <main className={`flex-1 px-4 md:px-8 lg:px-12 py-6 transition-all duration-300 ${isBlurred ? "blur-sm" : ""}`}>
+                    
+                    {/* Header Card */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 className="text-xl font-semibold text-gray-800">
+                                    {classData?.classroom?.name || "Classroom"}
+                                </h2>
+                                <p className="text-sm text-gray-500 flex items-center gap-1">
+                                    <BiUserCheck className="text-lg" /> 
+                                    Total Students: {filteredStudents.length}
+                                </p>
+                            </div>
 
-                                            <DataRow
-                                                data={cls}
-                                                header={false}
-                                                classname={cls.name}
-                                                profile={cls?.profilePic}
-                                                index={index + 1}
-                                                bgColor={"#FFFFFF"}
-                                                attendeceData={attendeceData}
-                                                setAttendenceData={setAttendenceData}
-                                            />
-                                        ))}
-                                        {searchText && matchedStudents?.map((cls, index) => {
-                                            if (cls.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())) {
-                                                return <DataRow
-                                                    data={cls}
-                                                    header={false}
-                                                    classname={cls.name}
-                                                    profile={cls.profilePic}
-                                                    index={index + 1}
-                                                    bgColor={"#FFFFFF"}
-                                                    attendeceData={attendeceData}
-                                                    setAttendenceData={setAttendenceData}
-                                                />
-                                            }
-                                        })}
-                                    </div>
-
-                                    {attendenceMutation.isPending && <div> <Loader /> </div>}
-
-                                    {!attendenceMutation.isPending && <div className="flex justify-end my-4 border-t border-black">
-                                        <div className="flex justify-end py-4">
-                                            <p onClick={attendenceMutation.mutate} className="flex cursor-pointer px-8 py-3 text-sm text-white rounded-3xl bg-[#0B1053]">{location.state.attendance?.length > 0 ? "Update" : "Submit"}</p>
-                                        </div>
-                                    </div>}
-                                </div>
+                            <div className="relative w-full md:w-72">
+                                <BiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+                                <input
+                                    type="text"
+                                    value={searchText}
+                                    placeholder="Search student name..."
+                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                />
                             </div>
                         </div>
                     </div>
-                </div>
-            </>
-    )
-}
+
+                    {/* Table Container */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        {/* Sticky Header */}
+                        <div className="sticky top-0 z-10 bg-gray-50 border-b border-gray-100">
+                            <DataRow
+                                isQuiz={true}
+                                header={true}
+                                index={"SR."}
+                                classname={"STUDENT NAME"}
+                                bgColor={"transparent"}
+                                students={"STATUS"}
+                                teachers={"LATE"}
+                            />
+                        </div>
+
+                        <div className="max-h-[calc(100vh-350px)] overflow-y-auto">
+                            {filteredStudents.length > 0 ? (
+                                filteredStudents.map((student, index) => (
+                                    <div key={student.id} className="border-b border-gray-50 last:border-0 hover:bg-blue-50/30 transition-colors">
+                                        <DataRow
+                                            data={student}
+                                            header={false}
+                                            classname={student.name}
+                                            profile={student?.profilePic}
+                                            index={index + 1}
+                                            bgColor={"transparent"}
+                                            attendeceData={attendeceData}
+                                            setAttendenceData={setAttendenceData}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="py-20 text-center text-gray-400">
+                                    <p>No students found matching your search.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="text-sm text-gray-500">
+                            Review the list before {location.state.attendance?.length > 0 ? "updating" : "submitting"}.
+                        </div>
+                        
+                        <button
+                            disabled={attendenceMutation.isPending}
+                            onClick={() => attendenceMutation.mutate()}
+                            className={`px-10 py-3 rounded-xl font-medium text-white transition-all transform active:scale-95 shadow-lg shadow-blue-900/20 ${
+                                attendenceMutation.isPending 
+                                ? "bg-gray-400 cursor-not-allowed" 
+                                : "bg-[#0B1053] hover:bg-[#151b6e]"
+                            }`}
+                        >
+                            {attendenceMutation.isPending ? (
+                                <span className="flex items-center gap-2">Processing...</span>
+                            ) : (
+                                location.state.attendance?.length > 0 ? "Update Attendance" : "Submit Attendance"
+                            )}
+                        </button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    );
+};
 
 export default MarkAttendence;

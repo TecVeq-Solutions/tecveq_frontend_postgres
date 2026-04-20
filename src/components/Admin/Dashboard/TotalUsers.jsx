@@ -17,9 +17,9 @@ const getLast7MonthsNames = () => {
 
 const MONTHS = getLast7MonthsNames()
 
-// ─── Icons ────────────────────────────────────────────────
+// ─── Icons ─────────────────────────────────────────────────────
 const StudentIcon = ({ color }) => (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -27,43 +27,41 @@ const StudentIcon = ({ color }) => (
     </svg>
 )
 const TeacherIcon = ({ color }) => (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
     </svg>
 )
 const ParentIcon = ({ color }) => (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
 )
 const TotalIcon = ({ color }) => (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
     </svg>
 )
-
 const UpArrow = () => (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
         <polyline points="18 15 12 9 6 15" />
     </svg>
 )
 const DownArrow = () => (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
         <polyline points="6 9 12 15 18 9" />
     </svg>
 )
 
-// ─── Card Config ──────────────────────────────────────────
+// ─── Card Config ───────────────────────────────────────────────
 const CARD_CONFIG = [
     {
         key: 'students',
         label: 'Total Students',
         color: '#3b82f6',
         iconBg: '#dbeafe',
-        iconBorder: '#bfdbfe',
-        glowBg: '#dbeafe44',
+        iconBorder: '#93c5fd',
         Icon: StudentIcon,
         chartType: 'line',
     },
@@ -72,8 +70,7 @@ const CARD_CONFIG = [
         label: 'Total Teachers',
         color: '#a855f7',
         iconBg: '#f3e8ff',
-        iconBorder: '#e9d5ff',
-        glowBg: '#f3e8ff44',
+        iconBorder: '#d8b4fe',
         Icon: TeacherIcon,
         chartType: 'bar',
     },
@@ -82,8 +79,7 @@ const CARD_CONFIG = [
         label: 'Total Parents',
         color: '#f59e0b',
         iconBg: '#fef3c7',
-        iconBorder: '#fde68a',
-        glowBg: '#fef3c744',
+        iconBorder: '#fcd34d',
         Icon: ParentIcon,
         chartType: 'bar',
     },
@@ -92,14 +88,23 @@ const CARD_CONFIG = [
         label: 'Total Users',
         color: '#10b981',
         iconBg: '#d1fae5',
-        iconBorder: '#a7f3d0',
-        glowBg: '#d1fae544',
+        iconBorder: '#6ee7b7',
         Icon: TotalIcon,
         chartType: 'area',
     },
 ]
 
-// ─── Chart Hook ───────────────────────────────────────────
+// ─── Tooltip Style ─────────────────────────────────────────────
+const tooltipStyle = {
+    backgroundColor: '#111827',
+    titleColor: '#f9fafb',
+    bodyColor: '#9ca3af',
+    padding: 10,
+    cornerRadius: 10,
+    displayColors: false,
+}
+
+// ─── Chart Hook ────────────────────────────────────────────────
 const useChart = (type, data, color) => {
     const canvasRef = useRef(null)
     const chartRef = useRef(null)
@@ -116,14 +121,11 @@ const useChart = (type, data, color) => {
                     labels: MONTHS,
                     datasets: [{
                         data,
-                        backgroundColor: data.map(v => {
-                            if (max === 0) return color + '55'
-                            return v === max ? color : color + '55'
-                        }),
-                        borderRadius: 5,
+                        backgroundColor: data.map(v => (max === 0 || v !== max) ? color + '44' : color),
+                        borderRadius: 4,
                         borderSkipped: false,
                         barPercentage: 0.55,
-                        categoryPercentage: 0.7,
+                        categoryPercentage: 0.65,
                     }],
                 },
                 options: {
@@ -134,12 +136,12 @@ const useChart = (type, data, color) => {
                         x: { display: false, grid: { display: false } },
                         y: { display: false, grid: { display: false }, beginAtZero: true },
                     },
-                    animation: { duration: 1100, easing: 'easeInOutQuart' },
+                    animation: { duration: 900, easing: 'easeInOutQuart' },
                 },
             })
         } else {
-            const grad = ctx.createLinearGradient(0, 0, 0, 110)
-            grad.addColorStop(0, color + (type === 'area' ? '45' : '35'))
+            const grad = ctx.createLinearGradient(0, 0, 0, 88)
+            grad.addColorStop(0, color + (type === 'area' ? '40' : '28'))
             grad.addColorStop(1, color + '00')
 
             chartRef.current = new Chart(ctx, {
@@ -151,10 +153,10 @@ const useChart = (type, data, color) => {
                         borderColor: color,
                         backgroundColor: grad,
                         fill: true,
-                        borderWidth: 2.5,
-                        tension: 0.45,
+                        borderWidth: 2,
+                        tension: 0.42,
                         pointRadius: 0,
-                        pointHoverRadius: 5,
+                        pointHoverRadius: 4,
                         pointHoverBackgroundColor: color,
                     }],
                 },
@@ -166,7 +168,7 @@ const useChart = (type, data, color) => {
                         x: { display: false, grid: { display: false } },
                         y: { display: false, grid: { display: false }, beginAtZero: true },
                     },
-                    animation: { duration: 1100, easing: 'easeInOutQuart' },
+                    animation: { duration: 900, easing: 'easeInOutQuart' },
                 },
             })
         }
@@ -177,78 +179,56 @@ const useChart = (type, data, color) => {
     return canvasRef
 }
 
-const tooltipStyle = {
-    backgroundColor: '#111827',
-    titleColor: '#f9fafb',
-    bodyColor: '#9ca3af',
-    padding: 10,
-    cornerRadius: 10,
-    displayColors: false,
-}
-
-// ─── Single Card ──────────────────────────────────────────
+// ─── Single Card ───────────────────────────────────────────────
 const StatCard = ({ config, value, trendData, trendStr, isUp }) => {
-    const { label, color, iconBg, iconBorder, glowBg, Icon, chartType } = config
+    const { label, color, iconBg, iconBorder, Icon, chartType } = config
     const canvasRef = useChart(chartType, trendData, color)
 
     return (
         <div
-            className="relative bg-white rounded-2xl overflow-hidden cursor-default group transition-all duration-200 hover:-translate-y-1"
+            className="relative bg-white rounded-2xl overflow-hidden cursor-default transition-all duration-200 hover:-translate-y-0.5"
             style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                border: '1px solid #f1f5f9',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px -4px rgba(0,0,0,0.07)',
+                border: '0.5px solid #e5e7eb',
             }}
         >
-            {/* Ambient glow */}
-            <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                    background: `radial-gradient(ellipse at 90% 0%, ${glowBg} 0%, transparent 65%)`,
-                }}
-            />
+            {/* Top color stripe */}
+            <div className="h-[2px] w-full" style={{ background: color }} />
 
-            {/* Top stripe accent */}
-            <div
-                className="absolute top-0 left-0 right-0 h-[2px]"
-                style={{
-                    background: `linear-gradient(90deg, ${color}00 0%, ${color}60 40%, ${color}00 100%)`,
-                }}
-            />
-
-            {/* Card content */}
-            <div className="relative z-10 pt-5 px-5">
-                {/* Label row */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2.5">
-                        <div
-                            className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                            style={{
-                                background: iconBg,
-                                border: `1px solid ${iconBorder}`,
-                            }}
-                        >
-                            <Icon color={color} />
-                        </div>
-                        <span className="text-[12.5px] font-semibold text-gray-500 tracking-wide uppercase" style={{ letterSpacing: '0.03em' }}>
-                            {label}
-                        </span>
+            {/* Card body */}
+            <div className="px-4 pt-4 pb-2.5">
+                {/* Icon + Label */}
+                <div className="flex items-center gap-2 mb-3.5">
+                    <div
+                        className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center flex-shrink-0"
+                        style={{ background: iconBg, border: `0.5px solid ${iconBorder}` }}
+                    >
+                        <Icon color={color} />
                     </div>
+                    <span
+                        className="text-[11px] font-bold tracking-widest uppercase"
+                        style={{ color: '#6b7280', letterSpacing: '0.06em' }}
+                    >
+                        {label}
+                    </span>
                 </div>
 
                 {/* Value */}
-                <div className="text-[30px] font-black text-gray-900 tracking-tight leading-none mb-3" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                <div
+                    className="text-[28px] font-extrabold leading-none mb-2.5 tracking-tight text-gray-900"
+                    style={{ fontVariantNumeric: 'tabular-nums' }}
+                >
                     {value.toLocaleString()}
                 </div>
 
-                {/* Trend badge */}
-                <div className="flex items-center gap-2 mb-1">
+                {/* Trend */}
+                <div className="flex items-center gap-2">
                     <span
-                        className="inline-flex items-center gap-1 text-[11.5px] font-bold px-2 py-0.5 rounded-full"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full"
                         style={{
                             color: isUp ? '#15803d' : '#b91c1c',
                             background: isUp ? '#f0fdf4' : '#fef2f2',
-                            border: `1px solid ${isUp ? '#bbf7d0' : '#fecaca'}`,
+                            border: `0.5px solid ${isUp ? '#bbf7d0' : '#fecaca'}`,
                         }}
                     >
                         {isUp ? <UpArrow /> : <DownArrow />}
@@ -258,11 +238,11 @@ const StatCard = ({ config, value, trendData, trendStr, isUp }) => {
                 </div>
             </div>
 
-            {/* Separator */}
-            <div className="mx-5 mt-3 h-px bg-gray-50" />
+            {/* Divider */}
+            <div className="mx-4 h-px bg-gray-100" />
 
-            {/* Chart — flush to card edges */}
-            <div style={{ height: 104, marginTop: -1 }}>
+            {/* Chart */}
+            <div style={{ height: 88 }}>
                 <canvas
                     ref={canvasRef}
                     role="img"
@@ -274,7 +254,7 @@ const StatCard = ({ config, value, trendData, trendStr, isUp }) => {
     )
 }
 
-// ─── Main Component ───────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────
 const TotalUsers = () => {
     const { adminUsersData } = useAdmin()
 
@@ -285,11 +265,9 @@ const TotalUsers = () => {
         usersArray.forEach(user => {
             const dateStr = user.createdAt || user.created_at
             const date = dateStr ? new Date(dateStr) : new Date()
-            const monthDiff = (now.getFullYear() - date.getFullYear()) * 12 + now.getMonth() - date.getMonth()
-
-            if (monthDiff >= 0 && monthDiff < 7) {
-                trend[6 - monthDiff]++
-            }
+            const monthDiff =
+                (now.getFullYear() - date.getFullYear()) * 12 + now.getMonth() - date.getMonth()
+            if (monthDiff >= 0 && monthDiff < 7) trend[6 - monthDiff]++
         })
 
         const currentMonth = trend[6]
@@ -346,20 +324,26 @@ const TotalUsers = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                        <div className="flex gap-1">
-                            <div className="w-1.5 h-4 rounded-full bg-violet-500" />
-                            <div className="w-1.5 h-4 rounded-full bg-violet-300" />
+                        <div className="flex gap-[3px] items-center">
+                            <div className="w-1 h-[18px] rounded-full bg-violet-500" />
+                            <div className="w-1 h-3 rounded-full bg-violet-300" />
                         </div>
-                        <h2 className="text-[16px] font-bold text-gray-900 tracking-tight">Total Users</h2>
+                        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Total Users</h2>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                    <div
+                        className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                        style={{ color: '#059669', background: '#ecfdf5', border: '0.5px solid #a7f3d0' }}
+                    >
+                        <span
+                            className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"
+                            style={{ animation: 'pulse 1.8s infinite' }}
+                        />
                         Live Data
                     </div>
                 </div>
 
-                {/* 4-col grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                {/* Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     {CARD_CONFIG.map((config, i) => {
                         const tKey = trendKeys[i]
                         return (

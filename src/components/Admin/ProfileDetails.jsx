@@ -155,7 +155,7 @@ const ProfileDetails = ({ onClose }) => {
         {/* ── Scrollable Body ── */}
         <div className="overflow-y-auto pt-2 flex-1 custom-scrollbar">
           {/* ── Avatar Section ── */}
-          <div className="flex flex-col items-center  px-6 sm:px-7 pb-2">
+          <div className="flex flex-col items-center  px-3 sm:px-7 pb-2">
             {/* Avatar ring */}
             <div
               className={`p-[3px] rounded-full ${loading ? "animate-pulse" : ""}`}
@@ -227,7 +227,7 @@ const ProfileDetails = ({ onClose }) => {
 
           {/* ── Status badge ── */}
           <div
-            className="mx-6 sm:mx-7 mt-4 mb-1 px-4 py-2.5 rounded-xl flex items-center gap-2.5 text-[12px] font-medium"
+            className="mx-3 sm:mx-7 mt-4 mb-1 px-4 py-2.5 rounded-xl flex items-center gap-2.5 text-[12px] font-medium"
             style={{
               background:
                 "linear-gradient(90deg, rgba(20,155,154,0.08), rgba(11,16,83,0.04))",
@@ -243,7 +243,7 @@ const ProfileDetails = ({ onClose }) => {
           </div>
 
           {/* ── Form Fields ── */}
-          <div className="px-6 sm:px-7 pt-4 pb-4">
+          <div className="px-3 sm:px-7 pt-4 pb-4">
             <CustomInput
               label="Full Name"
               name="name"

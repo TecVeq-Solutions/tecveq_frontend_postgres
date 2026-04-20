@@ -80,9 +80,10 @@ const Navbar = ({ heading }) => {
               </div>
             }
           </div>
-          <GlobalSearch />
+          <GlobalSearch desktopOnly={true} />
           <div className="flex items-center gap-1 sm:gap-2">
-            <div className="flex gap-2 sm:gap-4">
+            <div className="flex gap-2 sm:gap-4 items-center">
+              <GlobalSearch mobileOnly={true} />
               <div
                 className={`p-1 sm:p-2 border cursor-pointer rounded-md border-black/50 transition-all duration-500 ${mail ? "bg-[#0B1053] text-white" : ""
                   }`}

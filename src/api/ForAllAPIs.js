@@ -6,7 +6,7 @@ import { BACKEND_URL } from "../constants/api";
 
 axios.defaults.withCredentials = true;
 
-export const getAllAnnouncements = apiRequest(async () => await axios.get(`${BACKEND_URL}/announcement/annoouncement`));
+export const getAllAnnouncements = apiRequest(async () => await axios.get(`${BACKEND_URL}/announcement/`));
 
 export const getAllNotifications = apiRequest(async () => await axios.get(`${BACKEND_URL}/notification`));
 
