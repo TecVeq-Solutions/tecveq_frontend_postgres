@@ -193,11 +193,11 @@ const ClassModal = ({ open, setopen, isEditTrue, refetch }) => {
 
 
   return (
-    <div
-      ref={ref}
-      className={`fixed z-10 mt-10 bg-white p-8 w-[500px] px-20 border border-black/20 shadow-md text-black rounded-xl ml-5 md:ml-96 place-self-center flex ${open ? "" : "hidden"
-        }`}
-    >
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0 pointer-events-none hidden"}`}>
+      <div
+        ref={ref}
+        className="bg-white p-8 w-[90%] md:w-[500px] px-4 md:px-20 border border-black/20 shadow-2xl text-black rounded-2xl flex flex-col max-h-[90vh]"
+      >
       <div className="flex flex-1 gap-2">
         <div className="flex flex-col w-full gap-4">
           <div className="flex items-center justify-between">
@@ -282,6 +282,7 @@ const ClassModal = ({ open, setopen, isEditTrue, refetch }) => {
           }
         </div>
       </div>
+    </div>
     </div>
   );
 };

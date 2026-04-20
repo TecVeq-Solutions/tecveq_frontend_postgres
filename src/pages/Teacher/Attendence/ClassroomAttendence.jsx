@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "../../../utils/Loader";
 import Navbar from "../../../components/Teacher/Navbar";
 import DataRow from "../../../components/Teacher/Attendence/Submission/DataRow";
-import { BiSearch } from "react-icons/bi";
+import { BiSearch, BiCalendar, BiCheckCircle, BiInfoCircle } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBlur } from "../../../context/BlurContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,14 +19,11 @@ const ClassroomAttendence = () => {
   const { userData } = useUser();
   const navigate = useNavigate();
   const { isBlurred } = useBlur();
+  const queryClient = useQueryClient();
 
   const allData = location?.state;
-
-  // ✅ Find the logged-in teacher's subject
   const matchedTeacher = allData?.teachers?.find((t) => t.teacherID === (userData?.id || userData?._id) || t.teacher === (userData?.id || userData?._id));
   const subjectId = matchedTeacher?.subjectID || matchedTeacher?.subject;
-  console.log(matchedTeacher, "matched teacher");
-  console.log(subjectId, "subject id");
 
   const [searchText, setSearchText] = useState("");
   const [attendenceData, setAttendenceData] = useState([]);
@@ -37,14 +34,10 @@ const ClassroomAttendence = () => {
   const { getAttandence } = useGetAttandenceOfClassroom(location?.state?.id, currentDate);
   const { updateAttandence } = useUpdateAttandenceOfClassroom();
 
-  // ✅ Fetch and filter students based on subject
   useEffect(() => {
     if (!location.state || !subjectId) return;
-
     const students = allData?.studentDetails || [];
-    const matchedStudents = students.filter((student) =>
-      student.subjects?.includes(subjectId)
-    );
+    const matchedStudents = students.filter((student) => student.subjects?.includes(subjectId));
 
     if (getAttandence) {
       const fetchedAttendanceData = getAttandence?.students?.map((attendance) => ({
@@ -63,174 +56,155 @@ const ClassroomAttendence = () => {
       setAttendenceData(initialAttendanceData);
       setFilteredStudents(matchedStudents);
     }
-  }, [getAttandence, location.state, subjectId]);
+  }, [getAttandence, location.state, subjectId, allData?.studentDetails]);
 
-  // ✅ Filter by search text
   useEffect(() => {
     const students = allData?.studentDetails || [];
-    const matchedStudents = students.filter((student) =>
-      student.subjects?.includes(subjectId)
-    );
+    const matchedStudents = students.filter((student) => student.subjects?.includes(subjectId));
     const filtered = searchText
-      ? matchedStudents.filter((student) =>
-        student.name.toLowerCase().includes(searchText.toLowerCase())
-      )
+      ? matchedStudents.filter((student) => student.name.toLowerCase().includes(searchText.toLowerCase()))
       : matchedStudents;
     setFilteredStudents(filtered || []);
   }, [searchText, allData?.studentDetails, subjectId]);
 
-  const queryClient = useQueryClient();
   const attendenceMutation = useMutation({
     mutationKey: ["mark-attendence"],
-    mutationFn: async () => {
-      const result = await markHeadAttendence(
-        attendenceData,
-        location?.state?.id,
-        currentDate
-      );
-      console.log(result, "result");
-      return result;
-    },
+    mutationFn: async () => await markHeadAttendence(attendenceData, location?.state?.id, currentDate),
     onSettled: (data, error) => {
-      setFilteredStudents(data);
       if (error) {
-        toast.error(error?.response?.data?.message);
-        navigate("/teacher/classroom/head-attendence");
+        toast.error(error?.response?.data?.message || "Something went wrong");
       } else {
         toast.success("Attendance submitted successfully!");
-        // Invalidate all relevant queries for all roles to ensure reports "progress"
-        queryClient.invalidateQueries(["reports"]);
-        queryClient.invalidateQueries(["report"]);
-        queryClient.invalidateQueries(["studentReports"]);
-        queryClient.invalidateQueries(["student-assignments-quizes"]);
-        queryClient.invalidateQueries(["teacherStudets"]);
         queryClient.invalidateQueries(["fetchAttandenceGet"]);
         navigate("/teacher/classroom/head-attendence");
       }
     }
   });
 
-  const updateFunction = () => setShowPopup(true);
-  const handleCancelUpdate = () => setShowPopup(false);
-
   const handleConfirmUpdate = () => {
     setShowPopup(false);
-    try {
-
-      updateAttandence({
-        data: attendenceData,
-        classroomID: location?.state?.id,
-        date: currentDate
-      });
-      console.log("Attendance updated!");
-    } catch (error) {
-      console.error("Error updating attendance:", error);
-    }
+    updateAttandence({ data: attendenceData, classroomID: location?.state?.id, date: currentDate });
   };
 
   return (
-    <div className="flex flex-1 bg-[#F9F9F9] font-poppins min-w-0">
+    <div className="flex flex-1 bg-[#FDFDFD] font-poppins min-h-screen">
       <div className="flex flex-1 min-w-0">
-        <div className={`w-full h-screen flex-grow lg:ml-72 min-w-0`}>
-          <div className="h-screen pt-1">
+        <div className={`w-full flex-grow lg:ml-72 min-w-0`}>
+          <div className="h-screen flex flex-col">
             <Navbar heading={"Mark Attendance"} />
-            <div className={`px-3 lg:px-20 sm:px-10 ${isBlurred ? "blur" : ""}`}>
-              <div className="py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col gap-2 w-full md:flex-row md:justify-between items-center ">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-3xl">
-                      <BiSearch />
-                      <input
-                        type="text"
-                        value={searchText}
-                        placeholder="Search"
-                        className="outline-none"
-                        onChange={(e) => setSearchText(e.target.value)}
-                      />
-                    </div>
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-3xl">
-                      <input
-                        type="date"
-                        value={currentDate}
-                        onChange={(e) => setCurrentDate(e.target.value)}
-                      />
-                    </div>
-                  </div>
+            
+            <div className={`flex flex-col flex-1 px-4 lg:px-10 py-6 transition-all duration-300 ${isBlurred ? "blur-md" : ""}`}>
+              
+              {/* ── Header Toolbar ── */}
+              <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="relative w-full md:w-96 group">
+                  <BiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg group-focus-within:text-[#0B1053] transition-colors" />
+                  <input
+                    type="text"
+                    value={searchText}
+                    placeholder="Search by student name..."
+                    className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#0B1053]/20 focus:ring-4 focus:ring-indigo-50 transition-all text-sm font-medium"
+                    onChange={(e) => setSearchText(e.target.value)}
+                  />
                 </div>
-              </div>
-
-              <div className="mt-8 h-[80%] overflow-auto markattendece " >
-                <DataRow
-                  isQuiz={true}
-                  header={true}
-                  index={"Sr. No"}
-                  classname={"Name"}
-                  bgColor={"#F9F9F9"}
-                  students={"Students"}
-                  teachers={"Teachers"}
-                />
-                {filteredStudents.length > 0 ? (
-                  filteredStudents.map((student, index) => (
-                    <DataRow
-                      key={index}
-                      data={student}
-                      header={false}
-                      classname={student.name}
-                      profile={student.profilePic}
-                      index={index + 1}
-                      bgColor={"#FFFFFF"}
-                      attendeceData={attendenceData}
-                      setAttendenceData={setAttendenceData}
+                
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <div className="relative flex-1 md:flex-none">
+                    <BiCalendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="date"
+                      value={currentDate}
+                      className="pl-10 pr-4 py-2.5 bg-gray-50 border border-transparent rounded-xl outline-none focus:bg-white focus:border-[#0B1053]/20 transition-all text-sm font-medium text-gray-600"
+                      onChange={(e) => setCurrentDate(e.target.value)}
                     />
-                  ))
-                ) : (
-                  <p>No students found</p>
-                )}
-              </div>
-
-              {attendenceMutation.isPending && <Loader />}
-
-              {!attendenceMutation.isPending && (
-                <div className="flex justify-end my-4 border-t border-black">
-                  <div className="flex justify-end py-4">
-                    {!getAttandence ? (
-                      <button
-                        onClick={attendenceMutation.mutate}
-                        className="flex cursor-pointer px-8 py-3 text-sm text-white rounded-3xl bg-[#0B1053]"
-                      >
-                        Submit
-                      </button>
-                    ) : (
-                      <button
-                        onClick={updateFunction}
-                        className="flex cursor-pointer px-8 py-3 text-sm text-white rounded-3xl bg-[#0B1053]"
-                      >
-                        Update
-                      </button>
-                    )}
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* ── Attendance List Card ── */}
+              <div className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] flex flex-col overflow-hidden">
+                <div className="bg-gray-50/50 border-b border-gray-100">
+                  <DataRow
+                    isQuiz={true}
+                    header={true}
+                    index={"#"}
+                    classname={"Student Name"}
+                    bgColor={"transparent"}
+                    students={"Status"}
+                    teachers={"Remarks"}
+                  />
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-2 scrollbar-hide">
+                  {filteredStudents.length > 0 ? (
+                    filteredStudents.map((student, index) => (
+                      <div key={student.id || index} className="hover:bg-gray-50/50 transition-colors rounded-xl overflow-hidden mb-1">
+                        <DataRow
+                          data={student}
+                          header={false}
+                          classname={student.name}
+                          profile={student.profilePic}
+                          index={index + 1}
+                          bgColor={"transparent"}
+                          attendeceData={attendenceData}
+                          setAttendenceData={setAttendenceData}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                       <BiInfoCircle size={40} className="mb-2 opacity-20" />
+                       <p className="font-medium">No students found for this subject</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* ── Action Footer ── */}
+                <div className="p-5 bg-white border-t border-gray-100 flex justify-between items-center">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                    Total: {filteredStudents.length} Students
+                  </div>
+                  
+                  {attendenceMutation.isPending ? (
+                    <div className="px-10"><Loader /></div>
+                  ) : (
+                    <button
+                      onClick={!getAttandence ? attendenceMutation.mutate : () => setShowPopup(true)}
+                      className="flex items-center gap-2 px-10 py-3 text-sm font-bold text-white rounded-2xl bg-[#0B1053] hover:bg-[#161d7a] active:scale-95 shadow-lg shadow-indigo-100 transition-all"
+                    >
+                      <BiCheckCircle className="text-lg" />
+                      {!getAttandence ? "Submit Attendance" : "Update Attendance"}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* ── Elegant Confirmation Modal ── */}
         {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <p className="mb-4 text-lg">Are you sure you want to update attendance?</p>
-              <div className="flex justify-end space-x-4">
+          <div className="fixed inset-0 z-[99] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all">
+            <div className="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full mx-4 transform animate-in fade-in zoom-in duration-200">
+              <div className="w-16 h-16 bg-indigo-50 text-[#0B1053] rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <BiInfoCircle size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 text-center mb-2">Confirm Update</h3>
+              <p className="text-gray-500 text-center text-sm leading-relaxed mb-8">
+                Are you sure you want to modify today's attendance records for this class?
+              </p>
+              <div className="flex gap-3">
                 <button
-                  onClick={handleCancelUpdate}
-                  className="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  onClick={() => setShowPopup(false)}
+                  className="flex-1 px-4 py-3 text-sm font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all"
                 >
-                  No
+                  Cancel
                 </button>
                 <button
                   onClick={handleConfirmUpdate}
-                  className="px-4 py-2 text-sm text-white bg-[#0B1053] rounded-md hover:bg-maroon-dark"
+                  className="flex-1 px-4 py-3 text-sm font-bold text-white bg-[#0B1053] rounded-xl hover:bg-[#161d7a] shadow-lg shadow-indigo-100 transition-all"
                 >
-                  Yes
+                  Confirm
                 </button>
               </div>
             </div>
