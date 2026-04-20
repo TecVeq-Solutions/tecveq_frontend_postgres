@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { getAllUsers } from '../api/Admin/AdminApi';
 import { getAllLevels } from '../api/Admin/LevelsApi';
 import { getAllSubjects } from '../api/Admin/SubjectsApi';
+import { getAllClassroom } from '../api/Admin/classroomApi';
+import axios from 'axios';
+import { BACKEND_URL } from '../constants/api';
 
 const AdminContext = createContext();
 
@@ -12,6 +15,7 @@ export const AdminProvider = ({ children }) => {
   const [allLevels, setAllLevels] = useState([]);
   const [allSubjects, setAllSubjects] = useState([]);
   const [allClassrooms, setAllClassrooms] = useState([]);
+  const [selectedTeacherSubjects, setSelectedTeacherSubjects] = useState([]);
   const [adminLogedIn, setAdminLogedIn] = useState(false);
 
   const [adminUsersData, setAdminUsersdata] = useState({
@@ -65,12 +69,42 @@ export const AdminProvider = ({ children }) => {
     enabled: adminLogedIn,
   });
 
+  // Fetch classrooms data
+  const classroomQuery = useQuery({
+    queryKey: ['classrooms'],
+    queryFn: async () => {
+      const results = await getAllClassroom();
+      setAllClassrooms(results);
+      return results;
+    },
+    staleTime: 300000,
+    enabled: adminLogedIn,
+  });
+
+  // Function to update teacher subjects
+  const updateTeacherSubjects = async (teacherId) => {
+    if (!teacherId) {
+      setSelectedTeacherSubjects([]);
+      return;
+    }
+    try {
+      const response = await axios.get(`${BACKEND_URL}/subject/teacher-subject/${teacherId}`);
+      if (response.status === 200) {
+        setSelectedTeacherSubjects(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching teacher subjects", error);
+      setSelectedTeacherSubjects([]);
+    }
+  };
+
   // Ensure data is refetched when `adminLogedIn` becomes true
   useEffect(() => {
     if (adminLogedIn) {
       userQuery.refetch();
       subjectQuery.refetch();
       levelQuery.refetch();
+      classroomQuery.refetch();
     }
   }, [adminLogedIn]);
 
@@ -93,6 +127,13 @@ export const AdminProvider = ({ children }) => {
     allSubjects,
     subjectsRefetch: subjectQuery.refetch,
     subjectsIsPending: subjectQuery.isPending,
+
+    allClassrooms,
+    classroomsRefetch: classroomQuery.refetch,
+    classroomsIsPending: classroomQuery.isPending,
+
+    selectedTeacherSubjects,
+    updateTeacherSubjects,
   }), [
     adminLogedIn,
     allClassrooms,
@@ -105,6 +146,9 @@ export const AdminProvider = ({ children }) => {
     allSubjects,
     subjectQuery.refetch,
     subjectQuery.isPending,
+    classroomQuery.refetch,
+    classroomQuery.isPending,
+    selectedTeacherSubjects,
   ]);
 
   return (

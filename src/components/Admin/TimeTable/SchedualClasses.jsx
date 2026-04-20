@@ -5,21 +5,25 @@ import IMAGES from "../../../assets/images";
 
 import { toast } from "react-toastify";
 import { IoClose, IoCalendarOutline, IoTimeOutline, IoLinkOutline, IoBookOutline, IoPeopleOutline, IoRocketOutline } from "react-icons/io5";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useUser } from "../../../context/UserContext";
 import { createClasses } from "../../../api/Teacher/Class";
 import { useAdmin } from "../../../context/AdminContext";
-import { getAllClassroom } from "../../../api/Admin/classroomApi";
-import { useGetTeacherSubject } from "../../../api/Admin/SubjectsApi";
 import { convertToISOWithTimezoneOffset } from "../../../utils/ConvertTimeZone";
 import CustomSelectableField from "../../../commonComponents/CustomSelectableField";
 import CustomMultiSelectableField from "../../../commonComponents/MultiSelectableField";
 
 const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpen }) => {
   const { userData } = useUser();
-  const { allSubjects, adminUsersData } = useAdmin();
+  const { 
+    allSubjects, 
+    adminUsersData, 
+    allClassrooms, 
+    selectedTeacherSubjects, 
+    updateTeacherSubjects 
+  } = useAdmin();
 
   const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [loading, setLoading] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedClassrooms, setSelectedClassrooms] = useState([]);
   const [selectedDays, setSelectedDays] = useState([]);
@@ -37,29 +41,31 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
   });
 
   const parsedTeacher = selectedTeacher ? JSON.parse(selectedTeacher) : null;
-  const { teacherSubject } = useGetTeacherSubject(parsedTeacher?.id);
-  const { data: classroomsData } = useQuery({
-    queryKey: ["classroom"],
-    queryFn: getAllClassroom
-  });
+
+  // Sync teacher subjects when teacher changes
+  React.useEffect(() => {
+    if (parsedTeacher?.id) {
+      updateTeacherSubjects(parsedTeacher.id);
+    }
+  }, [selectedTeacher]);
 
   const filteredClassrooms = useMemo(() => {
-    if (!classroomsData) return [];
-    if (!selectedSubject) return classroomsData;
+    if (!allClassrooms) return [];
+    if (!selectedSubject) return allClassrooms;
 
     try {
       const subject = JSON.parse(selectedSubject);
       if (subject.classroomId) {
-        return classroomsData.filter(c => c.id === subject.classroomId);
+        return allClassrooms.filter(c => c.id === subject.classroomId);
       }
       if (subject.levelID) {
-        return classroomsData.filter(c => c.levelID === subject.levelID);
+        return allClassrooms.filter(c => c.levelID === subject.levelID);
       }
     } catch (e) {
       console.error("Error parsing subject", e);
     }
-    return classroomsData;
-  }, [classroomsData, selectedSubject]);
+    return allClassrooms;
+  }, [allClassrooms, selectedSubject]);
 
   const handleDayToggle = (day) => {
     setSelectedDays((prev) =>
@@ -67,7 +73,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
     );
   };
 
-  const handleScheduleClass = () => {
+  const handleScheduleClass = async () => {
     if (!selectedTeacher) {
       toast.error("Please select a teacher");
       return;
@@ -81,35 +87,32 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
       return;
     }
 
-    const isoEndTime = new Date(convertToISOWithTimezoneOffset(classObj.startEventDate, classObj.endTime));
-    const isoStartTime = new Date(convertToISOWithTimezoneOffset(classObj.startEventDate, classObj.startTime));
+    setLoading(true);
+    try {
+      const isoEndTime = new Date(convertToISOWithTimezoneOffset(classObj.startEventDate, classObj.endTime));
+      const isoStartTime = new Date(convertToISOWithTimezoneOffset(classObj.startEventDate, classObj.startTime));
 
-    selectedClassrooms.forEach((classroomID) => {
       const payload = {
         ...classObj,
         teacher: { teacherID: parsedTeacher.id, status: "absent" },
         subjectID: JSON.parse(selectedSubject).id,
-        classroomID,
+        classroomID: selectedClassrooms, // Send as array for bulk creation
         startTime: isoStartTime,
         endTime: isoEndTime,
         selectedDays,
       };
-      classCreateMutate.mutate(payload);
-    });
-  };
 
-  const classCreateMutate = useMutation({
-    mutationFn: async (data) => await createClasses(data),
-    onSettled: (data, error) => {
-      if (!error) {
-        toast.success("Class scheduled successfully");
-        refetch();
-        setAddScheduleModalOpen(false);
-      } else {
-        toast.error(error?.response?.data?.error || "Failed to schedule class");
-      }
-    },
-  });
+      await createClasses(payload);
+      
+      toast.success("Classes scheduled successfully");
+      refetch();
+      setAddScheduleModalOpen(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Failed to schedule classes");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!addScheduleModalOpen) return null;
 
@@ -161,7 +164,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
               />
 
               <CustomSelectableField
-                options={teacherSubject || allSubjects}
+                options={selectedTeacherSubjects?.length > 0 ? selectedTeacherSubjects : allSubjects}
                 label="Course / Subject"
                 selectedOption={selectedSubject}
                 setSelectedOption={setSelectedSubject}
@@ -291,7 +294,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
         {/* Footer */}
         <div className="px-8 py-6 bg-slate-50 border-t border-slate-100">
           <div className="flex gap-4">
-            {classCreateMutate.isPending ? (
+            {loading ? (
               <div className="w-full flex justify-center py-2"><Loader color="#2563eb" /></div>
             ) : (
               <>

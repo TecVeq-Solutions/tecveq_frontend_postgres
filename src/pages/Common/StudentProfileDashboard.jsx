@@ -7,7 +7,8 @@ import {
     IoChatbubbleEllipses, IoTime, IoEllipsisVertical,
     IoDocumentText, IoWarning, IoLibrary, IoBus,
     IoSchool, IoDownload, IoMail, IoCall, IoStar,
-    IoTrendingUp, IoCheckmarkCircle, IoCloseCircle, IoList, IoClose
+    IoTrendingUp, IoCheckmarkCircle, IoCloseCircle, IoList, IoClose,
+    IoSparkles, IoShieldCheckmark, IoRibbon
 } from "react-icons/io5";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid,
@@ -27,9 +28,114 @@ import StudentNavbar from "../../components/Student/Dashboard/Navbar";
 import ParentNavbar from "../../components/Parent/Dashboard/Navbar";
 import TeacherNavbar from "../../components/Teacher/Navbar";
 
-/* ── Design tokens & patterns ─────────────────────────────────── */
-const dotPattern = `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.2' fill='%236366f1' fill-opacity='0.07'/%3E%3C/svg%3E")`;
-const gridPattern = `url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h32v32H0z' fill='none'/%3E%3Cpath d='M0 32V0M32 0v32' stroke='%236366f1' stroke-opacity='0.04' stroke-width='1'/%3E%3C/svg%3E")`;
+/* ── Premium Design System ──────────────────────────────────── */
+// Injecting custom styles
+const styleTag = typeof document !== 'undefined' ? (() => {
+    const existing = document.getElementById('spd-styles');
+    if (existing) return existing;
+    const s = document.createElement('style');
+    s.id = 'spd-styles';
+    s.textContent = `
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+        .spd-root { font-family: 'DM Sans', sans-serif; }
+        .spd-root h1, .spd-root h2, .spd-root h3 { font-family: 'Sora', sans-serif; }
+        .spd-glow-indigo { box-shadow: 0 0 0 1px rgba(99,102,241,0.15), 0 8px 32px -8px rgba(99,102,241,0.25); }
+        .spd-glow-emerald { box-shadow: 0 0 0 1px rgba(16,185,129,0.15), 0 8px 32px -8px rgba(16,185,129,0.25); }
+        .spd-glow-amber { box-shadow: 0 0 0 1px rgba(245,158,11,0.15), 0 8px 32px -8px rgba(245,158,11,0.25); }
+        .spd-card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .spd-card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 40px -8px rgba(99,102,241,0.18); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .spd-tab-active { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); }
+        .spd-shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .spd-float { animation: floatY 4s ease-in-out infinite; }
+        @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        .spd-pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+        .spd-gradient-text {
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .spd-ring-progress { transform-origin: center; transform: rotate(-90deg); }
+        .spd-mesh-bg {
+            background-color: #f8f7ff;
+            background-image:
+                radial-gradient(at 20% 20%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                radial-gradient(at 80% 10%, rgba(168,85,247,0.06) 0%, transparent 40%),
+                radial-gradient(at 50% 80%, rgba(236,72,153,0.04) 0%, transparent 50%);
+        }
+        .spd-stat-card {
+            background: white;
+            border: 1px solid rgba(226,232,240,0.8);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .spd-stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(99,102,241,0.03) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .spd-stat-card:hover::before { opacity: 1; }
+        .spd-stat-card:hover { border-color: rgba(99,102,241,0.2); transform: translateY(-3px); box-shadow: 0 16px 48px -12px rgba(99,102,241,0.2); }
+        .spd-sidebar-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid rgba(226,232,240,0.8);
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+        .spd-sidebar-card:hover { box-shadow: 0 8px 32px -8px rgba(99,102,241,0.15); }
+        .spd-action-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .spd-action-btn:active { transform: scale(0.97); }
+        .spd-table-row { transition: background 0.15s ease; }
+        .spd-table-row:hover { background: rgba(238,242,255,0.5); }
+        .spd-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .spd-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(241,245,249,1);
+        }
+        .spd-info-row:last-child { border-bottom: none; }
+    `;
+    document.head.appendChild(s);
+    return s;
+})() : null;
 
 const StudentProfileDashboard = () => {
     const { studentId } = useParams();
@@ -115,7 +221,7 @@ const StudentProfileDashboard = () => {
     });
 
     if (isLoading) return (
-        <div className="h-screen w-full flex items-center justify-center bg-[#F0F2FF]">
+        <div className="h-screen w-full flex items-center justify-center spd-mesh-bg">
             <LargeLoader />
         </div>
     );
@@ -132,12 +238,12 @@ const StudentProfileDashboard = () => {
     } = data;
 
     const tabs = [
-        { id: "overview", label: "Overview", icon: <IoPerson size={15} /> },
-        { id: "academic", label: "Academics", icon: <IoSchool size={15} /> },
-        { id: "attendance", label: "Attendance", icon: <IoCalendar size={15} /> },
-        { id: "fees", label: "Fees", icon: <IoWallet size={15} /> },
-        { id: "timetable", label: "Timetable", icon: <IoTime size={15} /> },
-        { id: "more", label: "More", icon: <IoEllipsisVertical size={15} /> }
+        { id: "overview", label: "Overview", icon: <IoPerson size={14} /> },
+        { id: "academic", label: "Academics", icon: <IoSchool size={14} /> },
+        { id: "attendance", label: "Attendance", icon: <IoCalendar size={14} /> },
+        { id: "fees", label: "Fees", icon: <IoWallet size={14} /> },
+        { id: "timetable", label: "Timetable", icon: <IoTime size={14} /> },
+        { id: "more", label: "More", icon: <IoEllipsisVertical size={14} /> }
     ];
 
     const calculateAttendancePercentage = () => {
@@ -196,21 +302,23 @@ const StudentProfileDashboard = () => {
         }))
     ].sort((a, b) => moment(b.date).diff(moment(a.date)));
 
-    /* ── Sub-components ─────────────────────────────────────────── */
+    /* ── Premium Sub-components ─────────────────────────────── */
 
-    const GlassCard = ({ children, className = "" }) => (
-        <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${className}`}>
+    const PremiumCard = ({ children, className = "", glow = false }) => (
+        <div className={`bg-white rounded-3xl border border-slate-100 shadow-sm ${glow ? 'spd-glow-indigo' : ''} ${className}`}
+            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 8px 24px -8px rgba(99,102,241,0.08)' }}>
             {children}
         </div>
     );
 
-    const SectionHeader = ({ icon, title, action, accentColor = "indigo" }) => (
+    const SectionHeader = ({ icon, title, action, gradient = "from-indigo-500 to-violet-500" }) => (
         <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2.5">
-                <span className={`w-7 h-7 rounded-lg bg-${accentColor}-50 border border-${accentColor}-100 flex items-center justify-center text-${accentColor}-500`}>
+            <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-sm`}
+                    style={{ boxShadow: '0 4px 12px -2px rgba(99,102,241,0.35)' }}>
                     {icon}
-                </span>
-                <h3 className="text-sm font-bold text-gray-800 tracking-tight">{title}</h3>
+                </div>
+                <h3 style={{ fontFamily: "'Sora', sans-serif" }} className="text-sm font-bold text-slate-800 tracking-tight">{title}</h3>
             </div>
             {action}
         </div>
@@ -218,58 +326,58 @@ const StudentProfileDashboard = () => {
 
     const StatusPill = ({ status }) => {
         const map = {
-            present: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-            late: "bg-amber-50 text-amber-700 border border-amber-200",
-            absent: "bg-red-50 text-red-600 border border-red-200",
-            paid: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-            unpaid: "bg-red-50 text-red-600 border border-red-200",
-            issued: "bg-amber-50 text-amber-700 border border-amber-200",
-            returned: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-            approved: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-            pending: "bg-amber-50 text-amber-700 border border-amber-200",
+            present: { bg: "rgba(16,185,129,0.08)", color: "#059669", border: "rgba(16,185,129,0.2)" },
+            late: { bg: "rgba(245,158,11,0.08)", color: "#d97706", border: "rgba(245,158,11,0.2)" },
+            absent: { bg: "rgba(239,68,68,0.08)", color: "#dc2626", border: "rgba(239,68,68,0.2)" },
+            paid: { bg: "rgba(16,185,129,0.08)", color: "#059669", border: "rgba(16,185,129,0.2)" },
+            unpaid: { bg: "rgba(239,68,68,0.08)", color: "#dc2626", border: "rgba(239,68,68,0.2)" },
+            issued: { bg: "rgba(245,158,11,0.08)", color: "#d97706", border: "rgba(245,158,11,0.2)" },
+            returned: { bg: "rgba(16,185,129,0.08)", color: "#059669", border: "rgba(16,185,129,0.2)" },
+            approved: { bg: "rgba(16,185,129,0.08)", color: "#059669", border: "rgba(16,185,129,0.2)" },
+            pending: { bg: "rgba(245,158,11,0.08)", color: "#d97706", border: "rgba(245,158,11,0.2)" },
         };
+        const s = map[status?.toLowerCase()] || { bg: "rgba(148,163,184,0.1)", color: "#64748b", border: "rgba(148,163,184,0.2)" };
         return (
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${map[status?.toLowerCase()] || "bg-gray-50 text-gray-500 border border-gray-200"}`}>
+            <span style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}`, borderRadius: 8, padding: '2px 8px', fontSize: 10, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
                 {status}
             </span>
         );
     };
 
     const AttendanceDot = ({ isPresent, late }) => {
-        if (isPresent && late) return <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />;
-        if (isPresent) return <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />;
-        return <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />;
+        const color = (isPresent && late) ? '#f59e0b' : isPresent ? '#10b981' : '#ef4444';
+        return <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0, display: 'inline-block', boxShadow: `0 0 6px ${color}60` }} />;
     };
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (!active || !payload?.length) return null;
         return (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-lg px-3 py-2 text-sm">
-                <p className="text-gray-400 text-[10px] mb-0.5">{moment(label).format("MMM DD, YYYY")}</p>
-                <p className="font-bold text-indigo-600">{payload[0].value} marks</p>
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid rgba(226,232,240,1)', boxShadow: '0 8px 32px -8px rgba(99,102,241,0.2)', padding: '10px 14px', fontFamily: "'DM Sans', sans-serif" }}>
+                <p style={{ color: '#94a3b8', fontSize: 10, marginBottom: 3 }}>{moment(label).format("MMM DD, YYYY")}</p>
+                <p style={{ fontWeight: 800, color: '#6366f1', fontSize: 14 }}>{payload[0].value} marks</p>
             </div>
         );
     };
 
     const InfoRow = ({ label, value }) => (
-        <div className="flex justify-between items-center py-2.5 border-b border-gray-50 last:border-0">
-            <span className="text-xs text-gray-400 font-medium">{label}</span>
-            <span className="text-xs font-semibold text-gray-700">{value || "N/A"}</span>
+        <div className="spd-info-row">
+            <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>{label}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#334155' }}>{value || "N/A"}</span>
         </div>
     );
 
-    const MiniStat = ({ label, count, colorClass }) => (
-        <div className={`flex flex-col items-center px-3 py-2 rounded-xl border ${colorClass}`}>
-            <span className="text-lg font-extrabold leading-none">{count}</span>
-            <span className="text-[10px] font-semibold mt-0.5 uppercase tracking-wider">{label}</span>
+    const MiniStat = ({ label, count, colorClass, color }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 12px', borderRadius: 14, border: `1px solid ${color}25`, background: `${color}08` }}>
+            <span style={{ fontSize: 20, fontWeight: 800, color, fontFamily: "'Sora', sans-serif", lineHeight: 1 }}>{count}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em', color: `${color}CC` }}>{label}</span>
         </div>
     );
 
     return (
-        <div className="min-h-screen font-poppins pb-16 lg:ml-80 ml-0" style={{ backgroundImage: dotPattern }}>
+        <div className="spd-root min-h-screen w-full md:px-8 pb-16 lg:ml-80 ml-0 spd-mesh-bg">
 
             {/* Navbar */}
-            <div className="max-w-7xl mx-auto mb-4 px-4 sm:px-0">
+            <div className=" mx-auto mb-4 px-4 sm:px-0">
                 {userData?.userType === 'admin' || userData?.userType === 'super_admin' ? (
                     <AdminNavbar heading="Student Profile" />
                 ) : userData?.userType === 'teacher' ? (
@@ -281,428 +389,587 @@ const StudentProfileDashboard = () => {
                 )}
             </div>
 
-            {/* Header */}
-            <div className="max-w-7xl mx-auto flex items-center gap-4 mb-7 px-4 sm:px-0">
-                <button
+            {/* ── Page Header ──────────────────────────────── */}
+            <div className=" mx-auto flex items-center gap-4 mb-8 px-4 sm:px-0">
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => navigate(-1)}
-                    className="p-2 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all text-gray-500 hover:text-indigo-600 active:scale-95"
+                    style={{
+                        width: 44, height: 44, borderRadius: 14, background: 'white',
+                        border: '1px solid rgba(226,232,240,0.8)', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center', color: '#64748b',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)', cursor: 'pointer',
+                        flexShrink: 0
+                    }}
                 >
                     <IoArrowBack size={18} />
-                </button>
+                </motion.button>
                 <div>
-                    <h1 className="text-xl font-extrabold text-gray-900 tracking-tight">Student Profile</h1>
-                    <p className="text-xs text-gray-400 font-medium mt-0.5">Full academic overview & analytics</p>
+                    <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>
+                        Student Profile
+                    </h1>
+                    <p style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500, marginTop: 2 }}>Full academic overview & analytics</p>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-7 px-4 sm:px-0">
+            <div className=" mx-auto grid grid-cols-1 lg:grid-cols-4 gap-7 px-4 sm:px-0">
 
-                {/* ── LEFT SIDEBAR ────────────────────────── */}
+                {/* ── LEFT SIDEBAR ─────────────────────────── */}
                 <div className="lg:col-span-1 space-y-4">
 
-                    {/* Profile Card */}
+                    {/* ── Profile Card ── */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm"
+                        transition={{ duration: 0.5 }}
+                        className="spd-sidebar-card"
                     >
-                        {/* Top accent bar */}
-                        <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
-                        {/* Subtle grid bg on top section */}
-                        <div className="relative px-5 pt-5 pb-4 flex flex-col items-center text-center" style={{ backgroundImage: gridPattern }}>
-                            <div className="relative mb-3">
-                                <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-white shadow-md ring-1 ring-indigo-100">
-                                    <img
-                                        src={basicInfo.profilePic || profilePlaceholder}
-                                        alt={basicInfo.name}
-                                        className="w-full h-full object-cover"
-                                    />
+                        {/* Top Hero Banner */}
+                        <div style={{
+                            height: 80, background: 'linear-gradient(135deg, #1e1b4b 0%, #3730a3 40%, #6d28d9 100%)',
+                            position: 'relative', overflow: 'hidden'
+                        }}>
+                            {/* Decorative circles */}
+                            <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
+                            <div style={{ position: 'absolute', top: 20, right: 20, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
+                            <div style={{ position: 'absolute', bottom: -10, left: 10, width: 50, height: 50, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                            {/* Grid overlay */}
+                            <div style={{
+                                position: 'absolute', inset: 0,
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0z' fill='none'/%3E%3Cpath d='M0 20V0M20 0v20' stroke='%23ffffff' stroke-opacity='0.06' stroke-width='0.5'/%3E%3C/svg%3E")`
+                            }} />
+                        </div>
+
+                        {/* Avatar */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px 20px', marginTop: -40, textAlign: 'center' }}>
+                            <div style={{ position: 'relative', marginBottom: 12 }}>
+                                <div style={{
+                                    width: 80, height: 80, borderRadius: 22,
+                                    border: '3px solid white', overflow: 'hidden',
+                                    boxShadow: '0 8px 24px -4px rgba(99,102,241,0.3), 0 0 0 1px rgba(99,102,241,0.1)'
+                                }}>
+                                    <img src={basicInfo.profilePic || profilePlaceholder} alt={basicInfo.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-400 border-2 border-white rounded-full shadow-sm" />
+                                {/* Online dot */}
+                                <span className="spd-pulse-dot" style={{
+                                    position: 'absolute', bottom: -2, right: -2, width: 16, height: 16,
+                                    borderRadius: '50%', background: '#10b981', border: '2px solid white',
+                                    boxShadow: '0 0 8px rgba(16,185,129,0.5)', display: 'block'
+                                }} />
                             </div>
-                            <h2 className="text-base font-extrabold text-gray-900 leading-tight">{basicInfo.name}</h2>
-                            <div className="mt-1.5 flex items-center gap-1.5">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-full">
-                                    Roll #{basicInfo.rollNo || "N/A"}
-                                </span>
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-full">
-                                    {basicInfo.level?.name || "N/A"}
-                                </span>
-                            </div>
-                        </div>
 
-                        <div className="px-5 pb-4 space-y-0.5">
-                            <InfoRow label="Class" value={basicInfo.classroomStudents?.[0]?.name} />
-                            <InfoRow label="Level" value={basicInfo.level?.name} />
-                        </div>
+                            <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 800, color: '#0f172a', lineHeight: 1.3, marginBottom: 8 }}>
+                                {basicInfo.name}
+                            </h2>
 
-                        <div className="px-5 pb-5 space-y-2.5 border-t border-gray-50 pt-3">
-                            <div className="flex items-center gap-2.5 group">
-                                <span className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-500 flex-shrink-0">
-                                    <IoMail size={12} />
-                                </span>
-                                <span className="text-xs text-gray-500 truncate">{basicInfo.email}</span>
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 16 }}>
+                                <span style={{
+                                    fontSize: 10, fontWeight: 700, color: '#6366f1',
+                                    background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)',
+                                    padding: '4px 10px', borderRadius: 8
+                                }}>Roll #{basicInfo.rollNo || "N/A"}</span>
+                                <span style={{
+                                    fontSize: 10, fontWeight: 700, color: '#64748b',
+                                    background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.12)',
+                                    padding: '4px 10px', borderRadius: 8
+                                }}>{basicInfo.level?.name || "N/A"}</span>
                             </div>
-                            <div className="flex items-center gap-2.5 group">
-                                <span className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 flex-shrink-0">
-                                    <IoCall size={12} />
-                                </span>
-                                <span className="text-xs text-gray-500">{basicInfo.phoneNumber || "N/A"}</span>
+
+                            <div style={{ width: '100%', borderTop: '1px solid rgba(241,245,249,1)', paddingTop: 14 }}>
+                                <InfoRow label="Class" value={basicInfo.classroomStudents?.[0]?.name} />
+                                <InfoRow label="Level" value={basicInfo.level?.name} />
+                            </div>
+
+                            {/* Contact */}
+                            <div style={{ width: '100%', paddingTop: 14, borderTop: '1px solid rgba(241,245,249,1)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <div style={{
+                                        width: 30, height: 30, borderRadius: 10,
+                                        background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1', flexShrink: 0
+                                    }}>
+                                        <IoMail size={12} />
+                                    </div>
+                                    <span style={{ fontSize: 11, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{basicInfo.email}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <div style={{
+                                        width: 30, height: 30, borderRadius: 10,
+                                        background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0
+                                    }}>
+                                        <IoCall size={12} />
+                                    </div>
+                                    <span style={{ fontSize: 11, color: '#64748b' }}>{basicInfo.phoneNumber || "N/A"}</span>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
 
-                    {/* Attendance Ring */}
+                    {/* ── Attendance Ring Card ── */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.08 }}
-                        className="relative overflow-hidden bg-[#0D1268] rounded-2xl border border-indigo-900/50 shadow-md"
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E")` }}
+                        transition={{ delay: 0.1, duration: 0.5 }}
+                        style={{
+                            borderRadius: 24,
+                            background: 'linear-gradient(145deg, #0f0c29 0%, #1e1b4b 50%, #24243e 100%)',
+                            border: '1px solid rgba(99,102,241,0.2)',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            boxShadow: '0 20px 60px -15px rgba(99,102,241,0.4)'
+                        }}
                     >
-                        {/* Corner accent */}
-                        <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-indigo-700/20 -translate-x-4 -translate-y-8" />
-                        <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full bg-purple-700/15 translate-x-[-30%] translate-y-[40%]" />
+                        {/* Decorative blobs */}
+                        <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.3), transparent)', filter: 'blur(20px)' }} />
+                        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.2), transparent)', filter: 'blur(16px)' }} />
+                        <div className="spd-shimmer" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
-                        <div className="relative p-5">
-                            <div className="flex items-center gap-4">
-                                {/* Ring */}
-                                <div className="relative w-[72px] h-[72px] flex-shrink-0">
-                                    <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                                        <circle cx="60" cy="60" r="52" stroke="rgba(255,255,255,0.1)" strokeWidth="10" fill="none" />
+                        <div style={{ position: 'relative', padding: 20 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+                                {/* SVG Ring */}
+                                <div style={{ position: 'relative', width: 76, height: 76, flexShrink: 0 }}>
+                                    <svg width="76" height="76" viewBox="0 0 120 120">
+                                        <circle cx="60" cy="60" r="52" stroke="rgba(255,255,255,0.07)" strokeWidth="10" fill="none" />
+                                        <defs>
+                                            <linearGradient id="ringGrad1" x1="0" y1="0" x2="1" y2="1">
+                                                <stop stopColor="#818cf8" />
+                                                <stop offset="1" stopColor="#a855f7" />
+                                            </linearGradient>
+                                        </defs>
                                         <motion.circle
                                             cx="60" cy="60" r="52"
-                                            stroke="#818cf8"
-                                            strokeWidth="10"
-                                            fill="none"
+                                            stroke="url(#ringGrad1)"
+                                            strokeWidth="10" fill="none"
                                             strokeLinecap="round"
                                             strokeDasharray={circumference}
                                             initial={{ strokeDashoffset: circumference }}
                                             animate={{ strokeDashoffset: circumference - (circumference * attendancePct / 100) }}
-                                            transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+                                            transition={{ duration: 1.4, ease: "easeOut", delay: 0.4 }}
+                                            style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
                                         />
                                     </svg>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-sm font-extrabold text-white">{attendancePct}%</span>
+                                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 800, color: 'white' }}>{attendancePct}%</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-0.5">Attendance Rate</p>
-                                    <p className={`text-xl font-extrabold ${attendancePct >= 75 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                    <p style={{ color: 'rgba(165,180,252,0.7)', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Attendance Rate</p>
+                                    <p style={{
+                                        fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 800,
+                                        color: attendancePct >= 75 ? '#34d399' : '#f87171', lineHeight: 1
+                                    }}>
                                         {attendancePct >= 75 ? "Good Standing" : "At Risk"}
                                     </p>
-                                    <p className="text-indigo-300/70 text-[10px] font-medium mt-0.5">{attendance.length} total sessions</p>
+                                    <p style={{ color: 'rgba(165,180,252,0.5)', fontSize: 10, fontWeight: 500, marginTop: 4 }}>{attendance.length} total sessions</p>
                                 </div>
                             </div>
 
-                            <div className="mt-4 pt-3 border-t border-white/10 grid grid-cols-3 gap-2">
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                                 {[
-                                    { color: "bg-emerald-400", label: "Present", count: attendance?.filter(a => a.isPresent && !a.late).length || 0 },
-                                    { color: "bg-amber-400", label: "Late", count: attendance?.filter(a => a.late).length || 0 },
-                                    { color: "bg-red-400", label: "Absent", count: attendance?.filter(a => !a.isPresent).length || 0 }
+                                    { color: '#34d399', label: "Present", count: attendance?.filter(a => a.isPresent && !a.late).length || 0 },
+                                    { color: '#fbbf24', label: "Late", count: attendance?.filter(a => a.late).length || 0 },
+                                    { color: '#f87171', label: "Absent", count: attendance?.filter(a => !a.isPresent).length || 0 }
                                 ].map(({ color, label, count }) => (
-                                    <div key={label} className="flex flex-col items-center gap-1 py-2 rounded-xl bg-white/5 border border-white/10">
-                                        <span className={`w-2 h-2 rounded-full ${color}`} />
-                                        <span className="text-sm font-extrabold text-white">{count}</span>
-                                        <span className="text-[9px] text-indigo-300 font-semibold uppercase tracking-wider">{label}</span>
+                                    <div key={label} style={{
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                                        padding: '10px 6px', borderRadius: 14,
+                                        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)'
+                                    }}>
+                                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 8px ${color}` }} />
+                                        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 800, color: 'white', lineHeight: 1 }}>{count}</span>
+                                        <span style={{ fontSize: 8, color: 'rgba(165,180,252,0.6)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </motion.div>
 
-                    {/* Quick Actions */}
+                    {/* ── Quick Actions ── */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
-                        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 space-y-1.5"
+                        transition={{ delay: 0.18, duration: 0.5 }}
+                        className="spd-sidebar-card"
+                        style={{ padding: 16 }}
                     >
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-2">Quick Actions</p>
-                        {[
-                            { icon: <IoChatbubbleEllipses size={14} />, label: "Message Parent", bg: "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100", dot: "bg-indigo-400", onClick: () => setIsMessageModalOpen(true) },
-                            { icon: <IoDocumentText size={14} />, label: "Download Report", bg: "bg-violet-50 border-violet-100 text-violet-700 hover:bg-violet-100", dot: "bg-violet-400", onClick: handleDownloadReport },
-                            { icon: <IoStar size={14} />, label: "Add Teacher Note", bg: "bg-amber-50 border-amber-100 text-amber-700 hover:bg-amber-100", dot: "bg-amber-400", onClick: () => setIsNoteModalOpen(true) }
-                        ].map(({ icon, label, bg, dot, onClick }) => (
-                            <button
-                                key={label}
-                                onClick={onClick}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all active:scale-[0.98] ${bg}`}
-                            >
-                                <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-                                {icon}
-                                {label}
-                            </button>
-                        ))}
+                        <p style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 4px 10px' }}>Quick Actions</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {[
+                                {
+                                    icon: <IoChatbubbleEllipses size={14} />,
+                                    label: "Message Parent",
+                                    colors: { bg: 'rgba(99,102,241,0.06)', border: 'rgba(99,102,241,0.15)', text: '#4f46e5', dot: '#6366f1' },
+                                    onClick: () => setIsMessageModalOpen(true)
+                                },
+                                {
+                                    icon: <IoDownload size={14} />,
+                                    label: "Download Report",
+                                    colors: { bg: 'rgba(139,92,246,0.06)', border: 'rgba(139,92,246,0.15)', text: '#7c3aed', dot: '#8b5cf6' },
+                                    onClick: handleDownloadReport
+                                },
+                                {
+                                    icon: <IoStar size={14} />,
+                                    label: "Add Teacher Note",
+                                    colors: { bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.15)', text: '#d97706', dot: '#f59e0b' },
+                                    onClick: () => setIsNoteModalOpen(true)
+                                }
+                            ].map(({ icon, label, colors, onClick }) => (
+                                <motion.button
+                                    key={label}
+                                    whileHover={{ x: 3 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    onClick={onClick}
+                                    style={{
+                                        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                                        padding: '10px 12px', borderRadius: 14, fontSize: 12, fontWeight: 600,
+                                        border: `1px solid ${colors.border}`, background: colors.bg,
+                                        color: colors.text, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif"
+                                    }}
+                                >
+                                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: colors.dot, boxShadow: `0 0 6px ${colors.dot}` }} />
+                                    {icon}
+                                    {label}
+                                </motion.button>
+                            ))}
+                        </div>
                     </motion.div>
                 </div>
 
                 {/* ── RIGHT CONTENT ─────────────────────────── */}
                 <div className="lg:col-span-3 space-y-6">
 
-                    {/* Navigation Tabs */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-                        {tabs.map((tab) => (
-                            <button
+                    {/* ── Navigation Tabs ── */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 4 }} className="no-scrollbar">
+                        {tabs.map((tab, i) => (
+                            <motion.button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap active:scale-95 ${activeTab === tab.id
-                                    ? "bg-[#0D1268] text-white shadow-md shadow-indigo-900/20"
-                                    : "bg-white text-gray-500 hover:text-gray-700 border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100"
-                                    }`}
+                                whileTap={{ scale: 0.95 }}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px',
+                                    borderRadius: 14, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+                                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                                    transition: 'all 0.2s ease',
+                                    ...(activeTab === tab.id ? {
+                                        background: 'linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)',
+                                        color: 'white',
+                                        border: '1px solid rgba(99,102,241,0.3)',
+                                        boxShadow: '0 8px 24px -4px rgba(67,56,202,0.4)'
+                                    } : {
+                                        background: 'white',
+                                        color: '#64748b',
+                                        border: '1px solid rgba(226,232,240,0.8)',
+                                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                                    })
+                                }}
                             >
-                                <span className={activeTab === tab.id ? "text-indigo-300" : "text-gray-400"}>
+                                <span style={{ color: activeTab === tab.id ? 'rgba(165,180,252,0.9)' : '#94a3b8' }}>
                                     {tab.icon}
                                 </span>
                                 {tab.label}
-                            </button>
+                            </motion.button>
                         ))}
                     </div>
 
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            transition={{ duration: 0.2 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.22 }}
                         >
 
-                            {/* ══ OVERVIEW TAB ══════════════════════════ */}
+                            {/* ══ OVERVIEW TAB ════════════════════════ */}
                             {activeTab === "overview" && (
                                 <div className="space-y-6">
-
                                     {/* Stat cards */}
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         {/* Assignments */}
-                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 relative overflow-hidden group hover:shadow-md hover:border-orange-200 transition-all">
-                                            <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-orange-50 -translate-y-8 translate-x-8" />
-                                            <div className="relative">
-                                                <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-500 mb-3 group-hover:scale-110 transition-transform">
-                                                    <IoDocumentText size={16} />
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                                            className="spd-stat-card" style={{ padding: 22 }}
+                                        >
+                                            <div style={{
+                                                position: 'absolute', top: -12, right: -12, width: 64, height: 64,
+                                                borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.12), transparent)'
+                                            }} />
+                                            <div style={{ position: 'relative' }}>
+                                                <div style={{
+                                                    width: 40, height: 40, borderRadius: 14,
+                                                    background: 'linear-gradient(135deg, #fed7aa, #fb923c)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    marginBottom: 14, boxShadow: '0 6px 16px -4px rgba(249,115,22,0.4)'
+                                                }}>
+                                                    <IoDocumentText size={16} color="white" />
                                                 </div>
-                                                <p className="text-3xl font-extrabold text-gray-900">{assignments.length}</p>
-                                                <p className="text-xs text-gray-400 font-semibold mt-0.5">Assignments</p>
-                                                <div className="mt-3 h-1 rounded-full bg-gray-100">
-                                                    <div className="h-full bg-orange-400 rounded-full transition-all" style={{ width: `${Math.min(assignments.length * 5, 100)}%` }} />
+                                                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 32, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{assignments.length}</p>
+                                                <p style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginTop: 4 }}>Assignments</p>
+                                                <div style={{ marginTop: 14, height: 4, borderRadius: 4, background: 'rgba(241,245,249,1)' }}>
+                                                    <motion.div
+                                                        initial={{ width: 0 }} animate={{ width: `${Math.min(assignments.length * 5, 100)}%` }}
+                                                        transition={{ duration: 0.8, delay: 0.2 }}
+                                                        style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg, #fdba74, #f97316)' }}
+                                                    />
                                                 </div>
                                             </div>
-                                        </div>
+                                        </motion.div>
 
                                         {/* Quizzes */}
-                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 relative overflow-hidden group hover:shadow-md hover:border-blue-200 transition-all">
-                                            <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-blue-50 -translate-y-8 translate-x-8" />
-                                            <div className="relative">
-                                                <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500 mb-3 group-hover:scale-110 transition-transform">
-                                                    <IoBook size={16} />
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                                            className="spd-stat-card" style={{ padding: 22 }}
+                                        >
+                                            <div style={{
+                                                position: 'absolute', top: -12, right: -12, width: 64, height: 64,
+                                                borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.12), transparent)'
+                                            }} />
+                                            <div style={{ position: 'relative' }}>
+                                                <div style={{
+                                                    width: 40, height: 40, borderRadius: 14,
+                                                    background: 'linear-gradient(135deg, #bfdbfe, #3b82f6)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    marginBottom: 14, boxShadow: '0 6px 16px -4px rgba(59,130,246,0.4)'
+                                                }}>
+                                                    <IoBook size={16} color="white" />
                                                 </div>
-                                                <p className="text-3xl font-extrabold text-gray-900">{quizzes.length}</p>
-                                                <p className="text-xs text-gray-400 font-semibold mt-0.5">Quizzes Taken</p>
-                                                <div className="mt-3 h-1 rounded-full bg-gray-100">
-                                                    <div className="h-full bg-blue-400 rounded-full transition-all" style={{ width: `${Math.min(quizzes.length * 8, 100)}%` }} />
+                                                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 32, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{quizzes.length}</p>
+                                                <p style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginTop: 4 }}>Quizzes Taken</p>
+                                                <div style={{ marginTop: 14, height: 4, borderRadius: 4, background: 'rgba(241,245,249,1)' }}>
+                                                    <motion.div
+                                                        initial={{ width: 0 }} animate={{ width: `${Math.min(quizzes.length * 8, 100)}%` }}
+                                                        transition={{ duration: 0.8, delay: 0.25 }}
+                                                        style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg, #93c5fd, #3b82f6)' }}
+                                                    />
                                                 </div>
                                             </div>
-                                        </div>
+                                        </motion.div>
 
                                         {/* Fee Status */}
-                                        <div className={`rounded-2xl border shadow-sm p-5 relative overflow-hidden group transition-all ${fees.some(f => f.status === 'unpaid')
-                                            ? 'bg-red-50 border-red-100 hover:shadow-md hover:border-red-200'
-                                            : 'bg-emerald-50 border-emerald-100 hover:shadow-md hover:border-emerald-200'
-                                            }`}>
-                                            <div className={`absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-8 translate-x-8 ${fees.some(f => f.status === 'unpaid') ? 'bg-red-100' : 'bg-emerald-100'}`} />
-                                            <div className="relative">
-                                                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform ${fees.some(f => f.status === 'unpaid') ? 'bg-red-100 border-red-200 text-red-500' : 'bg-emerald-100 border-emerald-200 text-emerald-600'}`}>
-                                                    <IoWallet size={16} />
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                                            className="spd-stat-card"
+                                            style={{
+                                                padding: 22,
+                                                background: fees.some(f => f.status === 'unpaid')
+                                                    ? 'linear-gradient(135deg, #fff5f5, #fef2f2)'
+                                                    : 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+                                                border: `1px solid ${fees.some(f => f.status === 'unpaid') ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.12)'}`
+                                            }}
+                                        >
+                                            <div style={{ position: 'relative' }}>
+                                                <div style={{
+                                                    width: 40, height: 40, borderRadius: 14,
+                                                    background: fees.some(f => f.status === 'unpaid')
+                                                        ? 'linear-gradient(135deg, #fca5a5, #ef4444)'
+                                                        : 'linear-gradient(135deg, #6ee7b7, #10b981)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    marginBottom: 14,
+                                                    boxShadow: fees.some(f => f.status === 'unpaid') ? '0 6px 16px -4px rgba(239,68,68,0.4)' : '0 6px 16px -4px rgba(16,185,129,0.4)'
+                                                }}>
+                                                    <IoWallet size={16} color="white" />
                                                 </div>
-                                                <p className={`text-2xl font-extrabold ${fees.some(f => f.status === 'unpaid') ? 'text-red-600' : 'text-emerald-700'}`}>
+                                                <p style={{
+                                                    fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 800, lineHeight: 1,
+                                                    color: fees.some(f => f.status === 'unpaid') ? '#dc2626' : '#059669'
+                                                }}>
                                                     {fees.some(f => f.status === 'unpaid') ? 'Dues Pending' : 'All Clear'}
                                                 </p>
-                                                <p className="text-xs text-gray-400 font-semibold mt-0.5">Fee Status</p>
-                                                <p className={`text-[10px] font-bold mt-1.5 ${fees.some(f => f.status === 'unpaid') ? 'text-red-500' : 'text-emerald-600'}`}>
+                                                <p style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginTop: 4 }}>Fee Status</p>
+                                                <p style={{ fontSize: 10, fontWeight: 700, marginTop: 8, color: fees.some(f => f.status === 'unpaid') ? '#ef4444' : '#10b981' }}>
                                                     {fees.filter(f => f.status === 'unpaid').length} unpaid · {fees.filter(f => f.status === 'paid').length} paid
                                                 </p>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     </div>
 
-                                    {/* Parent + Journey */}
+                                    {/* Parent + Performance */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <GlassCard className="p-5">
-                                            <SectionHeader icon={<IoPerson size={13} />} title="Parent / Guardian" />
-                                            <div className="flex gap-4 items-center mb-4">
-                                                <div className="w-14 h-14 rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
-                                                    <img src={basicInfo.guardian?.profilePic || profilePlaceholder} className="w-full h-full object-cover" alt="" />
+                                        <PremiumCard className="p-5">
+                                            <SectionHeader icon={<IoPerson size={13} />} title="Parent / Guardian" gradient="from-indigo-400 to-violet-500" />
+                                            <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 16 }}>
+                                                <div style={{ width: 56, height: 56, borderRadius: 18, overflow: 'hidden', border: '2px solid rgba(226,232,240,0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', flexShrink: 0 }}>
+                                                    <img src={basicInfo.guardian?.profilePic || profilePlaceholder} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 text-sm leading-tight">{basicInfo.guardian?.name || basicInfo.guardianName}</p>
-                                                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full mt-1 inline-block">Guardian</span>
+                                                    <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#0f172a', fontSize: 14, lineHeight: 1.3 }}>{basicInfo.guardian?.name || basicInfo.guardianName}</p>
+                                                    <span style={{ fontSize: 9, fontWeight: 700, color: '#6366f1', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', padding: '2px 8px', borderRadius: 6, display: 'inline-block', marginTop: 5, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Guardian</span>
                                                 </div>
                                             </div>
-                                            <div className="space-y-0">
-                                                <InfoRow label="Contact" value={basicInfo.guardian?.phoneNumber || basicInfo.guardianPhoneNumber} />
-                                                <InfoRow label="Email" value={basicInfo.guardian?.email || basicInfo.guardianEmail} />
-                                            </div>
-                                        </GlassCard>
+                                            <InfoRow label="Contact" value={basicInfo.guardian?.phoneNumber || basicInfo.guardianPhoneNumber} />
+                                            <InfoRow label="Email" value={basicInfo.guardian?.email || basicInfo.guardianEmail} />
+                                        </PremiumCard>
 
-                                        {/* Quick stats summary */}
-                                        <GlassCard className="p-5">
-                                            <SectionHeader icon={<IoTrendingUp size={13} />} title="Performance Summary" accentColor="violet" />
-                                            <div className="space-y-3">
+                                        <PremiumCard className="p-5">
+                                            <SectionHeader icon={<IoTrendingUp size={13} />} title="Performance Summary" gradient="from-violet-500 to-purple-600" />
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                                 {[
                                                     {
                                                         label: "Avg Assignment Score",
-                                                        value: assignments.length > 0
-                                                            ? `${Math.round(assignments.reduce((s, a) => s + (a.marks || 0), 0) / assignments.length)}%`
-                                                            : "N/A",
-                                                        color: "text-indigo-600",
-                                                        bg: "bg-indigo-50"
+                                                        value: assignments.length > 0 ? `${Math.round(assignments.reduce((s, a) => s + (a.marks || 0), 0) / assignments.length)}%` : "N/A",
+                                                        color: '#6366f1', bg: 'rgba(99,102,241,0.06)'
                                                     },
                                                     {
                                                         label: "Avg Quiz Score",
-                                                        value: quizzes.length > 0
-                                                            ? `${Math.round(quizzes.reduce((s, q) => s + (q.marks || 0), 0) / quizzes.length)}%`
-                                                            : "N/A",
-                                                        color: "text-blue-600",
-                                                        bg: "bg-blue-50"
+                                                        value: quizzes.length > 0 ? `${Math.round(quizzes.reduce((s, q) => s + (q.marks || 0), 0) / quizzes.length)}%` : "N/A",
+                                                        color: '#3b82f6', bg: 'rgba(59,130,246,0.06)'
                                                     },
                                                     {
                                                         label: "Total Submissions",
                                                         value: assignments.length + quizzes.length,
-                                                        color: "text-violet-600",
-                                                        bg: "bg-violet-50"
+                                                        color: '#8b5cf6', bg: 'rgba(139,92,246,0.06)'
                                                     }
                                                 ].map(({ label, value, color, bg }) => (
-                                                    <div key={label} className={`flex justify-between items-center px-3 py-2.5 rounded-xl ${bg}`}>
-                                                        <span className="text-xs font-semibold text-gray-600">{label}</span>
-                                                        <span className={`text-sm font-extrabold ${color}`}>{value}</span>
+                                                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', borderRadius: 14, background: bg }}>
+                                                        <span style={{ fontSize: 12, fontWeight: 500, color: '#475569' }}>{label}</span>
+                                                        <span style={{ fontSize: 14, fontWeight: 800, color, fontFamily: "'Sora', sans-serif" }}>{value}</span>
                                                     </div>
                                                 ))}
                                             </div>
-                                        </GlassCard>
+                                        </PremiumCard>
                                     </div>
 
                                     {/* Enrolled Subjects */}
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoBook size={13} />} title="Enrolled Subjects" accentColor="blue" />
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoBook size={13} />} title="Enrolled Subjects" gradient="from-blue-500 to-cyan-500" />
                                         {subjectAttendance.length > 0 ? (
                                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                                 {subjectAttendance.map((subject, idx) => (
-                                                    <div key={idx} className="relative overflow-hidden flex flex-col p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group">
-                                                        <div className="w-6 h-6 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-indigo-500 mb-2.5 group-hover:border-indigo-300 transition-colors">
-                                                            <IoBook size={11} />
+                                                    <motion.div
+                                                        key={idx}
+                                                        whileHover={{ y: -3 }}
+                                                        style={{
+                                                            padding: 16, borderRadius: 18,
+                                                            background: 'rgba(248,250,252,1)',
+                                                            border: '1px solid rgba(226,232,240,0.8)',
+                                                            cursor: 'default', transition: 'all 0.2s ease'
+                                                        }}
+                                                    >
+                                                        <div style={{
+                                                            width: 28, height: 28, borderRadius: 10,
+                                                            background: `linear-gradient(135deg, hsl(${(idx * 47) % 360},70%,88%), hsl(${(idx * 47 + 30) % 360},70%,72%))`,
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10
+                                                        }}>
+                                                            <IoBook size={12} color="white" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Subject</span>
-                                                        <span className="text-sm font-extrabold text-gray-800 line-clamp-1 group-hover:text-indigo-700 transition-colors mt-0.5">{subject.name}</span>
-                                                        <div className="mt-3">
-                                                            <div className="flex items-center justify-between mb-1">
-                                                                <span className="text-[10px] text-gray-400 font-medium">Attendance</span>
-                                                                <span className={`text-[10px] font-extrabold ${subject.percentage >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                                                    {subject.percentage}%
-                                                                </span>
+                                                        <span style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Subject</span>
+                                                        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 800, color: '#1e293b', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subject.name}</p>
+                                                        <div style={{ marginTop: 10 }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                                                                <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 500 }}>Attendance</span>
+                                                                <span style={{ fontSize: 10, fontWeight: 800, color: subject.percentage >= 75 ? '#059669' : '#d97706' }}>{subject.percentage}%</span>
                                                             </div>
-                                                            <div className="h-1 rounded-full bg-gray-200">
-                                                                <div
-                                                                    className={`h-full rounded-full ${subject.percentage >= 75 ? 'bg-emerald-400' : 'bg-amber-400'}`}
-                                                                    style={{ width: `${subject.percentage}%` }}
-                                                                />
+                                                            <div style={{ height: 4, borderRadius: 4, background: 'rgba(226,232,240,1)' }}>
+                                                                <div style={{ height: '100%', borderRadius: 4, width: `${subject.percentage}%`, background: subject.percentage >= 75 ? 'linear-gradient(90deg, #34d399, #10b981)' : 'linear-gradient(90deg, #fcd34d, #f59e0b)' }} />
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </motion.div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <p className="text-center text-gray-400 py-8 text-sm">No enrolled subjects found.</p>
+                                            <p style={{ textAlign: 'center', color: '#94a3b8', padding: '32px 0', fontSize: 13 }}>No enrolled subjects found.</p>
                                         )}
-                                    </GlassCard>
+                                    </PremiumCard>
 
                                     {/* Teacher's Notes */}
-                                    <GlassCard className="p-5">
+                                    <PremiumCard className="p-5">
                                         <SectionHeader
                                             icon={<IoList size={13} />}
                                             title="Teacher's Notes"
-                                            accentColor="amber"
+                                            gradient="from-amber-400 to-orange-500"
                                             action={
-                                                <button
+                                                <motion.button
+                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                                                     onClick={() => setIsNoteModalOpen(true)}
-                                                    className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors"
+                                                    style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', padding: '6px 12px', borderRadius: 10, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
                                                 >
                                                     + Add Note
-                                                </button>
+                                                </motion.button>
                                             }
                                         />
-                                        <div className="space-y-3">
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                             {notes && notes.length > 0 ? notes.map((note, i) => (
-                                                <div key={i} className="p-4 rounded-xl bg-amber-50 border border-amber-100 relative group hover:border-amber-200 transition-colors">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="w-6 h-6 rounded-lg bg-amber-200 flex items-center justify-center text-[10px] font-extrabold text-amber-800">
+                                                <div key={i} style={{
+                                                    padding: 16, borderRadius: 18,
+                                                    background: 'linear-gradient(135deg, rgba(254,243,199,0.6), rgba(253,230,138,0.3))',
+                                                    border: '1px solid rgba(251,191,36,0.2)'
+                                                }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                                        <div style={{ width: 26, height: 26, borderRadius: 8, background: 'linear-gradient(135deg, #fcd34d, #f59e0b)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: 'white' }}>
                                                             {note.teacher?.name?.charAt(0) || "T"}
                                                         </div>
-                                                        <p className="text-xs font-bold text-gray-700">{note.teacher?.name || "Teacher"}</p>
-                                                        <p className="text-[10px] text-gray-400 ml-auto">{moment(note.createdAt).format("MMM DD, YYYY")}</p>
+                                                        <p style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>{note.teacher?.name || "Teacher"}</p>
+                                                        <p style={{ fontSize: 10, color: '#94a3b8', marginLeft: 'auto' }}>{moment(note.createdAt).format("MMM DD, YYYY")}</p>
                                                     </div>
-                                                    <p className="text-xs text-gray-600 leading-relaxed italic border-l-2 border-amber-300 pl-3">"{note.content}"</p>
+                                                    <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, fontStyle: 'italic', borderLeft: '3px solid rgba(251,191,36,0.5)', paddingLeft: 12 }}>"{note.content}"</p>
                                                 </div>
                                             )) : (
-                                                <div className="py-8 text-center">
-                                                    <IoDocumentText className="text-gray-200 mx-auto mb-2" size={28} />
-                                                    <p className="text-gray-400 text-sm">No notes recorded yet.</p>
+                                                <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                                                    <IoDocumentText style={{ color: '#e2e8f0', margin: '0 auto 8px' }} size={32} />
+                                                    <p style={{ color: '#94a3b8', fontSize: 13 }}>No notes recorded yet.</p>
                                                 </div>
                                             )}
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
                                 </div>
                             )}
 
-                            {/* ══ ACADEMIC TAB ══════════════════════════ */}
+                            {/* ══ ACADEMIC TAB ════════════════════════ */}
                             {activeTab === "academic" && (
                                 <div className="space-y-6">
-                                    <GlassCard className="p-5">
+                                    <PremiumCard className="p-5">
                                         <SectionHeader
                                             icon={<IoTrendingUp size={13} />}
                                             title="Performance Trend"
-                                            accentColor="indigo"
+                                            gradient="from-indigo-500 to-violet-500"
                                             action={
-                                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                                                <span style={{ fontSize: 10, fontWeight: 700, color: '#059669', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', padding: '4px 10px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
                                                     <IoTrendingUp size={10} /> Assignments
                                                 </span>
                                             }
                                         />
-                                        <div className="h-[240px] w-full">
+                                        <div style={{ height: 240, width: '100%' }}>
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <AreaChart data={performanceTrends.assignments} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                                                     <defs>
                                                         <linearGradient id="gradMark" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.12} />
+                                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} />
                                                             <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                                         </linearGradient>
                                                     </defs>
-                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                    <XAxis dataKey="date" tickFormatter={(v) => moment(v).format("MMM DD")} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
-                                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(226,232,240,0.8)" />
+                                                    <XAxis dataKey="date" tickFormatter={(v) => moment(v).format("MMM DD")} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontFamily: "'DM Sans', sans-serif" }} />
+                                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontFamily: "'DM Sans', sans-serif" }} />
                                                     <Tooltip content={<CustomTooltip />} />
-                                                    <Area type="monotone" dataKey="marks" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#gradMark)" dot={{ r: 3.5, fill: '#6366f1', strokeWidth: 0 }} activeDot={{ r: 5, fill: '#6366f1' }} />
+                                                    <Area type="monotone" dataKey="marks" stroke="#6366f1" strokeWidth={2.5} fillOpacity={1} fill="url(#gradMark)" dot={{ r: 4, fill: '#6366f1', strokeWidth: 0 }} activeDot={{ r: 6, fill: '#6366f1', strokeWidth: 2, stroke: 'white' }} />
                                                 </AreaChart>
                                             </ResponsiveContainer>
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
 
-                                    <GlassCard className="p-5 overflow-hidden">
+                                    <PremiumCard style={{ overflow: 'hidden' }} className="p-5">
                                         <SectionHeader
                                             icon={<IoDocumentText size={13} />}
                                             title="Recent Submissions"
-                                            accentColor="violet"
+                                            gradient="from-violet-500 to-purple-600"
                                             action={
-                                                <button onClick={handleDownloadReport} className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">
+                                                <motion.button
+                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                                    onClick={handleDownloadReport}
+                                                    style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', padding: '6px 12px', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontFamily: "'DM Sans', sans-serif" }}
+                                                >
                                                     <IoDownload size={11} /> Report Card
-                                                </button>
+                                                </motion.button>
                                             }
                                         />
-                                        <div className="overflow-x-auto -mx-5 px-5">
-                                            <table className="w-full text-left">
+                                        <div style={{ overflowX: 'auto', margin: '0 -20px', padding: '0 20px' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
                                                 <thead>
-                                                    <tr className="border-b border-gray-100">
+                                                    <tr style={{ borderBottom: '1px solid rgba(241,245,249,1)' }}>
                                                         {["Type", "Subject", "Title", "Score", "Grade"].map(h => (
-                                                            <th key={h} className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest pr-4">{h}</th>
+                                                            <th key={h} style={{ paddingBottom: 12, fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', paddingRight: 16 }}>{h}</th>
                                                         ))}
                                                     </tr>
                                                 </thead>
@@ -711,25 +978,30 @@ const StudentProfileDashboard = () => {
                                                         ...assignments.map(a => ({ ...a, _type: 'Assignment' })),
                                                         ...quizzes.map(q => ({ ...q, _type: 'Quiz' }))
                                                     ].slice(0, 10).map((item, idx) => (
-                                                        <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-indigo-50/30 transition-colors">
-                                                            <td className="py-3 pr-4">
-                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item._type === 'Assignment' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
+                                                        <tr key={idx} className="spd-table-row" style={{ borderBottom: '1px solid rgba(248,250,252,1)' }}>
+                                                            <td style={{ padding: '12px 16px 12px 0' }}>
+                                                                <span style={{
+                                                                    fontSize: 9, fontWeight: 700, padding: '3px 8px', borderRadius: 7,
+                                                                    ...(item._type === 'Assignment'
+                                                                        ? { background: 'rgba(249,115,22,0.08)', color: '#ea580c', border: '1px solid rgba(249,115,22,0.15)' }
+                                                                        : { background: 'rgba(59,130,246,0.08)', color: '#2563eb', border: '1px solid rgba(59,130,246,0.15)' })
+                                                                }}>
                                                                     {item._type}
                                                                 </span>
                                                             </td>
-                                                            <td className="py-3 pr-4 font-semibold text-gray-700 text-xs">
+                                                            <td style={{ padding: '12px 16px 12px 0', fontSize: 12, fontWeight: 600, color: '#475569' }}>
                                                                 {item.assignment?.subject?.name || item.quiz?.subject?.name || "N/A"}
                                                             </td>
-                                                            <td className="py-3 pr-4 text-gray-500 text-xs max-w-[160px] truncate">
+                                                            <td style={{ padding: '12px 16px 12px 0', fontSize: 11, color: '#94a3b8', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                                 {item.assignment?.title || item.quiz?.title}
                                                             </td>
-                                                            <td className="py-3 pr-4">
-                                                                <div className="flex items-center gap-1">
-                                                                    <span className="font-bold text-indigo-600 text-sm">{item.marks}</span>
-                                                                    <span className="text-gray-300 text-xs">/{item.assignment?.totalMarks || item.quiz?.totalMarks}</span>
+                                                            <td style={{ padding: '12px 16px 12px 0' }}>
+                                                                <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                                                                    <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#6366f1', fontSize: 15 }}>{item.marks}</span>
+                                                                    <span style={{ color: '#cbd5e1', fontSize: 11 }}>/{item.assignment?.totalMarks || item.quiz?.totalMarks}</span>
                                                                 </div>
                                                             </td>
-                                                            <td className="py-3">
+                                                            <td style={{ padding: '12px 0' }}>
                                                                 <StatusPill status={item.grade || 'pending'} />
                                                             </td>
                                                         </tr>
@@ -737,339 +1009,371 @@ const StudentProfileDashboard = () => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
                                 </div>
                             )}
 
-                            {/* ══ ATTENDANCE TAB ════════════════════════ */}
+                            {/* ══ ATTENDANCE TAB ══════════════════════ */}
                             {activeTab === "attendance" && (
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        {/* Overview donut */}
-                                        <GlassCard className="p-5 flex flex-col items-center">
-                                            <SectionHeader icon={<IoCalendar size={13} />} title="Attendance Overview" />
-                                            <div className="relative w-40 h-40 my-2">
-                                                <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
-                                                    <circle cx="80" cy="80" r="68" stroke="#EEF2FF" strokeWidth="14" fill="none" />
-                                                    <motion.circle
-                                                        cx="80" cy="80" r="68"
-                                                        stroke="url(#ringGrad2)"
-                                                        strokeWidth="14"
-                                                        fill="none"
-                                                        strokeLinecap="round"
-                                                        strokeDasharray={2 * Math.PI * 68}
-                                                        initial={{ strokeDashoffset: 2 * Math.PI * 68 }}
-                                                        animate={{ strokeDashoffset: 2 * Math.PI * 68 * (1 - attendancePct / 100) }}
-                                                        transition={{ duration: 1.3, ease: "easeOut", delay: 0.2 }}
-                                                    />
+                                        {/* Donut Overview */}
+                                        <PremiumCard className="p-5" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                            <SectionHeader icon={<IoCalendar size={13} />} title="Attendance Overview" gradient="from-indigo-500 to-violet-500" />
+                                            <div style={{ position: 'relative', width: 160, height: 160, margin: '8px 0' }}>
+                                                <svg width="160" height="160" viewBox="0 0 160 160">
+                                                    <circle cx="80" cy="80" r="68" stroke="rgba(226,232,240,1)" strokeWidth="14" fill="none" />
                                                     <defs>
                                                         <linearGradient id="ringGrad2" x1="1" y1="0" x2="0" y2="1">
                                                             <stop stopColor="#6366f1" /><stop offset="1" stopColor="#a855f7" />
                                                         </linearGradient>
                                                     </defs>
+                                                    <motion.circle
+                                                        cx="80" cy="80" r="68"
+                                                        stroke="url(#ringGrad2)"
+                                                        strokeWidth="14" fill="none"
+                                                        strokeLinecap="round"
+                                                        strokeDasharray={2 * Math.PI * 68}
+                                                        initial={{ strokeDashoffset: 2 * Math.PI * 68 }}
+                                                        animate={{ strokeDashoffset: 2 * Math.PI * 68 * (1 - attendancePct / 100) }}
+                                                        transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
+                                                        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
+                                                    />
                                                 </svg>
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                    <span className="text-3xl font-extrabold text-gray-800">{attendancePct}%</span>
-                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Average</span>
+                                                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 30, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{attendancePct}%</span>
+                                                    <span style={{ fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>Average</span>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2 mt-3 w-full justify-center">
-                                                <MiniStat label="Present" count={(attendance?.filter(a => a.isPresent && !a.late).length || 0) + (classAttendance?.filter(a => a.isPresent && !a.late).length || 0)} colorClass="border-emerald-100 text-emerald-700 bg-emerald-50" />
-                                                <MiniStat label="Late" count={(attendance?.filter(a => a.late).length || 0) + (classAttendance?.filter(a => a.late).length || 0)} colorClass="border-amber-100 text-amber-700 bg-amber-50" />
-                                                <MiniStat label="Absent" count={(attendance?.filter(a => !a.isPresent).length || 0) + (classAttendance?.filter(a => !a.isPresent).length || 0)} colorClass="border-red-100 text-red-600 bg-red-50" />
+                                            <div style={{ display: 'flex', gap: 8, marginTop: 16, width: '100%', justifyContent: 'center' }}>
+                                                <MiniStat label="Present" count={(attendance?.filter(a => a.isPresent && !a.late).length || 0) + (classAttendance?.filter(a => a.isPresent && !a.late).length || 0)} color="#10b981" />
+                                                <MiniStat label="Late" count={(attendance?.filter(a => a.late).length || 0) + (classAttendance?.filter(a => a.late).length || 0)} color="#f59e0b" />
+                                                <MiniStat label="Absent" count={(attendance?.filter(a => !a.isPresent).length || 0) + (classAttendance?.filter(a => !a.isPresent).length || 0)} color="#ef4444" />
                                             </div>
-                                        </GlassCard>
+                                        </PremiumCard>
 
                                         {/* History */}
-                                        <GlassCard className="p-5">
-                                            <SectionHeader icon={<IoTime size={13} />} title="Attendance History" accentColor="violet" />
-                                            <div className="space-y-2 max-h-[360px] overflow-y-auto no-scrollbar pr-1">
+                                        <PremiumCard className="p-5">
+                                            <SectionHeader icon={<IoTime size={13} />} title="Attendance History" gradient="from-violet-500 to-purple-600" />
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 360, overflowY: 'auto' }} className="no-scrollbar">
                                                 {unifiedAttendanceHistory.length > 0 ? unifiedAttendanceHistory.slice(0, 20).map((record, i) => (
                                                     <motion.div
                                                         key={i}
-                                                        initial={{ opacity: 0, y: 6 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: i * 0.025 }}
-                                                        className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-white hover:border-indigo-100 border border-transparent hover:shadow-sm transition-all"
+                                                        initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.025 }}
+                                                        style={{
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                            padding: '10px 12px', borderRadius: 14,
+                                                            background: 'rgba(248,250,252,1)', border: '1px solid transparent',
+                                                            transition: 'all 0.15s ease', cursor: 'default'
+                                                        }}
+                                                        whileHover={{ background: 'white', borderColor: 'rgba(226,232,240,1)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                                                     >
-                                                        <div className="flex items-center gap-3 min-w-0">
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                                                             <AttendanceDot isPresent={record.isPresent} late={record.late} />
-                                                            <div className="min-w-0">
-                                                                <p className="text-xs font-bold text-gray-800 truncate">{record.title}</p>
-                                                                <div className="flex items-center gap-1.5 mt-0.5">
-                                                                    <span className="text-[10px] font-semibold text-indigo-600">{moment(record.date).format("MMM DD, YYYY")}</span>
-                                                                    <span className="text-gray-300">·</span>
-                                                                    <span className="text-[10px] text-gray-400 truncate">{record.subtitle}</span>
+                                                            <div style={{ minWidth: 0 }}>
+                                                                <p style={{ fontSize: 12, fontWeight: 700, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{record.title}</p>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                                                                    <span style={{ fontSize: 10, fontWeight: 600, color: '#6366f1' }}>{moment(record.date).format("MMM DD, YYYY")}</span>
+                                                                    <span style={{ color: '#cbd5e1' }}>·</span>
+                                                                    <span style={{ fontSize: 10, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{record.subtitle}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
+                                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, marginLeft: 8, flexShrink: 0 }}>
                                                             <StatusPill status={record.isPresent ? (record.late ? 'late' : 'present') : 'absent'} />
-                                                            <span className="text-[9px] text-gray-300 font-bold uppercase tracking-wider">{record.type}</span>
+                                                            <span style={{ fontSize: 8, color: '#cbd5e1', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{record.type}</span>
                                                         </div>
                                                     </motion.div>
                                                 )) : (
-                                                    <p className="text-center text-gray-400 py-12 text-sm">No attendance records found.</p>
+                                                    <p style={{ textAlign: 'center', color: '#94a3b8', padding: '48px 0', fontSize: 13 }}>No attendance records found.</p>
                                                 )}
                                             </div>
-                                        </GlassCard>
+                                        </PremiumCard>
                                     </div>
 
-                                    {/* Subject-wise attendance */}
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoBook size={13} />} title="Attendance per Subject" accentColor="blue" />
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left">
+                                    {/* Subject-wise */}
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoBook size={13} />} title="Attendance per Subject" gradient="from-blue-500 to-cyan-500" />
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
                                                 <thead>
-                                                    <tr className="border-b border-gray-100">
-                                                        <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Subject & Teacher</th>
-                                                        <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Progress</th>
-                                                        <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">P / L / A</th>
+                                                    <tr style={{ borderBottom: '1px solid rgba(241,245,249,1)' }}>
+                                                        {["Subject & Teacher", "Progress", "P / L / A"].map((h, i) => (
+                                                            <th key={h} style={{ paddingBottom: 12, fontSize: 9, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: i === 2 ? 'right' : 'left' }}>{h}</th>
+                                                        ))}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {subjectAttendance.length > 0 ? subjectAttendance.map((item, idx) => (
-                                                        <tr key={idx} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition-colors group">
-                                                            <td className="py-4 pr-4">
-                                                                <p className="font-bold text-gray-800 text-sm">{item.name}</p>
-                                                                <p className="text-[10px] text-gray-400 mt-0.5">{item.teacher || "N/A"}</p>
+                                                        <tr key={idx} className="spd-table-row" style={{ borderBottom: '1px solid rgba(248,250,252,1)' }}>
+                                                            <td style={{ padding: '16px 16px 16px 0' }}>
+                                                                <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, color: '#1e293b', fontSize: 13 }}>{item.name}</p>
+                                                                <p style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{item.teacher || "N/A"}</p>
                                                             </td>
-                                                            <td className="py-4 pr-6 min-w-[160px]">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="flex-grow h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                            <td style={{ padding: '16px 24px 16px 0', minWidth: 180 }}>
+                                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                                    <div style={{ flexGrow: 1, height: 6, background: 'rgba(226,232,240,1)', borderRadius: 6, overflow: 'hidden' }}>
                                                                         <motion.div
-                                                                            initial={{ width: 0 }}
-                                                                            animate={{ width: `${item.percentage}%` }}
-                                                                            className={`h-full rounded-full ${item.percentage >= 75 ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                                                                            initial={{ width: 0 }} animate={{ width: `${item.percentage}%` }}
+                                                                            style={{ height: '100%', borderRadius: 6, background: item.percentage >= 75 ? 'linear-gradient(90deg, #34d399, #10b981)' : 'linear-gradient(90deg, #fcd34d, #f59e0b)' }}
                                                                         />
                                                                     </div>
-                                                                    <span className={`text-xs font-extrabold w-10 text-right ${item.percentage >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                                                        {item.percentage}%
-                                                                    </span>
+                                                                    <span style={{ fontSize: 12, fontWeight: 800, fontFamily: "'Sora', sans-serif", color: item.percentage >= 75 ? '#059669' : '#d97706', width: 36, textAlign: 'right' }}>{item.percentage}%</span>
                                                                 </div>
-                                                                <p className="text-[10px] text-gray-300 font-medium mt-1">{item.total} total lectures</p>
+                                                                <p style={{ fontSize: 10, color: '#cbd5e1', fontWeight: 500, marginTop: 4 }}>{item.total} total lectures</p>
                                                             </td>
-                                                            <td className="py-4 text-right">
-                                                                <div className="flex gap-1.5 justify-end">
-                                                                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded">{item.present}P</span>
-                                                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded">{item.late}L</span>
-                                                                    <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded">{item.absent}A</span>
+                                                            <td style={{ padding: '16px 0', textAlign: 'right' }}>
+                                                                <div style={{ display: 'flex', gap: 5, justifyContent: 'flex-end' }}>
+                                                                    {[
+                                                                        { val: item.present, label: 'P', color: '#059669', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' },
+                                                                        { val: item.late, label: 'L', color: '#d97706', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
+                                                                        { val: item.absent, label: 'A', color: '#dc2626', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.2)' }
+                                                                    ].map(({ val, label, color, bg, border }) => (
+                                                                        <span key={label} style={{ fontSize: 10, fontWeight: 700, color, background: bg, border: `1px solid ${border}`, padding: '3px 8px', borderRadius: 8 }}>{val}{label}</span>
+                                                                    ))}
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                     )) : (
-                                                        <tr><td colSpan="3" className="py-10 text-center text-gray-400 text-sm">No subject attendance records found.</td></tr>
+                                                        <tr><td colSpan="3" style={{ padding: '40px 0', textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>No subject attendance records found.</td></tr>
                                                     )}
                                                 </tbody>
                                             </table>
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
                                 </div>
                             )}
 
-                            {/* ══ TIMETABLE TAB ═════════════════════════ */}
+                            {/* ══ TIMETABLE TAB ═══════════════════════ */}
                             {activeTab === "timetable" && (
-                                <GlassCard className="p-5">
-                                    <SectionHeader icon={<IoTime size={13} />} title="Weekly Schedule" accentColor="violet" />
-                                    <div className="space-y-2">
+                                <PremiumCard className="p-5">
+                                    <SectionHeader icon={<IoTime size={13} />} title="Weekly Schedule" gradient="from-violet-500 to-indigo-500" />
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                         {classes.length > 0 ? classes.map((cls, i) => (
                                             <motion.div
                                                 key={i}
-                                                initial={{ opacity: 0, y: 6 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: i * 0.04 }}
-                                                className="flex gap-4 p-3.5 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/30 transition-all group"
+                                                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                                                style={{
+                                                    display: 'flex', gap: 14, padding: '14px 16px', borderRadius: 18,
+                                                    border: '1px solid rgba(226,232,240,0.8)',
+                                                    background: 'rgba(248,250,252,0.6)',
+                                                    transition: 'all 0.2s ease', cursor: 'default'
+                                                }}
+                                                whileHover={{ background: 'white', borderColor: 'rgba(99,102,241,0.2)', boxShadow: '0 4px 16px rgba(99,102,241,0.08)' }}
                                             >
-                                                {/* Day badge */}
-                                                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-2.5 flex flex-col items-center justify-center min-w-[58px] group-hover:bg-indigo-100 transition-colors">
-                                                    <span className="text-[9px] font-extrabold uppercase text-indigo-500 tracking-wider">{moment(cls.startTime).format("ddd")}</span>
-                                                    <span className="text-lg font-extrabold text-indigo-700 leading-tight">{moment(cls.startTime).format("DD")}</span>
+                                                <div style={{
+                                                    background: 'linear-gradient(135deg, rgba(238,242,255,1), rgba(224,231,255,1))',
+                                                    border: '1px solid rgba(199,210,254,1)',
+                                                    borderRadius: 14, padding: '10px 12px',
+                                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: 60
+                                                }}>
+                                                    <span style={{ fontSize: 8, fontWeight: 800, textTransform: 'uppercase', color: '#6366f1', letterSpacing: '0.08em' }}>{moment(cls.startTime).format("ddd")}</span>
+                                                    <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 800, color: '#4338ca', lineHeight: 1.1 }}>{moment(cls.startTime).format("DD")}</span>
                                                 </div>
-                                                <div className="flex-grow min-w-0">
-                                                    <h4 className="font-bold text-gray-900 text-sm truncate">{cls.subject?.name}</h4>
-                                                    <div className="flex items-center gap-3 mt-1">
-                                                        <span className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
-                                                            <IoTime size={10} className="text-indigo-400" />
-                                                            {moment(cls.startTime).format("hh:mm A")} – {moment(cls.endTime).format("hh:mm A")}
-                                                        </span>
+                                                <div style={{ flexGrow: 1, minWidth: 0 }}>
+                                                    <h4 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#0f172a', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cls.subject?.name}</h4>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
+                                                        <IoTime size={10} color="#6366f1" />
+                                                        <span style={{ fontSize: 10, color: '#64748b', fontWeight: 500 }}>{moment(cls.startTime).format("hh:mm A")} – {moment(cls.endTime).format("hh:mm A")}</span>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col items-end justify-center flex-shrink-0">
-                                                    <span className="text-[10px] font-semibold text-gray-500 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg">{cls.teacher?.name}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                                                    <span style={{ fontSize: 10, fontWeight: 600, color: '#64748b', background: 'white', border: '1px solid rgba(226,232,240,1)', padding: '5px 10px', borderRadius: 10 }}>{cls.teacher?.name}</span>
                                                 </div>
                                             </motion.div>
                                         )) : (
-                                            <div className="py-16 text-center">
-                                                <IoCalendar size={36} className="text-gray-200 mx-auto mb-3" />
-                                                <p className="text-gray-400 text-sm font-medium">No classes scheduled.</p>
+                                            <div style={{ padding: '64px 0', textAlign: 'center' }}>
+                                                <IoCalendar size={36} color="#e2e8f0" style={{ margin: '0 auto 12px' }} />
+                                                <p style={{ color: '#94a3b8', fontSize: 13, fontWeight: 500 }}>No classes scheduled.</p>
                                             </div>
                                         )}
                                     </div>
-                                </GlassCard>
+                                </PremiumCard>
                             )}
 
-                            {/* ══ FEES TAB ══════════════════════════════ */}
+                            {/* ══ FEES TAB ════════════════════════════ */}
                             {activeTab === "fees" && (
                                 <div className="space-y-6">
-                                    {/* Hero dues card */}
-                                    <div
-                                        className="relative overflow-hidden bg-[#0D1268] rounded-2xl border border-indigo-900/40 p-7 text-white"
-                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h32v32H0z' fill='none'/%3E%3Cpath d='M0 32V0M32 0v32' stroke='%23ffffff' stroke-opacity='0.04' stroke-width='1'/%3E%3C/svg%3E")` }}
-                                    >
-                                        <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-indigo-700/20 translate-x-16 -translate-y-16" />
-                                        <IoWallet className="absolute bottom-4 right-6 text-white/5" size={96} />
-                                        <div className="relative">
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <span className="w-2 h-2 rounded-full bg-red-400" />
-                                                <p className="text-indigo-300 text-[10px] font-bold uppercase tracking-widest">Pending Dues</p>
+                                    {/* Hero Card */}
+                                    <div style={{
+                                        position: 'relative', overflow: 'hidden', borderRadius: 28,
+                                        background: 'linear-gradient(145deg, #0f0c29 0%, #1e1b4b 40%, #302b63 100%)',
+                                        border: '1px solid rgba(99,102,241,0.2)', padding: 28, color: 'white',
+                                        boxShadow: '0 24px 64px -16px rgba(99,102,241,0.45)'
+                                    }}>
+                                        {/* Decorative */}
+                                        <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.25), transparent)', filter: 'blur(24px)' }} />
+                                        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.15), transparent)', filter: 'blur(20px)' }} />
+                                        <div className="spd-shimmer" style={{ position: 'absolute', inset: 0 }} />
+                                        <IoWallet style={{ position: 'absolute', bottom: 20, right: 24, color: 'rgba(255,255,255,0.04)' }} size={110} />
+
+                                        <div style={{ position: 'relative' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                                                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f87171', boxShadow: '0 0 8px #f87171' }} />
+                                                <p style={{ color: 'rgba(165,180,252,0.7)', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Pending Dues</p>
                                             </div>
-                                            <h3 className="text-4xl font-extrabold mb-1">
+                                            <h3 style={{ fontFamily: "'Sora', sans-serif", fontSize: 40, fontWeight: 800, marginBottom: 6, lineHeight: 1 }}>
                                                 ${fees.reduce((sum, f) => f.status === 'unpaid' ? sum + f.amount : sum, 0).toLocaleString()}
                                             </h3>
-                                            <p className="text-indigo-300 text-sm mb-6">
+                                            <p style={{ color: 'rgba(165,180,252,0.6)', fontSize: 13, marginBottom: 24 }}>
                                                 {fees.filter(f => f.status === 'unpaid').length} unpaid · {fees.filter(f => f.status === 'paid').length} paid invoices
                                             </p>
-                                            <button className="bg-white text-indigo-900 font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-indigo-50 transition-colors active:scale-95">
+                                            <motion.button
+                                                whileHover={{ scale: 1.03, background: '#eef2ff' }} whileTap={{ scale: 0.97 }}
+                                                style={{
+                                                    background: 'white', color: '#312e81', fontFamily: "'Sora', sans-serif",
+                                                    fontWeight: 700, padding: '12px 24px', borderRadius: 14, fontSize: 13,
+                                                    cursor: 'pointer', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+                                                }}
+                                            >
                                                 Pay Now →
-                                            </button>
+                                            </motion.button>
                                         </div>
                                     </div>
 
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoWallet size={13} />} title="Payment History" accentColor="indigo" />
-                                        <div className="space-y-1">
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoWallet size={13} />} title="Payment History" gradient="from-indigo-500 to-blue-500" />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                             {fees.map((fee, i) => (
                                                 <motion.div
                                                     key={i}
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    transition={{ delay: i * 0.04 }}
-                                                    className="flex items-center justify-between p-3.5 rounded-xl hover:bg-gray-50 transition-colors group border border-transparent hover:border-gray-100"
+                                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                        padding: '12px 14px', borderRadius: 16, border: '1px solid transparent',
+                                                        transition: 'all 0.15s ease', cursor: 'default'
+                                                    }}
+                                                    whileHover={{ background: 'rgba(248,250,252,1)', borderColor: 'rgba(226,232,240,1)' }}
                                                 >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${fee.status === 'paid' ? 'bg-emerald-50 border border-emerald-100 text-emerald-500' : 'bg-red-50 border border-red-100 text-red-500'}`}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                        <div style={{
+                                                            width: 36, height: 36, borderRadius: 12,
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            ...(fee.status === 'paid'
+                                                                ? { background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10b981' }
+                                                                : { background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444' })
+                                                        }}>
                                                             {fee.status === 'paid' ? <IoCheckmarkCircle size={16} /> : <IoCloseCircle size={16} />}
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-gray-800 text-sm capitalize">
+                                                            <p style={{ fontWeight: 700, color: '#1e293b', fontSize: 13, textTransform: 'capitalize' }}>
                                                                 {fee.type} Fee — {moment().month(fee.month - 1).format("MMMM")} {fee.year}
                                                             </p>
-                                                            <p className="text-[10px] text-gray-400 mt-0.5">Due: {moment(fee.dueDate).format("MMM DD, YYYY")}</p>
+                                                            <p style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>Due: {moment(fee.dueDate).format("MMM DD, YYYY")}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <p className="font-extrabold text-gray-900 text-sm">${fee.amount}</p>
-                                                        <StatusPill status={fee.status} />
+                                                    <div style={{ textAlign: 'right' }}>
+                                                        <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#0f172a', fontSize: 15 }}>${fee.amount}</p>
+                                                        <div style={{ marginTop: 4 }}><StatusPill status={fee.status} /></div>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
                                 </div>
                             )}
 
-                            {/* ══ MORE TAB ══════════════════════════════ */}
+                            {/* ══ MORE TAB ════════════════════════════ */}
                             {activeTab === "more" && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     {/* Library */}
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoLibrary size={13} />} title="Library Records" accentColor="indigo" />
-                                        <div className="space-y-2">
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoLibrary size={13} />} title="Library Records" gradient="from-indigo-500 to-blue-500" />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             {library.length > 0 ? library.map((book, i) => (
-                                                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-white border border-transparent hover:border-gray-200 hover:shadow-sm transition-all">
-                                                    <div className="w-8 h-10 rounded-md bg-gradient-to-b from-indigo-300 to-indigo-600 flex-shrink-0 shadow-sm" />
-                                                    <div className="flex-grow min-w-0">
-                                                        <p className="text-xs font-bold text-gray-800 truncate">{book.bookName}</p>
-                                                        <p className="text-[10px] text-gray-400 mt-0.5">Issued: {moment(book.issueDate).format("MMM DD, YYYY")}</p>
+                                                <motion.div key={i} whileHover={{ x: 4 }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 14, background: 'rgba(248,250,252,1)', border: '1px solid transparent', transition: 'all 0.15s ease', cursor: 'default' }}>
+                                                    <div style={{ width: 32, height: 42, borderRadius: 8, background: `linear-gradient(160deg, hsl(${i * 67 % 360},65%,60%), hsl(${(i * 67 + 40) % 360},65%,45%))`, flexShrink: 0, boxShadow: '2px 3px 8px rgba(0,0,0,0.15)' }} />
+                                                    <div style={{ flexGrow: 1, minWidth: 0 }}>
+                                                        <p style={{ fontSize: 12, fontWeight: 700, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{book.bookName}</p>
+                                                        <p style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>Issued: {moment(book.issueDate).format("MMM DD, YYYY")}</p>
                                                     </div>
                                                     <StatusPill status={book.status} />
-                                                </div>
+                                                </motion.div>
                                             )) : (
-                                                <div className="py-8 text-center">
-                                                    <IoLibrary className="text-gray-200 mx-auto mb-2" size={28} />
-                                                    <p className="text-gray-400 text-sm">No books issued.</p>
+                                                <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                                                    <IoLibrary size={32} color="#e2e8f0" style={{ margin: '0 auto 8px' }} />
+                                                    <p style={{ color: '#94a3b8', fontSize: 13 }}>No books issued.</p>
                                                 </div>
                                             )}
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
 
                                     {/* Transport */}
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoBus size={13} />} title="Transport Details" accentColor="orange" />
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoBus size={13} />} title="Transport Details" gradient="from-orange-400 to-rose-500" />
                                         {transport ? (
-                                            <div className="space-y-3">
-                                                <div className="p-4 rounded-xl bg-orange-50 border border-orange-100">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="w-5 h-5 rounded bg-orange-200 flex items-center justify-center"><IoBus size={10} className="text-orange-700" /></span>
-                                                        <p className="text-[10px] font-extrabold text-orange-600 uppercase tracking-widest">Bus Info</p>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                                <div style={{ padding: 16, borderRadius: 18, background: 'linear-gradient(135deg, rgba(255,237,213,0.7), rgba(254,215,170,0.4))', border: '1px solid rgba(253,186,116,0.3)' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                                                        <div style={{ width: 22, height: 22, borderRadius: 8, background: 'linear-gradient(135deg, #fdba74, #f97316)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <IoBus size={10} color="white" />
+                                                        </div>
+                                                        <p style={{ fontSize: 9, fontWeight: 700, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Bus Info</p>
                                                     </div>
-                                                    <p className="text-sm font-bold text-gray-800">Bus No: {transport.busNumber}</p>
-                                                    <p className="text-xs text-gray-500 mt-0.5">{transport.route}</p>
+                                                    <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 800, color: '#1e293b' }}>Bus No: {transport.busNumber}</p>
+                                                    <p style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>{transport.route}</p>
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    {[
-                                                        { label: "Pickup Time", value: transport.pickupTime },
-                                                        { label: "Drop Time", value: transport.dropTime }
-                                                    ].map(({ label, value }) => (
-                                                        <div key={label} className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-center">
-                                                            <p className="text-[10px] text-gray-400 font-semibold mb-1">{label}</p>
-                                                            <p className="font-bold text-gray-800 text-sm">{value}</p>
+                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                                    {[{ label: "Pickup Time", value: transport.pickupTime }, { label: "Drop Time", value: transport.dropTime }].map(({ label, value }) => (
+                                                        <div key={label} style={{ padding: 14, background: 'rgba(248,250,252,1)', border: '1px solid rgba(226,232,240,0.8)', borderRadius: 14, textAlign: 'center' }}>
+                                                            <p style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</p>
+                                                            <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#1e293b', fontSize: 14 }}>{value}</p>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="py-8 text-center">
-                                                <IoBus className="text-gray-200 mx-auto mb-2" size={28} />
-                                                <p className="text-gray-400 text-sm">Not using institute transport.</p>
+                                            <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                                                <IoBus size={32} color="#e2e8f0" style={{ margin: '0 auto 8px' }} />
+                                                <p style={{ color: '#94a3b8', fontSize: 13 }}>Not using institute transport.</p>
                                             </div>
                                         )}
-                                    </GlassCard>
+                                    </PremiumCard>
 
                                     {/* Discipline */}
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoWarning size={13} />} title="Behavior Records" accentColor="red" />
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoWarning size={13} />} title="Behavior Records" gradient="from-red-400 to-rose-500" />
                                         {discipline.length > 0 ? (
-                                            <div className="space-y-3">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                                 {discipline.map((rec, i) => (
-                                                    <div key={i} className="p-4 bg-red-50 border border-red-100 rounded-xl">
-                                                        <p className="text-sm font-bold text-gray-800">{rec.incident}</p>
-                                                        <p className="text-xs text-red-600 mt-1.5 font-semibold border-l-2 border-red-300 pl-2">{rec.actionTaken}</p>
-                                                        <p className="text-[10px] text-gray-400 mt-2">{moment(rec.date).format("MMM DD, YYYY")}</p>
+                                                    <div key={i} style={{ padding: 16, background: 'linear-gradient(135deg, rgba(254,226,226,0.6), rgba(252,165,165,0.2))', border: '1px solid rgba(248,113,113,0.2)', borderRadius: 18 }}>
+                                                        <p style={{ fontSize: 13, fontWeight: 700, color: '#1e293b' }}>{rec.incident}</p>
+                                                        <p style={{ fontSize: 12, color: '#ef4444', marginTop: 8, fontWeight: 600, borderLeft: '3px solid rgba(239,68,68,0.4)', paddingLeft: 10 }}>{rec.actionTaken}</p>
+                                                        <p style={{ fontSize: 10, color: '#94a3b8', marginTop: 8 }}>{moment(rec.date).format("MMM DD, YYYY")}</p>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="py-6 text-center">
-                                                <IoCheckmarkCircle className="text-emerald-400 mx-auto mb-2" size={28} />
-                                                <p className="text-emerald-600 font-bold text-sm">Excellent Behavior</p>
-                                                <p className="text-gray-400 text-xs mt-0.5">No incidents recorded</p>
+                                            <div style={{ padding: '24px 0', textAlign: 'center' }}>
+                                                <IoCheckmarkCircle size={36} color="#34d399" style={{ margin: '0 auto 10px' }} />
+                                                <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#059669', fontSize: 14 }}>Excellent Behavior</p>
+                                                <p style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>No incidents recorded</p>
                                             </div>
                                         )}
-                                    </GlassCard>
+                                    </PremiumCard>
 
                                     {/* Leaves */}
-                                    <GlassCard className="p-5">
-                                        <SectionHeader icon={<IoCalendar size={13} />} title="Leave Requests" accentColor="emerald" />
-                                        <div className="space-y-2">
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoCalendar size={13} />} title="Leave Requests" gradient="from-emerald-400 to-teal-500" />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             {leaves.length > 0 ? leaves.map((l, i) => (
-                                                <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-gray-50 border border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm transition-all">
+                                                <motion.div key={i} whileHover={{ x: 3 }} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 14, background: 'rgba(248,250,252,1)', border: '1px solid transparent', transition: 'all 0.15s ease', cursor: 'default' }}>
                                                     <div>
-                                                        <p className="text-xs font-bold text-gray-800">
+                                                        <p style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>
                                                             {moment(l.startDate).format("MMM DD")} – {moment(l.endDate).format("MMM DD, YYYY")}
                                                         </p>
-                                                        <p className="text-[10px] text-gray-400 truncate max-w-[180px] mt-0.5">{l.reason}</p>
+                                                        <p style={{ fontSize: 10, color: '#94a3b8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{l.reason}</p>
                                                     </div>
                                                     <StatusPill status={l.status} />
-                                                </div>
+                                                </motion.div>
                                             )) : (
-                                                <div className="py-8 text-center">
-                                                    <IoCalendar className="text-gray-200 mx-auto mb-2" size={28} />
-                                                    <p className="text-gray-400 text-sm">No leave requests.</p>
+                                                <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                                                    <IoCalendar size={32} color="#e2e8f0" style={{ margin: '0 auto 8px' }} />
+                                                    <p style={{ color: '#94a3b8', fontSize: 13 }}>No leave requests.</p>
                                                 </div>
                                             )}
                                         </div>
-                                    </GlassCard>
+                                    </PremiumCard>
                                 </div>
                             )}
                         </motion.div>
@@ -1078,86 +1382,121 @@ const StudentProfileDashboard = () => {
             </div>
 
             {/* ── Modals ── */}
-            <Modal isOpen={isNoteModalOpen} onClose={() => setIsNoteModalOpen(false)} title="Add Teacher's Note" accentColor="amber">
-                <div className="space-y-4">
+            <PremiumModal isOpen={isNoteModalOpen} onClose={() => setIsNoteModalOpen(false)} title="Add Teacher's Note" subtitle="Record your observation about this student" accentGradient="from-amber-400 to-orange-500">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <textarea
-                        className="w-full h-28 p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 outline-none transition-all text-sm resize-none"
+                        style={{ width: '100%', height: 112, padding: 16, borderRadius: 16, border: '1px solid rgba(226,232,240,0.8)', background: 'rgba(248,250,252,1)', outline: 'none', resize: 'none', fontSize: 13, fontFamily: "'DM Sans', sans-serif", color: '#334155', lineHeight: 1.6, transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box' }}
+                        onFocus={e => { e.target.style.borderColor = 'rgba(245,158,11,0.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.08)'; e.target.style.background = 'white'; }}
+                        onBlur={e => { e.target.style.borderColor = 'rgba(226,232,240,0.8)'; e.target.style.boxShadow = 'none'; e.target.style.background = 'rgba(248,250,252,1)'; }}
                         placeholder="Write your observation about the student..."
                         value={noteContent}
                         onChange={(e) => setNoteContent(e.target.value)}
                     />
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                         onClick={() => addNoteMutation.mutate(noteContent)}
                         disabled={addNoteMutation.isPending || !noteContent.trim()}
-                        className="w-full py-3 rounded-xl bg-[#0D1268] text-white text-sm font-bold shadow-md hover:shadow-indigo-900/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                        style={{
+                            width: '100%', padding: '14px', borderRadius: 16, border: 'none',
+                            background: noteContent.trim() ? 'linear-gradient(135deg, #1e1b4b, #4338ca)' : 'rgba(226,232,240,1)',
+                            color: noteContent.trim() ? 'white' : '#94a3b8',
+                            fontSize: 13, fontWeight: 700, cursor: noteContent.trim() ? 'pointer' : 'not-allowed',
+                            fontFamily: "'Sora', sans-serif",
+                            boxShadow: noteContent.trim() ? '0 8px 24px -4px rgba(67,56,202,0.4)' : 'none',
+                            transition: 'all 0.2s ease'
+                        }}
                     >
                         {addNoteMutation.isPending ? "Adding..." : "Save Note"}
-                    </button>
+                    </motion.button>
                 </div>
-            </Modal>
+            </PremiumModal>
 
-            <Modal isOpen={isMessageModalOpen} onClose={() => setIsMessageModalOpen(false)} title="Message Parent" accentColor="indigo">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3 p-3.5 rounded-xl bg-indigo-50 border border-indigo-100">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 font-bold text-xs flex-shrink-0">
+            <PremiumModal isOpen={isMessageModalOpen} onClose={() => setIsMessageModalOpen(false)} title="Message Parent" subtitle="Send a direct message to the guardian" accentGradient="from-indigo-500 to-violet-600">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, background: 'rgba(238,242,255,1)', border: '1px solid rgba(199,210,254,0.8)' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #a5b4fc, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 800, color: 'white', flexShrink: 0 }}>
                             {basicInfo?.guardianName?.charAt(0) || "G"}
                         </div>
                         <div>
-                            <p className="text-[10px] font-extrabold uppercase text-indigo-400 tracking-widest">Guardian</p>
-                            <p className="text-sm font-bold text-indigo-900">{basicInfo?.guardianName}</p>
+                            <p style={{ fontSize: 9, fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Guardian</p>
+                            <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 800, color: '#312e81' }}>{basicInfo?.guardianName}</p>
                         </div>
                     </div>
                     <textarea
-                        className="w-full h-28 p-4 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none transition-all text-sm resize-none"
+                        style={{ width: '100%', height: 112, padding: 16, borderRadius: 16, border: '1px solid rgba(226,232,240,0.8)', background: 'rgba(248,250,252,1)', outline: 'none', resize: 'none', fontSize: 13, fontFamily: "'DM Sans', sans-serif", color: '#334155', lineHeight: 1.6, transition: 'border-color 0.2s, box-shadow 0.2s', boxSizing: 'border-box' }}
+                        onFocus={e => { e.target.style.borderColor = 'rgba(99,102,241,0.4)'; e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.07)'; e.target.style.background = 'white'; }}
+                        onBlur={e => { e.target.style.borderColor = 'rgba(226,232,240,0.8)'; e.target.style.boxShadow = 'none'; e.target.style.background = 'rgba(248,250,252,1)'; }}
                         placeholder="Type your message for the parent..."
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                     />
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                         onClick={() => sendMessageMutation.mutate(messageText)}
                         disabled={sendMessageMutation.isPending || !messageText.trim()}
-                        className="w-full py-3 rounded-xl bg-[#0D1268] text-white text-sm font-bold shadow-md hover:shadow-indigo-900/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
+                        style={{
+                            width: '100%', padding: '14px', borderRadius: 16, border: 'none',
+                            background: messageText.trim() ? 'linear-gradient(135deg, #1e1b4b, #4338ca)' : 'rgba(226,232,240,1)',
+                            color: messageText.trim() ? 'white' : '#94a3b8',
+                            fontSize: 13, fontWeight: 700, cursor: messageText.trim() ? 'pointer' : 'not-allowed',
+                            fontFamily: "'Sora', sans-serif",
+                            boxShadow: messageText.trim() ? '0 8px 24px -4px rgba(67,56,202,0.4)' : 'none',
+                            transition: 'all 0.2s ease'
+                        }}
                     >
                         {sendMessageMutation.isPending ? "Sending..." : "Send Message"}
-                    </button>
+                    </motion.button>
                 </div>
-            </Modal>
+            </PremiumModal>
         </div>
     );
 };
 
-/* ── Modal component ─────────────────────────────────────────── */
-const Modal = ({ isOpen, onClose, title, children, accentColor = "indigo" }) => {
+/* ── Premium Modal ────────────────────────────────────────────── */
+const PremiumModal = ({ isOpen, onClose, title, subtitle, children, accentGradient = "from-indigo-500 to-violet-600" }) => {
     if (!isOpen) return null;
-    const accentMap = {
-        indigo: "from-indigo-500 via-violet-500 to-purple-500",
-        amber: "from-amber-400 via-orange-400 to-yellow-400",
-    };
     return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+        <div style={{ position: 'fixed', inset: 0, zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute inset-0 bg-[#0D1268]/30 backdrop-blur-sm"
+                style={{ position: 'absolute', inset: 0, background: 'rgba(15,12,41,0.5)', backdropFilter: 'blur(8px)' }}
                 onClick={onClose}
             />
             <motion.div
-                initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                initial={{ opacity: 0, scale: 0.93, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-white rounded-2xl w-full max-w-md shadow-2xl relative z-10 border border-gray-100 overflow-hidden"
+                transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                style={{
+                    background: 'white', borderRadius: 28, width: '100%', maxWidth: 420,
+                    boxShadow: '0 32px 96px -16px rgba(15,12,41,0.4), 0 0 0 1px rgba(226,232,240,0.5)',
+                    position: 'relative', zIndex: 10, overflow: 'hidden', fontFamily: "'DM Sans', sans-serif"
+                }}
             >
-                {/* Accent bar */}
-                <div className={`h-1 w-full bg-gradient-to-r ${accentMap[accentColor] || accentMap.indigo}`} />
-                <div className="p-6">
-                    <div className="flex justify-between items-center mb-5">
-                        <h3 className="text-base font-extrabold text-gray-800 tracking-tight">{title}</h3>
-                        <button
+                {/* Accent top bar with gradient */}
+                <div style={{ height: 4, background: `linear-gradient(90deg, var(--tw-gradient-from, #6366f1), var(--tw-gradient-to, #8b5cf6))`, backgroundImage: `linear-gradient(90deg, ${accentGradient.includes('amber') ? '#f59e0b, #f97316' : accentGradient.includes('indigo') ? '#6366f1, #8b5cf6' : '#6366f1, #8b5cf6'})` }} />
+                {/* Subtle mesh bg in header */}
+                <div style={{
+                    padding: '24px 24px 20px',
+                    background: 'linear-gradient(180deg, rgba(248,250,252,0.8) 0%, white 100%)',
+                    borderBottom: '1px solid rgba(241,245,249,1)'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                            <h3 style={{ fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>{title}</h3>
+                            {subtitle && <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 3, fontWeight: 500 }}>{subtitle}</p>}
+                        </div>
+                        <motion.button
+                            whileHover={{ scale: 1.1, background: 'rgba(241,245,249,1)' }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={onClose}
-                            className="w-8 h-8 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-200 transition-colors"
+                            style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(248,250,252,1)', border: '1px solid rgba(226,232,240,1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', cursor: 'pointer', transition: 'all 0.15s ease', flexShrink: 0 }}
                         >
-                            <IoClose size={16} />
-                        </button>
+                            <IoClose size={15} />
+                        </motion.button>
                     </div>
+                </div>
+                <div style={{ padding: 24 }}>
                     {children}
                 </div>
             </motion.div>

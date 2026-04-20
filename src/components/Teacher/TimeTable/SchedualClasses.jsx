@@ -4,7 +4,7 @@ import Loader from "../../../utils/Loader";
 import IMAGES from "../../../assets/images";
 
 import { toast } from "react-toastify";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoCalendarOutline, IoTimeOutline, IoLinkOutline, IoBookOutline, IoPeopleOutline, IoRocketOutline } from "react-icons/io5";
 import { useMutation } from "@tanstack/react-query";
 import { useUser } from "../../../context/UserContext";
 import { createClasses } from "../../../api/Teacher/Class";
@@ -85,165 +85,195 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
   if (!addScheduleModalOpen) return null;
 
   return (
-    <div className="absolute top-0 right-0 z-10 w-96 bg-white rounded-xl shadow-xl border border-gray-100 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-maroon_10 flex items-center justify-center">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A41D30" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
+    <div className="fixed inset-0 z-[999] flex justify-end items-start bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-300">
+      <div className="mr-6 mt-6 w-[440px] bg-white rounded-[24px] shadow-[0_20px_50px_rgba(8,_112,_184,_0.2)] flex flex-col max-h-[92vh] animate-in slide-in-from-right duration-500 overflow-hidden border border-blue-50">
+
+        {/* Header - Royal Blue Gradient (Same as Admin) */}
+        <div className="relative px-8 py-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <IoRocketOutline size={100} className="text-white rotate-12" />
           </div>
-          <span className="text-base font-medium text-grey_700">Schedule Class</span>
-        </div>
-        <button
-          onClick={() => setAddScheduleModalOpen(false)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"
-        >
-          <IoClose size={18} />
-        </button>
-      </div>
 
-      {/* Body */}
-      <div className="flex flex-col gap-3 px-5 py-4 overflow-y-auto max-h-[80vh] custom-scrollbar">
-        {/* Subject */}
-        <CustomSelectableField
-          options={teacherSubjects}
-          label="Select Subject"
-          selectedOption={selectedSubject}
-          setSelectedOption={setSelectedSubject}
-        />
-
-        {/* Topic */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">Topic</label>
-          <input
-            type="text"
-            placeholder="e.g. Introduction to Calculus"
-            value={classObj.title}
-            onChange={(e) => setClassObj((prev) => ({ ...prev, title: e.target.value }))}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-grey_700 outline-none focus:border-maroon focus:ring-1 focus:ring-maroon_10 transition"
-          />
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-inner">
+                <IoCalendarOutline size={24} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-tight">Schedule Class</h3>
+                <p className="text-blue-100 text-xs font-medium opacity-80">Teacher Portal • Session Planner</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setAddScheduleModalOpen(false)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+            >
+              <IoClose size={20} />
+            </button>
+          </div>
         </div>
 
-        {/* Classrooms */}
-        <CustomMultiSelectableField
-          label="Select Classroom"
-          options={allClassrooms}
-          selectedOption={selectedClassrooms}
-          setSelectedOption={setSelectedClassrooms}
-          isMulti={true}
-        />
+        {/* Body */}
+        <div className="flex flex-col gap-6 px-8 py-6 overflow-y-auto custom-scrollbar bg-white">
 
-        {/* Meeting URL */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">Meeting URL</label>
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
-            <input
-              type="text"
-              placeholder="https://meet.google.com/..."
-              value={classObj.meetingUrl}
-              onChange={(e) => setClassObj((prev) => ({ ...prev, meetingUrl: e.target.value }))}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm text-grey_700 outline-none focus:border-maroon focus:ring-1 focus:ring-maroon_10 transition"
+          {/* Section: Academic Info */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-blue-700 font-bold text-[13px] uppercase tracking-widest">
+              <IoBookOutline size={18} className="text-blue-500" />
+              <span>Subject & Topic</span>
+            </div>
+
+            <div className="space-y-4">
+              <CustomSelectableField
+                options={teacherSubjects}
+                label="Assign Subject"
+                selectedOption={selectedSubject}
+                setSelectedOption={setSelectedSubject}
+              />
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Class Topic</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Introduction to Organic Chemistry"
+                  value={classObj.title}
+                  onChange={(e) => setClassObj((prev) => ({ ...prev, title: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300 shadow-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-100 to-transparent" />
+
+          {/* Section: Logistics */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-blue-700 font-bold text-[13px] uppercase tracking-widest">
+              <IoPeopleOutline size={18} className="text-blue-500" />
+              <span>Classrooms & Venue</span>
+            </div>
+
+            <CustomMultiSelectableField
+              label="Select Classrooms"
+              options={allClassrooms}
+              selectedOption={selectedClassrooms}
+              setSelectedOption={setSelectedClassrooms}
+              isMulti={true}
             />
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Live Meeting URL</label>
+              <div className="relative group">
+                <IoLinkOutline className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500 transition-colors group-focus-within:text-blue-700" size={18} />
+                <input
+                  type="text"
+                  placeholder="https://zoom.us/j/..."
+                  value={classObj.meetingUrl}
+                  onChange={(e) => setClassObj((prev) => ({ ...prev, meetingUrl: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-100 to-transparent" />
+
+          {/* Section: Timing */}
+          <div className="space-y-4 pb-4">
+            <div className="flex items-center gap-2 text-blue-700 font-bold text-[13px] uppercase tracking-widest">
+              <IoTimeOutline size={18} className="text-blue-500" />
+              <span>Timing & Recurrence</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Start Date</label>
+                <input
+                  type="date"
+                  value={classObj.startEventDate}
+                  onChange={(e) => setClassObj((prev) => ({ ...prev, startEventDate: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">End Date</label>
+                <input
+                  type="date"
+                  value={classObj.endEventDate}
+                  onChange={(e) => setClassObj((prev) => ({ ...prev, endEventDate: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Repeating Days</label>
+              <div className="flex gap-2 flex-wrap">
+                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
+                  const active = selectedDays.includes(day);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => handleDayToggle(day)}
+                      className={`h-9 px-3.5 rounded-xl text-[12px] font-semibold transition-all duration-300 border
+                        ${active
+                          ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 scale-105"
+                          : "bg-white border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600"
+                        }`}
+                    >
+                      {day.slice(0, 3)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Start Time</label>
+                <input
+                  type="time"
+                  value={classObj.startTime}
+                  onChange={(e) => setClassObj((prev) => ({ ...prev, startTime: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">End Time</label>
+                <input
+                  type="time"
+                  value={classObj.endTime}
+                  onChange={(e) => setClassObj((prev) => ({ ...prev, endTime: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Dates */}
-        <div className="flex gap-2">
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">Start Date</label>
-            <input
-              type="date"
-              value={classObj.startEventDate}
-              onChange={(e) => setClassObj((prev) => ({ ...prev, startEventDate: e.target.value }))}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-grey_700 outline-none focus:border-maroon focus:ring-1 focus:ring-maroon_10 transition"
-            />
-          </div>
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">End Date</label>
-            <input
-              type="date"
-              value={classObj.endEventDate}
-              onChange={(e) => setClassObj((prev) => ({ ...prev, endEventDate: e.target.value }))}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-grey_700 outline-none focus:border-maroon focus:ring-1 focus:ring-maroon_10 transition"
-            />
-          </div>
-        </div>
-
-        {/* Day Selector */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">Repeat On</label>
-          <div className="flex gap-2 flex-wrap">
-            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
-              const active = selectedDays.includes(day);
-              return (
+        {/* Footer */}
+        <div className="px-8 py-6 bg-slate-50 border-t border-slate-100">
+          <div className="flex gap-4">
+            {classCreateMutate.isPending ? (
+              <div className="w-full flex justify-center py-2"><Loader color="#2563eb" /></div>
+            ) : (
+              <>
                 <button
-                  key={day}
-                  type="button"
-                  onClick={() => handleDayToggle(day)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-all
-                    ${active
-                      ? "bg-maroon_10 border-maroon text-maroon"
-                      : "bg-gray-50 border-gray-200 text-grey_600 hover:border-gray-300 hover:bg-gray-100"
-                    }`}
+                  onClick={() => setAddScheduleModalOpen(false)}
+                  className="flex-1 py-3.5 rounded-xl text-slate-600 text-sm font-bold hover:bg-slate-200/50 transition-all duration-200"
                 >
-                  {day.slice(0, 3)}
+                  Cancel
                 </button>
-              );
-            })}
+                <button
+                  onClick={handleScheduleClass}
+                  className="flex-[2] py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-sm font-bold shadow-[0_10px_20px_rgba(37,_99,_235,_0.3)] hover:shadow-[0_12px_25px_rgba(37,_99,_235,_0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                >
+                  Schedule Class
+                </button>
+              </>
+            )}
           </div>
-        </div>
-
-        {/* Times */}
-        <div className="flex gap-2">
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">Start Time</label>
-            <input
-              type="time"
-              value={classObj.startTime}
-              onChange={(e) => setClassObj((prev) => ({ ...prev, startTime: e.target.value }))}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-grey_700 outline-none focus:border-maroon focus:ring-1 focus:ring-maroon_10 transition"
-            />
-          </div>
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-xs font-medium text-grey_600 uppercase tracking-wide">End Time</label>
-            <input
-              type="time"
-              value={classObj.endTime}
-              onChange={(e) => setClassObj((prev) => ({ ...prev, endTime: e.target.value }))}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-grey_700 outline-none focus:border-maroon focus:ring-1 focus:ring-maroon_10 transition"
-            />
-          </div>
-        </div>
-
-        {/* Footer Buttons */}
-        <div className="flex gap-2 pt-3 border-t border-gray-100 mt-1">
-          {classCreateMutate.isPending ? (
-            <div className="w-full flex justify-center py-2"><Loader /></div>
-          ) : (
-            <>
-              <button
-                onClick={handleScheduleClass}
-                className="flex-1 py-2 rounded-lg bg-maroon hover:bg-[#8B1929] text-white text-sm font-medium transition"
-              >
-                Schedule Class
-              </button>
-              <button
-                onClick={() => setAddScheduleModalOpen(false)}
-                className="flex-1 py-2 rounded-lg border border-gray-200 bg-white text-grey_700 text-sm hover:bg-gray-50 transition"
-              >
-                Cancel
-              </button>
-            </>
-          )}
         </div>
       </div>
     </div>

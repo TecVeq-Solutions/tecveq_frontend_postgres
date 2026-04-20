@@ -7,12 +7,14 @@ export default function FilterButton({
   clickHandler,
   className,
   disabled,
+  style,
 }) {
   return (
     <button
-      className={`text-sm  text-white py-2 rounded-3xl flex gap-1 justify-center bg-[#6A00FF] ${className}`}
+      className={`text-sm py-2 rounded-3xl flex gap-1 items-center justify-center ${className}`}
       onClick={clickHandler}
       disabled={disabled ? disabled : false}
+      style={style}
     >
        {icon? 
        <HiOutlineCalendarDays size={20} /> 

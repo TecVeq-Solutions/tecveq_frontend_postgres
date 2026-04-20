@@ -40,7 +40,7 @@ const Fees = () => {
         }
     });
 
-    const filteredFees = feesData?.filter(fee => 
+    const filteredFees = feesData?.filter(fee =>
         fee.student.name.toLowerCase().includes(searchText.toLowerCase()) ||
         fee.student.level?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
         fee.student.rollNo?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -49,9 +49,9 @@ const Fees = () => {
 
     return (
         <div className="w-full bg-[#F9F9F9] font-poppins min-h-full pb-10">
-            <div className={`lg:ml-72 lg:px-10 sm:px-6 px-3 flex-grow min-h-full ${isBlurred ? "blur" : ""}`}>
+            <div className={`lg:ml-80 lg:px-10 sm:px-6 px-3 flex-grow h-[100vh] ${isBlurred ? "blur" : ""}`}>
                 <Navbar heading={"Fees Management"} />
-                
+
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 my-6">
                     <div className="flex items-center gap-2 border bg-white border-[#00000020] px-4 py-2 rounded-3xl w-full sm:w-96 shadow-sm">
                         <IoSearch className="text-gray-400" />
@@ -63,7 +63,7 @@ const Fees = () => {
                             onChange={(e) => setSearchText(e.target.value)}
                         />
                     </div>
-                    
+
                     <button
                         onClick={() => {
                             toggleBlur();
@@ -105,33 +105,31 @@ const Fees = () => {
                                         <td className="px-6 py-4 text-sm text-gray-600">{fee.student.rollNo || "N/A"}</td>
                                         <td className="px-6 py-4 text-sm font-bold text-[#6A00FF]">{fee.amount}</td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 text-[11px] font-bold rounded-full uppercase ${
-                                                fee.type === 'monthly' ? 'bg-blue-50 text-blue-600' :
+                                            <span className={`px-3 py-1 text-[11px] font-bold rounded-full uppercase ${fee.type === 'monthly' ? 'bg-blue-50 text-blue-600' :
                                                 fee.type === 'six-months' ? 'bg-purple-50 text-purple-600' :
-                                                'bg-orange-50 text-orange-600'
-                                            }`}>
+                                                    'bg-orange-50 text-orange-600'
+                                                }`}>
                                                 {fee.type}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600">
-                                            {fee.month ? `${new Date(0, fee.month-1).toLocaleString('en', {month: 'short'})} ${fee.year}` : fee.year}
+                                            {fee.month ? `${new Date(0, fee.month - 1).toLocaleString('en', { month: 'short' })} ${fee.year}` : fee.year}
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{new Date(fee.dueDate).toLocaleDateString()}</td>
                                         <td className="px-6 py-4">
-                                            <select 
+                                            <select
                                                 value={fee.status}
                                                 onChange={(e) => updateStatusMutation.mutate({ id: fee.id, status: e.target.value })}
-                                                className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${
-                                                    fee.status === 'paid' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
-                                                }`}
+                                                className={`text-xs font-bold px-2 py-1 rounded border outline-none cursor-pointer ${fee.status === 'paid' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
+                                                    }`}
                                             >
                                                 <option value="unpaid">Unpaid</option>
                                                 <option value="paid">Paid</option>
                                             </select>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <button 
-                                                onClick={() => { if(window.confirm("Delete this fee?")) deleteMutation.mutate(fee.id) }}
+                                            <button
+                                                onClick={() => { if (window.confirm("Delete this fee?")) deleteMutation.mutate(fee.id) }}
                                                 className="text-red-400 hover:text-red-600 transition-colors text-xs font-bold"
                                             >
                                                 Delete
@@ -153,11 +151,11 @@ const Fees = () => {
             </div>
 
             {isGenerateModal && (
-                <GenerateFeeModal 
+                <GenerateFeeModal
                     onClose={() => {
                         setIsGenerateModal(false);
                         toggleBlur();
-                    }} 
+                    }}
                     onSuccess={() => {
                         setIsGenerateModal(false);
                         toggleBlur();

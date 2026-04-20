@@ -1,86 +1,102 @@
-import React, { useState } from 'react'
-import { FiEdit } from 'react-icons/fi'
-import { IoCalendarOutline } from 'react-icons/io5'
-import { LuClock } from 'react-icons/lu'
-import { MdOutlinePerson2 } from 'react-icons/md'
-import { PiDotsThreeOutlineVerticalLight } from 'react-icons/pi'
-import { RiDeleteBin6Line } from 'react-icons/ri'
+import React, { useState, useRef, useEffect } from 'react';
+import { FiEdit, FiCalendar, FiClock, FiUser, FiMoreVertical } from 'react-icons/fi';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 
 const QuoteCard = ({ quote, deleteQuote, editQuote, refetch }) => {
-
-    const DotsMenu = () => {
-        return (
-            <>
-                <div className='shadow-md absolute z-10 bg-white rounded-md top-36 right-5'>
-                    <div className='py-2 px-2'>
-                        <div className='py-2 px-2'>
-                            <div onClick={() => { editQuote(quote); refetch(); toggleMenu(); }} className='cursor-pointer flex gap-2 items-center py-2 px-2'>
-                                <FiEdit size={20} />
-                                <p>Edit</p>
-                            </div>
-                            <div className='border-b border-b-black/10'></div>
-                            <div onClick={() => { deleteQuote(quote.id); refetch(); toggleMenu(); }} className='cursor-pointer flex gap-2 items-center py-2 px-2 text-maroon'>
-                                <RiDeleteBin6Line size={20} />
-                                <p>Delete</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </>
-        )
-    }
-
     const [showMenu, setShowMenu] = useState(false);
-    const toggleMenu = () => {
-        setShowMenu(!showMenu);
-    }
+    const menuRef = useRef(null);
 
-    const getDateTimeFormat = (dateStr, type) => {
-        if (type == "d") {
-            console.log("date str for d is : ", dateStr)
-        } else {
-            console.log("date str for t is : ", dateStr)
-        }
-    }
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const toggleMenu = () => setShowMenu(!showMenu);
+
+    const DotsMenu = () => (
+        <div ref={menuRef} className='absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-1 overflow-hidden transition-all duration-200 ease-in-out transform scale-100'>
+            <button
+                onClick={() => { editQuote(quote); refetch(); setShowMenu(false); }}
+                className='w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 transition-colors'
+            >
+                <FiEdit className="text-blue-500" size={16} />
+                <span className="font-medium">Edit Quote</span>
+            </button>
+            <div className='border-b border-gray-50'></div>
+            <button
+                onClick={() => { deleteQuote(quote.id); refetch(); setShowMenu(false); }}
+                className='w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors'
+            >
+                <RiDeleteBin6Line size={16} />
+                <span className="font-medium">Delete</span>
+            </button>
+        </div>
+    );
 
     return (
-        <div className='px-2 py-2 flex flex-1 bg-white rounded-md border border-black/20'>
-            <div className='flex p-2 flex-1' >
-                <div className='flex flex-col-reverse lg:flex-row lg:justify-between flex-1 gap-2'>
-                    <div className='flex flex-col justify-between items-center'>
-                        <p className='text-xl font-medium flex-[2]'>{quote.title} </p>
-                        <div className='flex text-sm mt-4'>
-                            <p className='flex  flex-wrap'>{quote.description}</p>
-                        </div>
-                    </div>
-                    <div className='flex flex-row justify-center items-center gap-2 text-xs flex-wrap'>
+        <div className='group relative bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out mb-4'>
+            <div className='flex flex-col gap-4'>
 
-                        <div className='flex'>
-                            <div className='flex items-center gap-2 lg:gap-4'>
-                                <div className='flex gap-2 items-center'>
-                                    <p> <IoCalendarOutline size={16} /> </p>
-                                    <p>{quote.visibility}</p>
-                                </div>
-                                <div className='flex gap-2 items-center'>
-                                    <p><MdOutlinePerson2 size={16} /> </p>
-                                    <p>{quote?.date?.split("T")[0]}</p>
-                                </div>
-                                <div className='flex gap-2 items-center'>
-                                    <p><LuClock size={16} /> </p>
-                                    <p>{quote?.date?.split("T")[1].split(".")[0]}</p>
-                                </div>
-                            </div>
+                {/* Header Section */}
+                <div className='flex justify-between items-start gap-4'>
+                    <div className='space-y-1 flex-1'>
+                        <h3 className='text-lg font-bold text-gray-800 leading-tight group-hover:text-blue-600 transition-colors'>
+                            {quote.title}
+                        </h3>
+                        <p className='text-gray-500 text-sm leading-relaxed line-clamp-2'>
+                            {quote.description}
+                        </p>
+                    </div>
+
+                    {/* Action Menu */}
+                    <div className='relative'>
+                        <button
+                            onClick={toggleMenu}
+                            className='p-2 hover:bg-gray-100 rounded-full transition-colors focus:outline-none'
+                        >
+                            <FiMoreVertical size={20} className='text-gray-400 group-hover:text-gray-600' />
+                        </button>
+                        {showMenu && <DotsMenu />}
+                    </div>
+                </div>
+
+                {/* Footer Info Section */}
+                <div className='flex flex-wrap items-center gap-y-3 gap-x-6 pt-4 border-t border-gray-50 mt-2'>
+
+                    {/* Visibility/Status */}
+                    <div className='flex items-center gap-2 text-gray-500'>
+                        <div className="p-1.5 bg-blue-50 rounded-lg">
+                            <FiCalendar size={14} className="text-blue-600" />
                         </div>
-                        <div className='flex-1 justify-end flex gap-3'>
-                            {showMenu && <DotsMenu />}
-                            <PiDotsThreeOutlineVerticalLight onClick={toggleMenu} size={20} className='cursor-pointer' />
+                        <span className='text-xs font-semibold uppercase tracking-wider'>{quote.visibility}</span>
+                    </div>
+
+                    {/* Date */}
+                    <div className='flex items-center gap-2 text-gray-500'>
+                        <div className="p-1.5 bg-purple-50 rounded-lg">
+                            <FiUser size={14} className="text-purple-600" />
                         </div>
+                        <span className='text-xs font-medium'>{quote?.date?.split("T")[0]}</span>
+                    </div>
+
+                    {/* Time */}
+                    <div className='flex items-center gap-2 text-gray-500'>
+                        <div className="p-1.5 bg-orange-50 rounded-lg">
+                            <FiClock size={14} className="text-orange-600" />
+                        </div>
+                        <span className='text-xs font-medium'>{quote?.date?.split("T")[1]?.split(".")[0]}</span>
                     </div>
 
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default QuoteCard
+export default QuoteCard;

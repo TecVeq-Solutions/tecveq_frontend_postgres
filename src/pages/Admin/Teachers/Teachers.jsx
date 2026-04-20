@@ -48,24 +48,40 @@ const Teachers = () => {
       <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
         <div className="flex flex-1 ">
           <div
-            className={`sm:w-full w-screen min-h-full lg:px-10 sm:px-10 px-3 flex-grow lg:ml-72`}
+            className={`sm:w-full w-screen h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80`}
           >
             <div className="min-h-full">
               <Navbar heading={"Teachers"} />
               <div className={`${isBlurred ? "blur" : ""}`}>
-                <div className="flex flex-row-reverse my-4">
+                <div className="flex flex-row-reverse my-6">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-4 border bg-white border-[#00000020] px-4 py-2 rounded-3xl">
-                      <IoSearch className="hover:text-grey cursor-pointer" />
+                    {/* Main Container with Glass Effect */}
+                    <div className="group flex items-center gap-3 bg-white/80 backdrop-blur-md border border-gray-100 px-5 py-2.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:shadow-[0_8px_30px_rgb(59,130,246,0.1)] focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50 transition-all duration-300 w-full md:w-80">
+
+                      {/* Search Icon with Animation */}
+                      <IoSearch
+                        className="text-gray-400 group-focus-within:text-blue-500 group-hover:scale-110 transition-all duration-300 cursor-pointer"
+                        size={20}
+                      />
+
+                      {/* Input Field */}
                       <input
                         type="text"
                         value={searchText}
-                        placeholder="Search Teacher"
-                        className="bg-transparent outline-none"
-                        onChange={(e) => {
-                          setSearchText(e.target.value);
-                        }}
+                        placeholder="Search Teacher..."
+                        className="bg-transparent outline-none w-full text-sm font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal"
+                        onChange={(e) => setSearchText(e.target.value)}
                       />
+
+                      {/* Optional: Clear Button (Sirf tab dikhega jab text ho) */}
+                      {searchText && (
+                        <button
+                          onClick={() => setSearchText("")}
+                          className="text-gray-300 hover:text-red-400 transition-colors"
+                        >
+                          <span className="text-xs">✕</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

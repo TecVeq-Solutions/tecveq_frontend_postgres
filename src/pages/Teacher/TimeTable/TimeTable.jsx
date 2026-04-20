@@ -36,11 +36,12 @@ const TimeTable = () => {
               }`}
           >
             <div className={`flex  flex-col  gap-y-6 gap-1 bg-white w-full relative ${isSidebarOpen ? "-z-10" : "z-auto"}`}>
-              <div className={` border px-4  py-3 border-grey/30 rounded-md shadow-lg w-full `}>
+              <div className={` border px-4  py-3 border-grey/30 rounded-md shadow-lg w-full min-h-[550px]`}>
                 <MyCalendar
                   data={data}
                   isPending={isPending}
                   refetch={refetch}
+                  isRefetching={isRefetching}
                 />
               </div>
             </div>
