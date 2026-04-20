@@ -21,6 +21,11 @@ export const UserProvider = ({ children }) => {
   const { setTeacherLogedIn } = useTeacher();
   const { setStudentLogedIn } = useStudent();
 
+  useEffect(() => {
+    if (userData) {
+      localStorage.setItem("tcauser", JSON.stringify(userData));
+    }
+  }, [userData]);
 
   useEffect(() => {
     if (userData) {

@@ -1,14 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Custombutton from "./Custombutton";
 import logo from "../../../assets/logo.png";
+import profile from "../../../assets/images/profilepic.png";
 import { IoIosLogOut } from "react-icons/io";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoPowerOutline } from "react-icons/io5";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa6";
+import { GoPerson } from "react-icons/go";
+import { LuSettings } from "react-icons/lu";
 import { adminLogout } from "../../../api/Admin/AdminApi";
 import Loader from "../../../utils/Loader";
 import { useAdmin } from "../../../context/AdminContext";
 import { useSidebar } from "../../../context/SidebarContext";
 import { useUser } from "../../../context/UserContext";
+import { useBlur } from "../../../context/BlurContext";
+import ProfileDetails from "../ProfileDetails";
+import useClickOutside from "../../../hooks/useClickOutlise";
+import { userLogout } from "../../../api/ForAllAPIs";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -16,6 +24,11 @@ const Sidebar = () => {
   const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
   const [loading, setLoading] = useState(false);
   const [activeButton, setActiveButton] = useState("dashboard");
+  const [isProfileMenu, setIsProfileMenu] = useState(false);
+  const [isProfileDetails, setIsProfileDetails] = useState(false);
+  const { toggleBlur } = useBlur();
+  const profileMenuRef = useRef(null);
+  useClickOutside(profileMenuRef, () => setIsProfileMenu(false));
 
   useEffect(() => {
     const stored = localStorage.getItem("activeButton") || localStorage.getItem("activeTab");
@@ -39,6 +52,31 @@ const Sidebar = () => {
     setIsopen(false);
     navigate("/");
     setLoading(false);
+  };
+
+  const toggleProfielMenu = () => {
+    setIsProfileMenu(!isProfileMenu);
+  };
+
+  const toggleProfileDetails = () => {
+    toggleBlur();
+    setIsProfileDetails(!isProfileDetails);
+  };
+
+  const onProfileClick = () => {
+    toggleProfielMenu();
+    toggleProfileDetails();
+  };
+
+  const onSettingsClick = () => {
+    handleButtonClick("settings", "/admin/settings");
+    setIsProfileMenu(false);
+  };
+
+  const onLogoutClick = async () => {
+    localStorage.clear();
+    await userLogout();
+    navigate("/");
   };
 
   const menuItems = [
@@ -82,12 +120,64 @@ const Sidebar = () => {
   ];
 
   const Menubar = () => (
-    <div className="flex flex-col w-64 h-screen bg-[#0B1053] text-white shadow-xl overflow-hidden">
+    // w-64 
+    <div className="admin-sidebar flex flex-col   w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-6 pb-5 border-b border-white/[0.08]">
-        <div>
-          <img className="h-7 w-auto" src={logo} alt="TCA Logo" />
-          <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">Admin Portal</p>
+      <div className=" flex items-center justify-between px-[16px] pt-6 pb-5 border-b 
+       border-gray-200">
+        <div className="w-full">
+          <img className="h-full  w-full" src={logo} alt="TCA Logo" />
+          {/* .......................  main admin profile sidebar .............. */}
+          <div className="relative mt-6 w-full" ref={profileMenuRef}>
+            <div
+              className="flex items-center w-full gap-3 p-2 bg-[#eef2f6] rounded-xl cursor-pointer shadow-sm  hover:bg-[#eef2f6] transition-colors duration-200"
+              onClick={toggleProfielMenu}
+            >
+              <img
+                src={userData.profilePic || profile}
+                alt="Profile"
+                className="w-10 h-10  rounded-full object-cover bg-white"
+              />
+              <div className="flex flex-col">
+                <p className="font-medium text-[#6A00FF]   text-[15px] leading-tight">{userData.name || "Jone Copper"}</p>
+                <p className="text-[#6c757d] text-xs mt-0.5">Admin</p>
+              </div>
+              {isProfileMenu ? (
+                <FaChevronDown className="ml-auto text-[#6A00FF] text-xs mr-1" />
+              ) : (
+                <FaChevronRight className="ml-auto text-[#6A00FF] text-xs mr-1" />
+              )}
+            </div>
+            {/* .................................................. */}
+            {isProfileMenu && (
+              <div className="absolute right-0 top-full mt-2 z-50 w-44 bg-white rounded-[1.25rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 p-2.5">
+                <div className="flex flex-col gap-1">
+                  <div
+                    className="flex items-center gap-3 px-3 py-2 cursor-pointer text-[#334155]  hover:text-black hover:bg-gray-50 rounded-lg hover:bg-[#F1F3F5] text-sm transition-colors"
+                    onClick={onProfileClick}
+                  >
+                    <GoPerson className="text-lg" />
+                    <p className="font-medium">My Profile</p>
+                  </div>
+                  <div
+                    className="flex items-center hover:bg-[#F1F3F5]  gap-3 px-3 py-2 cursor-pointer text-[#334155]  hover:text-black  rounded-lg text-sm transition-colors"
+                    onClick={onSettingsClick}
+                  >
+                    <LuSettings className="text-lg" />
+                    <p className="font-medium">Setting</p>
+                  </div>
+
+                  <div
+                    className="flex items-center gap-3 px-3 py-2.5 mt-1 cursor-pointer text-[#334155] hover:bg-[#F1F3F5]  hover:text-black   rounded-xl text-sm transition-colors"
+                    onClick={onLogoutClick}
+                  >
+                    <IoPowerOutline className="text-lg font-bold" />
+                    <p className="font-medium">Log Out</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <IoClose
           className="w-5 h-5 block lg:hidden text-white/50 hover:text-white cursor-pointer"
@@ -99,8 +189,8 @@ const Sidebar = () => {
       <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto custom-scrollbar">
         {menuGroups.map((group, gIdx) => (
           <div key={gIdx} className="flex flex-col gap-1">
-            <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-2">{group.label}</p>
-            <div className="space-y-0.5">
+            <p className="text-[13px] text-white/100 uppercase tracking-widest px-3 mb-2">{group.label}</p>
+            <div className="space-y-1">
               {group.items.map(({ key, title, icon, route }) => (
                 <Custombutton
                   key={key}
@@ -163,6 +253,8 @@ const Sidebar = () => {
       <div className="max-lg:hidden">
         <Menubar />
       </div>
+
+      {isProfileDetails && <ProfileDetails onClose={toggleProfileDetails} />}
     </div>
   );
 };
