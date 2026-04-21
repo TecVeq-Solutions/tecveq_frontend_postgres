@@ -59,9 +59,10 @@ const Classroom = () => {
   }
 
   const { data, isPending, refetch, isRefetching } = useQuery({ queryKey: ["classroom"], queryFn: getAllClassroom });
-
+  // Perceived Performance: Only show big loader on initial load (isPending)
+  // Subsequent refetches (isRefetching) will happen in the background
   return (
-    isPending || isRefetching ? (
+    isPending ? (
       <div className="flex flex-1 justify-center items-center min-h-screen">
         <Loader />
       </div>
@@ -126,43 +127,42 @@ const Classroom = () => {
                   </div>
 
                   {/* Data Table Container */}
-                  <div className="mt-4 w-full bg-white rounded-xl shadow-sm border border-black/10 overflow-hidden">
+                  {/* Data Table Container */}
+                  <div className="mt-6 w-full bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto w-full">
-                      <div className="min-w-[550px] lg:min-w-full">
+                      <div className="min-w-[600px] lg:min-w-full">
                         <DataRow
                           header={true}
-                          isQuiz={true}
-                          index={"Sr. No"}
-                          bgColor={"#F9F9F9"}
+                          index={"#"}
+                          classname={"Classroom"}
+                          classesSchedualled={"Scheduled"}
                           students={"Students"}
                           teachers={"Teachers"}
                           createdBy={"Created By"}
-                          classname={"Classroom"}
-                          classesSchedualled={"Classes Scheduled"}
                         />
 
-                        {searchText === "" &&
+                        {/* Logic for Search (Unchanged) */}
+                        {searchText === "" && Array.isArray(data) &&
                           data.map((cls, index) => (
                             <DataRow
                               data={cls}
                               key={cls.id}
                               header={false}
                               index={index + 1}
-                              bgColor={"#FFFFFF"}
                               classname={cls.name}
-                              students={cls.students.length}
-                              teachers={cls.teachers.length}
-                              createdBy={cls.createdBy.userType}
+                              students={cls._count?.students || 0}
+                              teachers={cls._count?.teachers || 0}
+                              createdBy={cls.createdBy?.userType || "N/A"}
                               toggleClassMenu={toggleClassMenuOpen}
-                              classesSchedualled={cls?.classes?.length}
+                              classesSchedualled={cls?._count?.classes || 0}
                             />
                           ))}
 
-                        {searchText &&
+                        {searchText && Array.isArray(data) &&
                           data.map((cls, index) => {
                             if (
-                              cls.name.toLowerCase().includes(searchText.toLowerCase()) ||
-                              cls.createdBy.userType.toLowerCase().includes(searchText.toLowerCase())
+                              cls?.name?.toLowerCase()?.includes(searchText.toLowerCase()) ||
+                              cls?.createdBy?.userType?.toLowerCase()?.includes(searchText.toLowerCase())
                             ) {
                               return (
                                 <DataRow
@@ -170,21 +170,24 @@ const Classroom = () => {
                                   key={cls.id}
                                   header={false}
                                   index={index + 1}
-                                  bgColor={"#FFFFFF"}
                                   classname={cls.name}
-                                  students={cls.students.length}
-                                  teachers={cls.teachers.length}
-                                  createdBy={cls.createdBy.userType}
+                                  students={cls._count?.students || 0}
+                                  teachers={cls._count?.teachers || 0}
+                                  createdBy={cls.createdBy?.userType || "N/A"}
                                   toggleClassMenu={toggleClassMenuOpen}
-                                  classesSchedualled={cls.classes.length}
+                                  classesSchedualled={cls?._count?.classes || 0}
                                 />
                               );
                             }
+                            return null;
                           })}
 
-                        {data.length === 0 && (
-                          <div className="text-center py-8 text-xl font-medium text-gray-400">
-                            No classrooms to display!
+                        {/* Empty State */}
+                        {Array.isArray(data) && data.length === 0 && (
+                          <div className="text-center py-20 bg-gray-50/50">
+                            <p className="text-xl font-semibold text-gray-300 italic">
+                              No classrooms found!
+                            </p>
                           </div>
                         )}
                       </div>

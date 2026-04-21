@@ -99,76 +99,48 @@ const Teachers = () => {
                   />
 
                   {/* When search filter is not applied */}
-                  {searchText == "" &&
-                    teacherData &&
-                    teacherData.map((thr, index) => {
-                      return thr.map((item) => {
-                        console.log(item, "item data is");
+                    {(() => {
+                      const allTeachersList = teacherData.flat();
+                      const filteredTeachers = allTeachersList.filter((item) => {
+                        if (!searchText) return true;
+                        return item?.teacher?.name.toLowerCase().includes(searchText.toLowerCase());
+                      });
+
+                      if (filteredTeachers.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100 mt-4">
+                            <div className="text-gray-300 mb-2">
+                              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                            </div>
+                            <p className="text-lg font-medium text-gray-500">No teachers found matching your criteria</p>
+                          </div>
+                        );
+                      }
+
+                      return filteredTeachers.map((item, index) => {
+                        const attendance = item?.attendence?.classData?.length === 0
+                          ? 0
+                          : (item.attendence.attendnececount.presents / item.attendence.classData.length) * 100;
 
                         return (
                           <DataRows
-                            key={JSON.stringify(item)}
+                            key={item.teacher.id + item.subject.id}
                             header={false}
-                            attendance={
-                              item?.attendence?.classData?.length == 0
-                                ? 0
-                                : (item.attendence.attendnececount.presents /
-                                  item.attendence.classData.length) *
-                                100
-                            }
                             index={index + 1}
                             bgColor={"#FFFFFF"}
+                            attendance={attendance}
                             classAvg={item?.classAvg}
                             subject={item?.subject?.name}
-                            teacherProfile={
-                              item?.teacher?.profilePic || IMAGES?.Profile
-                            }
+                            teacherProfile={item?.teacher?.profilePic || IMAGES?.Profile}
                             teacherName={item?.teacher?.name}
-                            teacherId={item?.classroomName}
+                            teacherId={item?.teacher?.referenceNo || item?.teacher?.id.slice(0, 6).toUpperCase()}
                             onClickFunction={handleFunctionClick(item)}
                           />
                         );
                       });
-                    })}
-
-                  {/* When search filter is applied */}
-                  {searchText &&
-                    teacherData.map((thr, index) => {
-                      return thr.map((item) => {
-                        if (item?.teacher?.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase())) {
-                          return (
-                            <DataRows
-                              key={JSON.stringify(item)}
-                              index={index + 1}
-                              teacherName={item.teacher.name}
-                              teacherId={item.teacher.id.slice(0, 4)}
-                              subject={item.subject.name}
-                              classAvg={item.classAvg}
-                              attendance={
-                                item.attendence.classData.length == 0
-                                  ? 0
-                                  : (item.attendence.attendnececount.presents /
-                                    item.attendence.classData.length) *
-                                  100
-                              }
-                              teacherProfile={
-                                item?.teacher?.profilePic || IMAGES?.Profile
-                              }
-                              bgColor={"#FFFFFF"}
-                              header={false}
-                              onClickFunction={handleFunctionClick(item)}
-                            />
-                          );
-                        }
-                      });
-                    })}
-
-                  {/* When there is not any teacher present*/}
-                  {teacherData.length == 0 && (
-                    <div className="text-center py-4 text-3xl font-medium">
-                      No teachers to display!
-                    </div>
-                  )}
+                    })()}
                 </div>
               </div>
             </div>

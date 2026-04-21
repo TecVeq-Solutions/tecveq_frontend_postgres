@@ -26,7 +26,7 @@ const ManageUsers = () => {
   const [requestsModal, setRequestsModal] = useState(false);
   const [isAddUserModal, setIsAddUserModal] = useState(false);
   const [isEditUserModal, setIsEditUserModal] = useState(false);
-  const { adminUsersDataPending, adminUsersData, adminUsersRefecth } = useAdmin();
+  const { adminUsersDataPending, adminUsersData, adminUsersRefecth, allLevels } = useAdmin();
 
 
   const toggleRequestModal = () => {
@@ -221,17 +221,32 @@ const ManageUsers = () => {
                       contact={"Contact"}
                     />
 
-                    {adminUsersData?.allUsers
-                      ?.filter((usr) => {
-                        const matchesName = searchText && usr.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase());
-                        const matchesRollNo = searchText && usr.rollNo && usr.rollNo.includes(searchText);
-                        const matchesUserType = selectText && usr.userType === selectText.toLocaleLowerCase();
-                        if (!searchText && selectText) return matchesUserType;
-                        if (searchText && !selectText) return matchesName || matchesRollNo;
-                        if (searchText && selectText) return matchesUserType && (matchesName || matchesRollNo);
-                        return true;
-                      })
-                      .map((usr, index) => (
+                    {(() => {
+                      const filteredUsers = adminUsersData?.allUsers?.filter((usr) => {
+                        const searchLower = searchText.toLowerCase();
+                        const matchesSearch = !searchText ||
+                          usr.name?.toLowerCase().includes(searchLower) ||
+                          (usr.rollNo && usr.rollNo.includes(searchText));
+
+                        const matchesUserType = !selectText || usr.userType === selectText.toLowerCase();
+
+                        return matchesSearch && matchesUserType;
+                      });
+
+                      if (filteredUsers?.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100 mt-4">
+                            <div className="text-gray-300 mb-2">
+                              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                            </div>
+                            <p className="text-lg font-medium text-gray-500">No users found matching your criteria</p>
+                          </div>
+                        );
+                      }
+
+                      return filteredUsers.map((usr, index) => (
                         <DataRows
                           data={usr}
                           key={usr.id}
@@ -239,25 +254,28 @@ const ManageUsers = () => {
                           index={index + 1}
                           userName={usr.name}
                           role={usr.userType}
-                          userclass={usr?.class}
+                                                    userclass={
+                            usr.userType === "student"
+                              ? (usr.level?.name || allLevels.find(l => l.id === usr.levelID)?.name || "—")
+                              : usr.userType === "teacher"
+                                ? (Array.from(new Set(usr.classroomTeachers?.map(ct => ct.classroom?.name).filter(Boolean))).join(", ") || "—")
+                                : usr.userType === "parent"
+                                  ? (Array.from(new Set(usr.students?.map(s => s.level?.name || allLevels.find(l => l.id === s.levelID)?.name).filter(Boolean))).join(", ") || "—")
+                                  : "—"
+                          }
                           contact={usr.phoneNumber}
                           userId={
                             usr?.userType === "teacher"
-                              ? `${usr.referenceNo}`
+                              ? `${usr.referenceNo || usr.id.slice(0, 6).toUpperCase()}`
                               : usr?.userType === "parent"
-                                ? usr?.id.slice(0, 5)
-                                : usr?.rollNo || "not assign"
+                                ? usr?.id.slice(0, 5).toUpperCase()
+                                : usr?.rollNo || "Not Assigned"
                           }
                           toggleClassMenu={(e) => toggleMenu(e)}
                           onClickFunction={handleFunctionClick(usr)}
                         />
-                      ))}
-
-                    {adminUsersData.allUsers.length === 0 && (
-                      <div className="text-center py-12 text-[#0B1053]/30 font-medium text-lg">
-                        No users to display
-                      </div>
-                    )}
+                      ));
+                    })()}
                   </div>
                 </div>
               </div>

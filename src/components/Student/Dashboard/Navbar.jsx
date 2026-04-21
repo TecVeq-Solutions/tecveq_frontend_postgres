@@ -89,7 +89,7 @@ const Navbar = ({ heading }) => {
 
   return (
     <div className="flex flex-1 h-20">
-      <div className={`flex justify-between items-center md:justify-between flex-1 py-3 ${isBlurred ? "blur" : ""}`}>
+      <div className={` student flex justify-between items-center md:justify-between flex-1 py-3 ${isBlurred ? "blur" : ""}`}>
         {/* hidden */}
         <div className=" md:flex flex-col">
           {heading ? <div className="font-medium text-lg sm:text-2xl ml-[3.5rem] sm:ml-[1.4rem] lg:ml-[0rem]  ">{heading} </div> :

@@ -29,17 +29,15 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (userData) {
-      if (userData.userType == "admin") {
-        setAdminLogedIn(true);
-      }
-      if (userData.userType == "student") {
-        setStudentLogedIn(true);
-      }
-      if (userData.userType == "teacher") {
-        setTeacherLogedIn(true);
-      }
+      setAdminLogedIn(userData.userType === "admin");
+      setTeacherLogedIn(userData.userType === "teacher");
+      setStudentLogedIn(userData.userType === "student");
+    } else {
+      setAdminLogedIn(false);
+      setTeacherLogedIn(false);
+      setStudentLogedIn(false);
     }
-  }, [])
+  }, [userData, setAdminLogedIn, setTeacherLogedIn, setStudentLogedIn]);
 
   return (
     <UserContext.Provider value={{ userData, setUserData, addUserToLS, socketContext, setSocketContext }}>

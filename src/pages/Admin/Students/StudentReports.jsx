@@ -111,63 +111,41 @@ const StudentReports = () => {
                       studentRollno={"Roll No."}
                     />
 
-                    {/* When search and class filter is not applied */}
-                    {searchText == "" && classFilter == "" && adminUsersData.allStudents.map((std, index) => (
-                      <DataRows
-                        key={index}
-                        header={false}
-                        index={index + 1}
-                        bgColor={"#FFFFFF"}
-                        studentName={std.name}
-                        contact={std.phoneNumber}
-                        studentClass={std.level?.name || "N/A"}
-                        studentRollno={std.rollNo || "N/A"}
-                        studentProfile={std?.profilePic}
-                        onClickFunction={handleFunctionClick(std)}
-                      />
-                    ))}
+                    {(() => {
+                      const filteredStudents = adminUsersData.allStudents.filter((std) => {
+                        const matchesSearch = std.name?.toLowerCase().includes(searchText.toLowerCase());
+                        const matchesClass = !classFilter || JSON.parse(classFilter).id === std.levelID;
+                        return matchesSearch && matchesClass;
+                      });
 
-                    {/* When only search filter is applied */}
-                    {classFilter == "" && searchText && adminUsersData.allStudents.map((std, index) => {
-                      console.log("stunet name  outoside is : ", searchText);
-                      console.log(std)
-                      if (std?.name.toLowerCase()?.includes(searchText.toLowerCase())) {
-                        console.log("stunet name is : ", searchText);
-                        return <DataRows
-                          key={index}
-                          header={false}
-                          index={index + 1}
-                          bgColor={"#FFFFFF"}
-                          studentName={std.name}
-                          contact={std.phoneNumber}
-                          studentClass={std?.class}
-                          studentRollno={std?.rollno}
-                          studentProfile={std.profilePic}
-                          onClickFunction={handleFunctionClick(std)}
-                        />
+                      if (filteredStudents.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100 mt-4">
+                            <div className="text-gray-300 mb-2">
+                              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                            </div>
+                            <p className="text-lg font-medium text-gray-500">No students found matching your criteria</p>
+                          </div>
+                        );
                       }
-                    })}
 
-                    {/* When only class filter is applied */}
-                    {adminUsersData.allStudents.map((std, index) => {
-                      if (classFilter && (JSON.parse(classFilter).id == std.levelID)) {
-                        return <DataRows
-                          key={index}
+                      return filteredStudents.map((std, index) => (
+                        <DataRows
+                          key={std.id || index}
                           header={false}
                           index={index + 1}
                           bgColor={"#FFFFFF"}
                           studentName={std.name}
-                          studentClass={std?.class}
                           contact={std.phoneNumber}
-                          studentRollno={std?.rollno}
+                          studentClass={std.level?.name || allLevels.find(l => l.id === std.levelID)?.name || "N/A"}
+                          studentRollno={std.rollNo || "N/A"}
                           studentProfile={std?.profilePic}
                           onClickFunction={handleFunctionClick(std)}
                         />
-                      }
-                    })}
-
-                    {/* When there is not any student */}
-                    {adminUsersData.allStudents.length == 0 && <div className="text-center py-4 text-3xl font-medium">No students to display!</div>}
+                      ));
+                    })()}
 
                   </div>
                 </div>

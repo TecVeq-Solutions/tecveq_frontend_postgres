@@ -124,7 +124,7 @@ const AttendanceReportComp = () => {
 
     if (isLoadingClassrooms) {
         return (
-            <div className="bg-white border border-[#e5e7eb] rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white  border border-[#e5e7eb] rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563eb] mx-auto"></div>
                     <p className="mt-2 text-[#6b7280]">Loading classrooms...</p>
@@ -157,7 +157,7 @@ const AttendanceReportComp = () => {
     };
 
     return (
-        <div className="bg-white border border-[#e5e7eb] rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white border mt-10 border-[#e5e7eb] rounded-xl shadow-lg overflow-hidden">
             {/* Header */}
             <div className="bg-[#6A00FF] px-4 sm:px-6 py-3 sm:py-4">
                 <div className="flex items-center justify-between gap-2">

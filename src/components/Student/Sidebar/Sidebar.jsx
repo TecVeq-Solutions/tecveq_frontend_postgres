@@ -47,20 +47,20 @@ const Sidebar = () => {
   };
 
   const mainItems = [
-    { key: "dashboard",   title: "Dashboard",   icon: "home",  route: "/student/dashboard" },
-    { key: "timetable",   title: "Time Table",  icon: "time",  route: "/timetable"         },
-    { key: "reports",     title: "Reports",     icon: "graph", route: "/reports"           },
+    { key: "dashboard", title: "Dashboard", icon: "home", route: "/student/dashboard" },
+    { key: "timetable", title: "Time Table", icon: "time", route: "/timetable" },
+    { key: "reports", title: "Reports", icon: "graph", route: "/reports" },
   ];
 
   const academicItems = [
-    { key: "assignments", title: "Assignments", icon: "book",  route: "/assignments"       },
-    { key: "quizzes",     title: "Quizzes",     icon: "quiz",  route: "/quizzes"           },
+    { key: "assignments", title: "Assignments", icon: "book", route: "/assignments" },
+    { key: "quizzes", title: "Quizzes", icon: "quiz", route: "/quizzes" },
   ];
 
   const Menubar = () => (
-    <div className="flex flex-col w-64 h-screen bg-[#0B1053] text-white shadow-xl overflow-hidden">
+    <div className=" student flex flex-col w-64 h-screen bg-[#0B1053] text-white shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-6 pb-5 border-b border-white/[0.08]">
+      <div className="  flex items-center justify-between px-5 pt-6 pb-5 border-b border-white/[0.08]">
         <div>
           <img className="h-7 w-auto" src={logo} alt="TCA Logo" />
           <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">Student Portal</p>
@@ -104,9 +104,9 @@ const Sidebar = () => {
             <div className="text-center space-y-1">
               <p className="text-[11px] text-white/50">Live Class in Progress</p>
               <p className="text-sm font-medium text-white line-clamp-1">{meetingStart?.event?.subjectID?.name}</p>
-              <a 
-                href={meetingStart?.event.meetLink} 
-                target="_blank" 
+              <a
+                href={meetingStart?.event.meetLink}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="mt-4 flex items-center justify-center gap-2 w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors border border-white/10 group"
               >

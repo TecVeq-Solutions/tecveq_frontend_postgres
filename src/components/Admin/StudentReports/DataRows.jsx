@@ -68,7 +68,7 @@ const DataRows = ({
       </div>
 
       {/* Name */}
-      <span className="flex-[3] text-sm font-medium text-gray-800 truncate">{studentName}</span>
+      <span className="flex-[3] text-sm font-medium admin text-gray-800 truncate">{studentName}</span>
 
       {/* Class Badge */}
       <div className="flex-[2]">

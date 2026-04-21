@@ -85,7 +85,7 @@ const Navbar = ({ heading }) => {
   };
 
   return (
-    <nav className="w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+    <nav className=" admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
       {/* Background layer that blurs */}
       <div
         className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""
