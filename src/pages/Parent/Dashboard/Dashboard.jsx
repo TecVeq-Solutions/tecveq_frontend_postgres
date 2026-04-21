@@ -4,11 +4,11 @@ import Attendance from "../../../components/Parent/Dashboard/Attendance";
 import SubjectsEnrolled from "../../../components/Parent/Dashboard/SubjectsEnrolled";
 import LastDeliverables from "../../../components/Parent/Dashboard/LastDeliverables";
 
-import { useBlur } from "../../../context/BlurContext";
+
 
 
 const Dashboard = () => {
-  const { isBlurred } = useBlur();
+
 
 
   
@@ -20,16 +20,14 @@ const Dashboard = () => {
             <Navbar />
           </div>
           <div
-            className={`flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 py-2 ${isBlurred ? "blur" : ""
-              }`}
+            className="flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 py-2"
           >
             <div className="flex-[6] flex w-full">
               <SubjectsEnrolled />
             </div>
           </div>
           <div
-            className={`flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 pb-10 pt-2 my-2 ${isBlurred ? "blur" : ""
-              }`}
+            className="flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 pb-10 pt-2 my-2"
           >
             <div className="flex flex-[2]">
               <LastDeliverables />

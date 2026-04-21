@@ -38,11 +38,12 @@ const CreateQuoteModal = ({ open, setopen, refetch, isEditTrue, quoteData }) => 
                 results = await createAnnouncements({ ...quoteObj, date: datetime });
                 toast.success("Quote created successfully");
             }
-
+            return results;
+        },
+        onSuccess: async () => {
+            await refetch();
             toggleBlur();
             setopen(false);
-            await refetch();
-            return results;
         },
         onError: () => {
             toast.error("An error occurred. Please try again.");

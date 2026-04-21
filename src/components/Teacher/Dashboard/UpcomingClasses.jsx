@@ -85,6 +85,20 @@ const UpcomingClasses = () => {
     if (!allClasses) return;
     const targetDate = new Date(selectedDate).toDateString();
     let arr = allClasses.filter((item) => new Date(item.startTime).toDateString() === targetDate);
+
+    const lsUser = localStorage.getItem("tcauser");
+    if (lsUser) {
+      try {
+        const user = JSON.parse(lsUser);
+        if (user && user.userType === "teacher") {
+          arr = arr.filter(item => {
+            const tId = item.teacher?.id || item.teacher?._id || item.teacher?.teacherID?.id || item.teacher?.teacherID?._id || item.teacherId || item.teacherID;
+            return tId === user.id || tId === user._id;
+          });
+        }
+      } catch (e) {}
+    }
+
     setFilteredClasses(arr);
   }
 

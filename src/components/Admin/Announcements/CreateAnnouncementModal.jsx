@@ -38,17 +38,18 @@ const CreateAnnouncementModal = ({
             let anndate = announcemnetObj.date;
             let datetime = (anntime && anndate) ? anndate + "T" + anntime + ":00.000Z" : new Date().toISOString();
 
-            toggleBlur();
-            setopen(false);
-
             let results;
             if (isEditTrue) {
                 results = await editAnnouncements({ ...announcemnetObj, date: datetime }, announcementData.id);
             } else {
                 results = await createAnnouncements({ ...announcemnetObj, date: datetime }, sendOnWhatsapp);
             }
-            await refetch();
             return results;
+        },
+        onSuccess: async () => {
+            await refetch();
+            toggleBlur();
+            setopen(false);
         }
     });
 
