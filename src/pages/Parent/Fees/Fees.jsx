@@ -23,11 +23,11 @@ const Fees = () => {
 
     return (
         <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins min-h-screen">
-            <div className={`flex flex-col flex-1 px-4 lg:ml-72 ${isBlurred ? "blur" : ""}`}>
+            <div className={`flex flex-col flex-1 px-4 lg:ml-80 ${isBlurred ? "blur" : ""}`}>
                 <div className="flex h-20 md:px-14 lg:px-0">
                     <Navbar />
                 </div>
-                
+
                 <div className="py-6 px-2 sm:px-10 lg:px-0">
                     <h1 className="text-2xl font-bold text-[#0B1053] mb-2 uppercase tracking-tight">Student Fees Portal</h1>
                     <p className="text-gray-500 text-sm">Review fee history and payment status for <span className="font-bold text-[#6A00FF]">{selectedChild?.name || "Student"}</span></p>
@@ -37,7 +37,7 @@ const Fees = () => {
                     <div className="flex flex-1 items-center justify-center h-[50vh] bg-white rounded-3xl mx-2 sm:mx-10 lg:mx-0 shadow-sm border border-dashed border-gray-200">
                         <div className="text-center">
                             <p className="text-gray-400 font-medium mb-4">No student selected.</p>
-                            <button 
+                            <button
                                 onClick={() => window.location.href = '/parent/children'}
                                 className="px-6 py-2 bg-[#0B1053] text-white rounded-full text-sm font-bold shadow-lg hover:bg-[#0B1053]/90 transition-all"
                             >
@@ -71,23 +71,22 @@ const Fees = () => {
                                             </td>
                                             <td className="px-6 py-5">
                                                 <span className="text-sm text-gray-600 font-semibold bg-gray-100 px-3 py-1 rounded-lg">
-                                                    {fee.month ? `${new Date(0, fee.month-1).toLocaleString('en', {month: 'long'})} ${fee.year}` : `Academic Year ${fee.year}`}
+                                                    {fee.month ? `${new Date(0, fee.month - 1).toLocaleString('en', { month: 'long' })} ${fee.year}` : `Academic Year ${fee.year}`}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-5 text-lg font-black text-[#6A00FF]">
                                                 ${fee.amount.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-5 text-sm text-gray-500 font-medium">
-                                                <div>Due: {new Date(fee.dueDate).toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})}</div>
+                                                <div>Due: {new Date(fee.dueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                                                 {fee.paidAt && <div className="text-[10px] text-green-500 font-bold uppercase mt-1">Paid On: {new Date(fee.paidAt).toLocaleDateString('en-GB')}</div>}
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="flex justify-center">
-                                                    <span className={`px-5 py-1.5 text-[10px] font-black rounded-full uppercase tracking-widest shadow-sm border-2 ${
-                                                        fee.status === 'paid' 
-                                                        ? 'bg-green-50 text-green-600 border-green-200' 
-                                                        : 'bg-red-50 text-red-600 border-red-200'
-                                                    }`}>
+                                                    <span className={`px-5 py-1.5 text-[10px] font-black rounded-full uppercase tracking-widest shadow-sm border-2 ${fee.status === 'paid'
+                                                            ? 'bg-green-50 text-green-600 border-green-200'
+                                                            : 'bg-red-50 text-red-600 border-red-200'
+                                                        }`}>
                                                         {fee.status}
                                                     </span>
                                                 </div>

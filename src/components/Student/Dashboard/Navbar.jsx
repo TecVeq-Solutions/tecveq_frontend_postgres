@@ -69,7 +69,7 @@ const Navbar = ({ heading }) => {
             </h1>
           ) : (
             <div className="flex flex-col pl-12 sm:pl-0">
-              <p className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">Hello {userData.name}</p>
+              <p className="text-lg md:text-2xl pl-5 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">Hello {userData.name}</p>
               <p className="hidden sm:block text-xs text-gray-500">Welcome to your learning space!</p>
             </div>
           )}

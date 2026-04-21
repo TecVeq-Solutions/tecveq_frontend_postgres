@@ -161,12 +161,12 @@ const SubjectsEnrolled = () => {
   const filteredSubjects = subjectQuery?.data?.subjects || subjectQuery?.data || [];
 
   return (
-    <div style={{ display: "flex", flex: 1 }}>
-      <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: "16px" }}>
+    <div style={{ display: "flex", flex: 1, minWidth: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: "16px", minWidth: 0 }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div className="gap-[5px] sm:gap-[10px]" style={{ display: "flex", alignItems: "center", }}>
             <div
               style={{
                 width: "36px",
@@ -186,7 +186,7 @@ const SubjectsEnrolled = () => {
               </svg>
             </div>
             <div>
-              <p className=" text-xl font-semibold tracking-tight text-gray-800" >
+              <p className=" text-lg sm:text-xl font-semibold tracking-tight text-gray-800" >
                 Subjects Enrolled
               </p>
               <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", fontWeight: 400, lineHeight: 1 }}>
@@ -219,7 +219,6 @@ const SubjectsEnrolled = () => {
           )}
         </div>
 
-        {/* Card */}
         <div
           style={{
             flex: 1,
@@ -227,65 +226,72 @@ const SubjectsEnrolled = () => {
             borderRadius: "20px",
             border: "1px solid rgba(0,0,0,0.07)",
             overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
             boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
           }}
         >
-          {/* Table Header */}
+          {/* Unified Scroll Container for Mobile & Desktop */}
           <div
+            className="overflow-auto pr-1"
             style={{
-              display: "grid",
-              gridTemplateColumns: "44px 1fr 1fr 1fr",
-              padding: "14px 20px",
-              background: "linear-gradient(135deg, #0B1053 0%, #1e3a8a 50%, #2563eb 100%)",
-              gap: "8px",
-              position: "relative",
-              overflow: "hidden",
+              maxHeight: "340px",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(0,0,0,0.2) transparent",
             }}
           >
-            {/* Decorative dots */}
-            <div style={{
-              position: "absolute", top: "-20px", right: "-20px",
-              width: "80px", height: "80px", borderRadius: "50%",
-              background: "rgba(255,255,255,0.05)",
-            }} />
-            <div style={{
-              position: "absolute", bottom: "-30px", right: "80px",
-              width: "60px", height: "60px", borderRadius: "50%",
-              background: "rgba(255,255,255,0.04)",
-            }} />
-            {[
-              { label: "#", align: "left" },
-              { label: "Subject", align: "center" },
-              { label: "Instructor", align: "center" },
-              { label: "Attendance", align: "center" },
-            ].map(({ label, align }) => (
+            <div style={{ minWidth: "500px", width: "100%" }}>
+              {/* Table Header */}
               <div
-                key={label}
                 style={{
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.55)",
-                  textAlign: align,
-                  position: "relative",
-                  zIndex: 1,
+                  display: "grid",
+                  gridTemplateColumns: "44px 1fr 1fr 1fr",
+                  padding: "14px 20px",
+                  background: "linear-gradient(135deg, #0B1053 0%, #1e3a8a 50%, #2563eb 100%)",
+                  gap: "8px",
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 10,
+                  overflow: "hidden",
                 }}
               >
-                {label}
+                {/* Decorative dots */}
+                <div style={{
+                  position: "absolute", top: "-20px", right: "-20px",
+                  width: "80px", height: "80px", borderRadius: "50%",
+                  background: "rgba(255,255,255,0.05)",
+                }} />
+                <div style={{
+                  position: "absolute", bottom: "-30px", right: "80px",
+                  width: "60px", height: "60px", borderRadius: "50%",
+                  background: "rgba(255,255,255,0.04)",
+                }} />
+                {[
+                  { label: "#", align: "left" },
+                  { label: "Subject", align: "center" },
+                  { label: "Instructor", align: "center" },
+                  { label: "Attendance", align: "center" },
+                ].map(({ label, align }) => (
+                  <div
+                    key={label}
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.55)",
+                      textAlign: align,
+                      position: "relative",
+                      zIndex: 1,
+                    }}
+                  >
+                    {label}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Body */}
-          <div
-            style={{
-              overflowY: "auto",
-              maxHeight: "280px",
-              scrollbarWidth: "thin",
-              scrollbarColor: "rgba(0,0,0,0.1) transparent",
-            }}
-          >
+              {/* Body */}
             {subjectQuery.isPending ? (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "48px 0" }}>
                 <Loader />
@@ -374,7 +380,8 @@ const SubjectsEnrolled = () => {
                   </p>
                 </div>
               </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Footer Stats Bar */}

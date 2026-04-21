@@ -11,7 +11,7 @@ const Announcements = () => {
   ) || [];
 
   const AnnouncementCard = ({ item }) => (
-    <div className="relative bg-white mt-5 p-5 mb-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-500/5 transition-transform duration-300 hover:scale-[1.01] overflow-hidden">
+    <div className="relative bg-white mt-1 p-5 mb-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-500/5 transition-transform duration-300 hover:scale-[1.01] overflow-hidden">
 
       {/* 1. Default Background Gradient (Ab hamesha dikhega) */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-transparent" />
@@ -39,7 +39,7 @@ const Announcements = () => {
         </div>
 
         {/* Description */}
-        <p className="text-[13px] text-slate-600 leading-relaxed ml-11">
+        <p className="text-[13px] text-slate-600 leading-relaxed ml-11 break-all">
           {item.description}
         </p>
 
@@ -55,7 +55,7 @@ const Announcements = () => {
   );
 
   return (
-    <div className="flex flex-col flex-1 gap-6 h-full p-2">
+    <div className="flex flex-col flex-1 gap-6 h-full sm:p-2">
       {/* Modern Header */}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-4">
@@ -72,7 +72,14 @@ const Announcements = () => {
       </div>
 
       {/* Main List Container */}
-      <div className="flex flex-col w-full px-4 py-6 bg-slate-100/40 rounded-[2.5rem] h-[420px] overflow-y-auto register-scrollbar border border-white shadow-inner">
+      <div
+        className="flex flex-col w-full px-2 sm:px-4 py-4 bg-slate-100/40 rounded-xl overflow-y-auto border border-white shadow-inner"
+        style={{
+          maxHeight: "340px",
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgba(0,0,0,0.1) transparent",
+        }}
+      >
 
         {isLoading ? (
           <div className="flex flex-col justify-center items-center h-full gap-4">

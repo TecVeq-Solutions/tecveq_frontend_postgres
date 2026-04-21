@@ -13,11 +13,11 @@ const getUrgencyColor = (dueDate) => {
 };
 
 const DeliverableItem = ({ item }) => {
-  const isQuiz = item.hasOwnProperty("questions") || item.type === "quiz";
+  const isQuiz = item.itemType === "quiz" || item.type === "quiz" || item.hasOwnProperty("questions");
   const urgency = getUrgencyColor(item.dueDate);
 
   return (
-    <div className="flex items-center gap-3 px-3.5 py-[11px] border-b border-black/[0.05] last:border-b-0 hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer">
+    <div className="flex flex-col sm:flex-row sm:items-center shrink-0 w-full gap-3 px-3.5 py-[11px] border-b border-black/[0.05] last:border-b-0 hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer">
 
       {/* Type Icon */}
       <div
@@ -40,8 +40,9 @@ const DeliverableItem = ({ item }) => {
         )}
       </div>
 
-      {/* Urgency dot */}
-      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${urgency}`} />
+      <div className="flex items-start sm:items-center flex-1 w-full gap-3">
+        {/* Urgency dot */}
+        <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 sm:mt-0 ${urgency}`} />
 
       {/* Info */}
       <div className="flex-1 min-w-0">
@@ -56,11 +57,12 @@ const DeliverableItem = ({ item }) => {
           Due {formatDate(item.dueDate)}
         </p>
       </div>
+      </div>
 
       {/* Right side */}
-      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+      <div className="flex sm:flex-col items-start sm:items-end gap-1.5 shrink-0 mt-2 sm:mt-0 w-full sm:w-auto">
         <span className="text-[10px] font-medium bg-[#0B1053] text-[#B5D4F4] px-2.5 py-0.5 rounded-full whitespace-nowrap">
-          {item.subjectID?.name}
+          {item.subjectID?.name || item.subject?.name}
         </span>
         <span
           className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${isQuiz
@@ -86,7 +88,9 @@ const Deliverables = () => {
 
   useEffect(() => {
     if (allAssignments.length > 0 || allQuizes.length > 0) {
-      const arr = [...matchedAssignments, ...matchedQuizes];
+      const assignmentsWithType = matchedAssignments.map(a => ({...a, itemType: "assignment"}));
+      const quizesWithType = matchedQuizes.map(q => ({...q, itemType: "quiz"}));
+      const arr = [...assignmentsWithType, ...quizesWithType];
       arr.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
       setAllDeliverables(arr);
     }
@@ -128,11 +132,11 @@ const Deliverables = () => {
             <div className="h-[3px] bg-[#0B1053]" style={{ borderRadius: 0 }} />
 
             <div
-              className="flex flex-col overflow-y-auto"
+              className="flex flex-col overflow-y-auto pr-1"
               style={{
                 maxHeight: "290px",
                 scrollbarWidth: "thin",
-                scrollbarColor: "rgba(0,0,0,0.1) transparent",
+                scrollbarColor: "rgba(0,0,0,0.2) transparent",
               }}
             >
               {allDeliverables.length > 0 ? (

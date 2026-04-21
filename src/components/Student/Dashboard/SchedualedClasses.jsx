@@ -58,7 +58,7 @@ const ScheduledClasses = () => {
 
     return (
       <div
-        className="group relative flex flex-col w-full gap-2 py-4 px-5 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+        className="group relative flex flex-col w-full shrink-0 gap-2 py-4 px-5 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
         style={{
           background: `linear-gradient(135deg, ${color}18 0%, ${color}08 100%)`,
           border: `1px solid ${color}30`,
@@ -293,7 +293,7 @@ const ScheduledClasses = () => {
           </div>
 
           {/* Classes panel */}
-          <div className="flex-1 flex flex-col p-6 gap-4 min-h-[300px]">
+          <div className="flex-1 flex flex-col p-3 sm:p-6 gap-4 min-h-[300px]">
             {/* Date heading */}
             <div className="flex items-center gap-2">
               <div>
@@ -312,7 +312,14 @@ const ScheduledClasses = () => {
             </div>
 
             {/* Class cards or empty state */}
-            <div className="flex flex-col gap-3 flex-1">
+            <div
+              className="flex flex-col gap-3 flex-1 overflow-y-auto pr-2"
+              style={{
+                maxHeight: "280px",
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(0,0,0,0.2) transparent",
+              }}
+            >
               {filteredClasses.length > 0 ? (
                 filteredClasses.map((item) => <EventComponent item={item} key={item.id} />)
               ) : (

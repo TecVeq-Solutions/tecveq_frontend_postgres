@@ -37,9 +37,9 @@ const Dashboard = () => {
   return (
     assignmentIsPending || announcementIsPending || quizIsPending || !studentLogedIn ? <div className="flex justify-center flex-1"> <LargeLoader /> </div> :
       <>
-        <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins ">
-          <div className="flex flex-1 gap-4">
-            <div className={`flex flex-col flex-1 px-2 sm:px-5 lg:ml-80`}>
+        <div className="flex w-full min-h-screen bg-[#f9f9f9]/50 font-poppins">
+          <div className="flex w-full">
+            <div className={`flex flex-col flex-1 w-full lg:w-[calc(100%-20rem)] lg:max-w-[calc(100%-20rem)] px-2 sm:px-5 lg:ml-80`}>
               <div className="flex h-20 md:px-14 lg:px-0">
                 <Navbar />
               </div>

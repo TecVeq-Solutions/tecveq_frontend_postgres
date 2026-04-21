@@ -1,6 +1,7 @@
 import React from 'react'
 import IMAGES from '../../../assets/images';
 import { useNavigate, useParams } from 'react-router-dom';
+import { VscFeedback } from "react-icons/vsc";
 
 const QuizAssignmentsTable = ({ data }) => {
     const params = useParams()
@@ -14,7 +15,7 @@ const QuizAssignmentsTable = ({ data }) => {
             <div className="flex flex-col flex-1 gap-2">
                 <div className="flex flex-1 overflow-x-auto">
                     <table className="flex flex-col flex-1 bg-white rounded-lg w-full">
-                        <thead className="flex px-2 py-3 rounded-tl-lg rounded-tr-lg bg-[#c5c8f5]">
+                        <thead className="flex px-2 py-3 rounded-tl-lg rounded-tr-lg bg-[#afb3f7]">
                             <tr className="flex flex-1 w-full">
                                 <td className={`flex-[1] ${thClass}`}>Sr No.</td>
                                 <td className={`flex-[3] ${thClass}`}>Title</td>
@@ -84,7 +85,8 @@ const QuizAssignmentsTable = ({ data }) => {
                                             {displayGrade}
                                         </td>
                                         <td className={`flex-[3] ${tdClass}`}>
-                                            {item.feedback || "No Feedback"}
+                                            {/* {item.feedback || "No Feedback"} */}
+                                            <VscFeedback />
                                         </td>
                                     </tr>
                                 );
