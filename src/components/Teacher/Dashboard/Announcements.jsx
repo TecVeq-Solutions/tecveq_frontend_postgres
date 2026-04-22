@@ -11,7 +11,7 @@ const Announcements = () => {
   ) || [];
 
   const AnnouncementCard = ({ item }) => (
-    <div className="relative bg-white mt-1 p-5 mb-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-500/5 transition-transform duration-300 hover:scale-[1.01] overflow-hidden text-xs">
+    <div className="relative bg-white mt-1 p-5 mb-4 rounded-3xl border border-gray-100 shadow-sm transition-transform duration-300 hover:scale-[1.01] overflow-hidden text-xs">
 
       {/* 1. Default Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-transparent" />
@@ -55,7 +55,7 @@ const Announcements = () => {
   );
 
   return (
-    <div className="flex flex-col flex-1 gap-6 h-full sm:p-2">
+    <div className="flex flex-col flex-1 gap-6 h-full w-full max-w-full">
       {/* Modern Header */}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-4">
@@ -73,7 +73,7 @@ const Announcements = () => {
 
       {/* Main List Container */}
       <div
-        className="flex flex-col w-full px-2 sm:px-4 py-4 bg-slate-100/40 rounded-xl overflow-y-auto register-scrollbar border border-white shadow-inner"
+        className="flex flex-col w-full px-2 sm:px-4 py-4 bg-slate-100/40 rounded-xl overflow-y-auto overflow-x-hidden register-scrollbar border border-white shadow-inner"
         style={{
           maxHeight: "340px",
           scrollbarWidth: "thin",

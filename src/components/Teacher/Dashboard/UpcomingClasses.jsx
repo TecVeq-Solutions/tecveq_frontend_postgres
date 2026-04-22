@@ -59,7 +59,7 @@ const UpcomingClasses = () => {
 
     return (
       <div
-        className="group relative flex flex-col w-full shrink-0 gap-2 py-4 px-5 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+        className="group relative flex  flex-col w-full shrink-0 gap-2 py-4 px-2 sm:px-5 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
         style={{
           background: `linear-gradient(135deg, ${color}18 0%, ${color}08 100%)`,
           border: `1px solid ${color}30`,
@@ -271,7 +271,7 @@ const UpcomingClasses = () => {
 
         {/* Main card */}
         <div
-          className={`flex flex-col lg:flex-row gap-0 bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100 ${isSidebarOpen ? "-z-50" : "z-auto"}`}
+          className={`flex flex-col lg:flex-row gap-0 bg-white rounded-3xl shadow-sm overflow-hidden border border-gray-100 z-0`}
         >
           {/* Calendar panel */}
           <div className="flex-none lg:w-72 p-6 border-b lg:border-b-0 lg:border-r border-gray-100">
@@ -316,7 +316,7 @@ const UpcomingClasses = () => {
             >
               {classesIsPending ? (
                 <div className="flex flex-col items-center justify-center py-10">
-                   <div className="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
                 </div>
               ) : filteredClasses.length > 0 ? (
                 filteredClasses.map((item) => <EventComponent item={item} key={item.id} />)

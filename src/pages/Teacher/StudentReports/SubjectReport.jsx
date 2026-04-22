@@ -120,19 +120,23 @@ const SubjectReport = () => {
               <div className="mt-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <Card
-                    percentage={data?.averageAssignmentMarks?.percentage || 0}
+                    percentage={data?.averageAssignmentMarks?.percentage == "NaN" ? 0 : (data?.averageAssignmentMarks?.percentage || 0)}
                     data={"Assignments"}
                     grade={data?.averageAssignmentMarks?.grade || "F"}
                     type={"Percentage"}
                   />
                   <Card
-                    percentage={data?.averageQuizMarks?.percentage || 0}
+                    percentage={data?.averageQuizMarks?.percentage == "NaN" ? 0 : (data?.averageQuizMarks?.percentage || 0)}
                     data={"Quizes"}
                     grade={data?.averageQuizMarks?.grade || "F"}
                     type={"Percentage"}
                   />
                   <Card
-                    percentage={data?.attendance?.avgAttendancePer?.toFixed(1) || 0}
+                    percentage={
+                      (data?.attendance?.avgAttendancePer === "NaN" || data?.attendance?.avgAttendencePer === "NaN") 
+                        ? 0 
+                        : (data?.attendance?.avgAttendancePer ?? data?.attendance?.avgAttendencePer ?? 0)
+                    }
                     data={"Attendance"}
                     type={"Percentage"}
                   />

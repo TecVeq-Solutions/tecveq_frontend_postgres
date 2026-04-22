@@ -15,32 +15,36 @@ const Dashboard = () => {
   const { isSidebarOpen } = useSidebar(); // new
 
   return (
-    <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
-      <div className="flex flex-1 gap-4">
-        <div className={`flex flex-col flex-1 px-4 lg:px-5 lg:ml-80`}>
-          <div className="flex h-20 md:px-14 lg:px-0">
-            <Navbar />
-          </div>
-          <div
-            className={`flex flex-col md:px-10 lg:px-0 lg:mt-0 mt-5 sm:mt-1 md:mt-1 lg:flex-row flex-1 gap-5 my-2 ${isBlurred ? "blur" : ""
-              }`}
-          >
-            <div className="flex flex-[2]">
+    <div className="flex flex-col flex-1 bg-[#f9f9f9]/50 font-poppins min-h-screen overflow-x-hidden">
+      <div className="flex flex-1 flex-col lg:ml-80 transition-all duration-300">
+        {/* Navbar Container */}
+        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 flex items-center pl-16 lg:pl-0">
+          <Navbar />
+        </div>
+
+        {/* Content Area */}
+        <div className={`flex flex-col p-3 sm:p-4 lg:p-6 gap-6 ${isBlurred ? "blur-md" : ""}`}>
+          
+          {/* Top Section: Announcements & Upcoming Classes */}
+          <div className="flex flex-col xl:flex-row gap-6">
+            <div className="flex-1 xl:flex-[2] min-w-0">
               <Announcements data={allAnnouncements} />
             </div>
-            <div className={`flex flex-[3] ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}>
+            <div className={`flex-1 xl:flex-[3] min-w-0 ${isSidebarOpen ? "z-0" : "z-auto"}`}>
               <UpcomingClasses />
             </div>
           </div>
-          <div
-            className={`flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 py-2 ${isBlurred ? "blur" : ""
-              }`}
-          >
-            <div className="flex-[6] flex w-full">
+
+          {/* Bottom Section: My Classes & Last Deliverables */}
+          <div className="flex flex-col xl:flex-row gap-6">
+            <div className="flex-1 xl:flex-[6] min-w-0">
               <MyClasses />
             </div>
-            <div className="flex-[4] flex w-full"><LastDeliverables /> </div>
+            <div className="flex-1 xl:flex-[4] min-w-0">
+              <LastDeliverables />
+            </div>
           </div>
+
         </div>
       </div>
     </div>

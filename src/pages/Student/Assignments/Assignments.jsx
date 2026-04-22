@@ -25,7 +25,8 @@ const Assignments = () => {
             <div className={`${isBlurred ? "blur" : ""} relative ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}>
               {/* Header Banner */}
               <div className="mt-6 mb-6 rounded-2xl px-6 py-5 flex items-center gap-4"
-                style={{ background: "linear-gradient(135deg, #6A00FF 0%, #9B4DFF 60%, #C084FC 100%)", boxShadow: "0 8px 32px rgba(106,0,255,0.25)" }}>
+                style={{ background: "linear-gradient(135deg, #6A00FF 0%, #9B4DFF 60%, #C084FC 100%)", }}>
+                {/* boxShadow: "0 8px 32px rgba(106,0,255,0.25)" */}
                 <div className="bg-white/20 rounded-xl p-3">
                   <ClipboardList className="text-white" size={28} />
                 </div>

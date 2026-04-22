@@ -153,82 +153,154 @@ const GradingQuizzes = () => {
   );
 
   return (
-    <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
-      <div className="flex flex-1">
-        <div
-          className={`w-full ${isBlurred ? "blur" : ""
-            } flex-grow lg:ml-72 px-4 md:px-10 lg:px-20`}
-        >
-          <div className="pt-8 ">
-            <div className="flex flex-row items-center justify-between flex-grow">
-              <div className="ml-11 sm:ml-0 flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-4">
-                <p className="font-semibold text-[18px] sm:text-[20px] md:text-[24px]">
-                  Grading Quizzes
-                </p>
-                <div className="flex items-center gap-1 text-[10px] md:text-xs">
-                  <IoBookOutline />
-                  <MdOutlineKeyboardArrowRight />
-                  <p className="hidden sm:block cursor-pointer" onClick={onAssignmentClick}>
-                    Quizzes
-                  </p>
-                  <MdOutlineKeyboardArrowRight className="hidden sm:block" />
-                  <p className="px-2 font-medium rounded-sm bg-tea">
-                    Grading Quizzes
-                  </p>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+        .grading-root { font-family: 'DM Sans', sans-serif; }
+        .icon-btn-glow:hover { box-shadow: 0 4px 16px rgba(99,102,241,0.18); }
+      `}</style>
+
+      <div className={`grading-root min-h-screen flex flex-1 ${isBlurred ? "blur-sm" : ""}`}>
+        <div className="flex-1">
+          <div
+            className="min-h-screen"
+            style={{
+              background: "linear-gradient(145deg, #ECEEF8 0%, #F2F0FA 50%, #EEF2F8 100%)",
+              backgroundImage:
+                "radial-gradient(ellipse at 10% 0%, rgba(99,102,241,0.1) 0%, transparent 55%)," +
+                "radial-gradient(ellipse at 90% 100%, rgba(139,92,246,0.08) 0%, transparent 55%)",
+              paddingLeft: "clamp(12px, 4vw, 80px)",
+              paddingRight: "clamp(12px, 4vw, 80px)",
+              paddingTop: 0,
+              marginLeft: "288px",
+            }}
+          >
+            {/* ══════════════════════════════════════
+                TOP BAR — Redesigned
+            ══════════════════════════════════════ */}
+            <div
+              className="sticky top-0 z-40 mb-8 p-6"
+              style={{
+                background: "rgba(255,255,255,0.88)",
+                backdropFilter: "blur(20px)",
+                borderBottom: "1px solid rgba(99,102,241,0.12)",
+                boxShadow: "0 2px 32px rgba(15,20,60,0.07)",
+              }}
+            >
+              <div
+                className="absolute top-0 left-0 right-0 h-[2.5px]"
+                style={{ background: "linear-gradient(90deg, #6366F1 0%, #8B5CF6 40%, #EC4899 80%, #F59E0B 100%)" }}
+              />
+
+              <div className="flex items-center justify-between" style={{ height: "68px" }}>
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
+                    style={{
+                      background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
+                      boxShadow: "0 4px 14px rgba(99,102,241,0.35)",
+                    }}
+                  >
+                    <IoBookOutline className="text-white text-[18px]" />
+                  </div>
+
+                  <div className="flex flex-col justify-center gap-0.5">
+                    <p
+                      className="text-[22px] font-bold text-[#0F1441] leading-tight tracking-[-0.4px]"
+                      style={{ fontFamily: "'Syne', sans-serif" }}
+                    >
+                      Grading Quizzes
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[11px] text-[#A0A4BE] font-medium">Home</span>
+                      <MdOutlineKeyboardArrowRight className="text-[#CDD0E3] text-[13px]" />
+                      <span
+                        className="text-[11px] text-[#7B7FA8] font-medium cursor-pointer transition-colors duration-200 hover:text-[#6366F1]"
+                        onClick={onAssignmentClick}
+                      >
+                        Quizzes
+                      </span>
+                      <MdOutlineKeyboardArrowRight className="text-[#CDD0E3] text-[13px]" />
+                      <span
+                        className="text-[11px] font-semibold text-[#6366F1] px-2 py-0.5 rounded-full"
+                        style={{
+                          background: "linear-gradient(135deg, #EEF0FF 0%, #F0EEFF 100%)",
+                          border: "1px solid rgba(99,102,241,0.2)",
+                        }}
+                      >
+                        Grading
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-row items-center gap-2 md:gap-4">
-                <div className="p-1 bg-white rounded-sm cursor-pointer border-1 border-grey">
-                  <img
+
+                <div className="flex items-center gap-3">
+                  <button
                     onClick={togglebell}
-                    src={IMAGES.Notification}
-                    alt=""
-                    className="md:w-[22px] md:h-[22px] w-[13px] h-[13px]"
-                  />
-                </div>
-                <div className="p-1 bg-white rounded-sm cursor-pointer border-1 border-grey">
-                  <img
+                    className="icon-btn-glow relative flex items-center justify-center w-10 h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px"
+                    style={{
+                      background: "linear-gradient(135deg, #F5F6FF 0%, #EDEEFF 100%)",
+                      border: "1px solid rgba(99,102,241,0.15)",
+                      boxShadow: "0 2px 8px rgba(15,20,60,0.06)",
+                    }}
+                  >
+                    <img src={IMAGES.Notification} alt="Notifications" className="w-[18px] h-[18px] block" />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#EF4444] rounded-full border border-white" />
+                  </button>
+
+                  <button
                     onClick={toggleMail}
-                    src={IMAGES.SMS}
-                    alt=""
-                    className="md:w-[22px] md:h-[22px] w-[13px] h-[13px]"
-                  />
-                </div>
-                <p className="text-justify md:text-[16px] text-[12px]">
-                  M. Haseeb
-                </p>
-                <div>
-                  <img
+                    className="icon-btn-glow flex items-center justify-center w-10 h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px"
+                    style={{
+                      background: "linear-gradient(135deg, #F5F6FF 0%, #EDEEFF 100%)",
+                      border: "1px solid rgba(99,102,241,0.15)",
+                      boxShadow: "0 2px 8px rgba(15,20,60,0.06)",
+                    }}
+                  >
+                    <img src={IMAGES.SMS} alt="Messages" className="w-[18px] h-[18px] block" />
+                  </button>
+
+                  <div className="w-px h-8" style={{ background: "linear-gradient(180deg, transparent, rgba(99,102,241,0.2), transparent)" }} />
+
+                  <div
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-[0_4px_16px_rgba(99,102,241,0.12)]"
+                    style={{
+                      background: "linear-gradient(135deg, #F5F6FF 0%, #EDEEFF 100%)",
+                      border: "1px solid rgba(99,102,241,0.15)",
+                    }}
                     onClick={toggleProfielMenu}
-                    src={userData.profilePic || IMAGES.ProfilePic}
-                    alt=""
-                    className="w-[29px] h-[30px] cursor-pointer"
-                  />
-                </div>
-                <div>
-                  <img
-                    onClick={toggleProfielMenu}
-                    src={IMAGES.ArrowLeft}
-                    alt=""
-                    className="w-[22px] h-[30px] cursor-pointer"
-                  />
+                  >
+                    <div className="relative">
+                      <img
+                        src={userData?.profilePic || IMAGES.ProfilePic}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full object-cover"
+                        style={{ border: "2px solid rgba(99,102,241,0.3)" }}
+                      />
+                      <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#22C55E] rounded-full border-2 border-white" />
+                    </div>
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-[13px] font-semibold text-[#1E2250]">{userData.name}</span>
+                      <span className="text-[10px] text-[#9CA3C0] font-medium">Teacher</span>
+                    </div>
+                    <img src={IMAGES.ArrowLeft} alt="" className="w-3.5 h-3.5 opacity-40" />
+                  </div>
                 </div>
               </div>
-              {mail ? (
-                <Notifications dashboard={false} onclose={toggleMail} />
-              ) : (
-                ""
-              )}
-              {isProfileDetails && <ProfileDetails onclose={toggleProfileDetails} />}
-              {isProfileMenu ? (
+
+              {mail && <Notifications dashboard={false} onclose={toggleMail} />}
+              {isProfileMenu && (
                 <ProfileMenu
                   onProfileClick={onProfileClick}
                   onSettingsClick={onSettingsClick}
                   onLogoutClick={onLogoutClick}
                   dashboard={false}
                 />
-              ) : (
-                ""
+              )}
+              {isProfileDetails && (
+                <div className="fixed top-0 right-0 w-96 h-full z-50 overflow-y-auto">
+                  <ProfileDetails onclose={toggleProfileDetails} />
+                </div>
               )}
             </div>
             <div className="py-4">

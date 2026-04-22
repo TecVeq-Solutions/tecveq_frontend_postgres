@@ -6,12 +6,14 @@ import { getAllQuizes } from "../../../api/Teacher/Quiz";
 import Loader from "../../../utils/Loader";
 import { useSidebar } from "../../../context/SidebarContext";
 
+import { CheckCircle2 } from "lucide-react";
+
 const LastDeliverables = () => {
   // Use staleTime: 0 to ensure data is always fetched fresh from the backend
   const { data: assignments, isPending: assignmentsPending, refetch: refetchAssignments } = useQuery({
     queryKey: ["assignments"],
     queryFn: getAllAssignments,
-    staleTime: 0, 
+    staleTime: 0,
     refetchOnWindowFocus: true,
   });
 
@@ -90,17 +92,17 @@ const LastDeliverables = () => {
   };
 
   const SummarySection = ({ label, total, submitted, students, colorClass }) => (
-    <div className="flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-slate-100 shadow-inner">
+    <div className="flex items-center justify-between px-3 py-3 bg-white rounded-2xl border border-slate-100 shadow-inner">
       <div className="flex flex-col">
         <div className="flex items-center gap-1.5">
-            <div className={`w-1.5 h-1.5 rounded-full ${colorClass.replace("bg-", "animate-pulse bg-")}`} />
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label} Summary</span>
+          <div className={`w-1.5 h-1.5 rounded-full ${colorClass.replace("bg-", "animate-pulse bg-")}`} />
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label} Summary</span>
         </div>
         <span className="text-[13px] font-extrabold text-[#0B1053] mt-0.5">
           {submitted} <span className="text-slate-300 font-medium text-[11px]">Submissions</span>
         </span>
       </div>
-      <div className={`px-2.5 py-1 rounded-lg ${colorClass} text-white font-black text-[11px] shadow-sm`}>
+      <div className={`px-2.5 py-1 rounded-lg ${colorClass} text-white truncate font-black text-[11px] shadow-sm`}>
         {total} {label.toUpperCase()}
       </div>
     </div>
@@ -119,8 +121,10 @@ const LastDeliverables = () => {
       <div className="flex flex-col flex-1 gap-5 md:py-6">
         {/* Header */}
         <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-5 rounded-full bg-[#0B1053]" />
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-50 rounded-xl shadow-sm border border-indigo-100/50">
+              <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+            </div>
             <p className="text-lg font-bold text-[#0B1053] tracking-tight">Last Deliverables</p>
           </div>
           <div className="flex items-center gap-1.5 text-[10px] text-emerald-500 font-bold uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
@@ -129,19 +133,19 @@ const LastDeliverables = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-3">
           {/* Assignment Card */}
-          <div className="flex flex-col gap-5 px-6 py-6 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
+          <div className="flex flex-col gap-5 px-3 sm:px-6 2xl:px-3 py-6 bg-white rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <SummarySection 
-              label="Assignments" 
-              total={totalAssignmentsCount} 
-              submitted={totalAssignmentSubmissions} 
+
+            <SummarySection
+              label="Assignments"
+              total={totalAssignmentsCount}
+              submitted={totalAssignmentSubmissions}
               students={totalStudentsInAssignments}
               colorClass="bg-indigo-500"
             />
-            
+
             {latestAssignment ? (
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
@@ -158,13 +162,13 @@ const LastDeliverables = () => {
           </div>
 
           {/* Quiz Card */}
-          <div className="flex flex-col gap-5 px-6 py-6 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden group">
+          <div className="flex flex-col gap-5 px-3 sm:px-6 2xl:px-3  py-6 bg-white rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-1 bg-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-            <SummarySection 
-              label="Quizzes" 
-              total={totalQuizesCount} 
-              submitted={totalQuizSubmissions} 
+            <SummarySection
+              label="Quizzes"
+              total={totalQuizesCount}
+              submitted={totalQuizSubmissions}
               students={totalStudentsInQuizes}
               colorClass="bg-purple-500"
             />

@@ -110,7 +110,7 @@ const SubjectRow = ({ data, index }) => {
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, color, icon }) => (
-  <div className="flex flex-1 items-center gap-3 min-w-[100px] bg-white rounded-2xl px-[18px] py-[14px] border border-[#f0f0f5] shadow-sm">
+  <div className="flex flex-1 items-center gap-2  sm:gap-3 min-w-[100px] bg-white rounded-2xl px-[10px] sm:px-[18px] py-[14px] border border-[#f0f0f5] shadow-sm">
     <div
       className="w-[38px] h-[38px] rounded-xl flex items-center justify-center text-lg shrink-0"
       style={{ background: color + "15" }}
@@ -125,6 +125,8 @@ const StatCard = ({ label, value, color, icon }) => (
     </div>
   </div>
 );
+
+import { Users } from "lucide-react";
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const MyClasses = () => {
@@ -145,7 +147,7 @@ const MyClasses = () => {
   return (
     <div
       //  min-h-screen 
-      className="flex flex-1 p-2 bg-[#f8f8fc]"
+      className="flex flex-1 sm:p-2 bg-[#f8f8fc]"
       style={{ fontFamily: "'Manrope', sans-serif" }}
     >
       <style>{`
@@ -181,28 +183,33 @@ const MyClasses = () => {
         }
       `}</style>
 
-      <div className="flex flex-col flex-1 gap-[22px] max-w-[900px] w-full">
+      <div className="flex flex-col flex-1 gap-6 w-full">
         {/* ── Header ── */}
         <div className="flex items-center justify-between animate-header-in">
-          <div>
-            <h1 className="m-0 text-[26px] font-extrabold text-indigo-950 tracking-tighter leading-none">
-              My Classes
-            </h1>
-            <p className="m-0 mt-1 text-[13px] text-gray-400 font-medium">
-              {allClassrooms?.length || 0} active classrooms
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-indigo-50 rounded-2xl shadow-sm border border-indigo-100/50">
+              <Users className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <h1 className="m-0 text-[26px] font-extrabold text-indigo-950 tracking-tighter leading-none">
+                My Classes
+              </h1>
+              <p className="m-0 mt-1 text-[13px] text-gray-400 font-medium">
+                {allClassrooms?.length || 0} active classrooms
+              </p>
+            </div>
           </div>
         </div>
 
         {/* ── Stat Cards ── */}
-        <div className="flex gap-3 flex-wrap animate-fade-slide-d05">
+        <div className="flex gap-2 sm:gap-3 flex-wrap animate-fade-slide-d05">
           <StatCard label="Total Classes" value={allClassrooms?.length || 0} color="#6366f1" icon="🏫" />
           <StatCard label="Total Lectures" value={totalLecturesCount} color="#06b6d4" icon="📖" />
           <StatCard label="Total Students" value={totalStudentsCount} color="#f59e0b" icon="👥" />
         </div>
 
         {/* ── Table Container ── */}
-        <div className="flex flex-col overflow-hidden animate-fade-slide-d1 bg-white rounded-3xl border border-[#f0f0f5] shadow-sm w-full">
+        <div className="flex flex-col overflow-hidden animate-fade-slide-d1 bg-white rounded-3xl border border-gray-100 shadow-sm w-full">
 
           {/* Horizontal scroll wrapper for mobile */}
           <div className="overflow-x-auto w-full mc-scroll">

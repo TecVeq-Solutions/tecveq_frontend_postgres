@@ -83,7 +83,7 @@ const Navbar = ({ heading }) => {
       </div>
 
       {/* Dropdowns Container */}
-      <div className="absolute top-0 right-0 w-full h-full pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none">
         <div className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-6">
           {bell && (
             <div className="pointer-events-auto fixed inset-x-4 top-20 sm:absolute sm:inset-auto sm:right-28 sm:mt-20 w-auto sm:w-80 z-[100]">

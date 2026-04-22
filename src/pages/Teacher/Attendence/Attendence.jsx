@@ -87,7 +87,7 @@ const Attendence = () => {
   return (
     <div className="flex flex-1 bg-[#FDFDFD] font-poppins min-h-screen">
       <div className="flex flex-1 min-w-0">
-        <div className="w-full flex-grow lg:ml-72 min-w-0">
+        <div className="w-full flex-grow lg:ml-80 min-w-0">
           <div className="h-screen flex flex-col">
             <Navbar heading={"Attendance Management"} />
 
