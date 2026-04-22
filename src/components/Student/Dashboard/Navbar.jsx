@@ -62,17 +62,11 @@ const Navbar = ({ heading }) => {
     <nav className="student-navbar w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
       <div className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}>
         {/* Left: Heading */}
-        <div className="flex-shrink-0 max-w-[200px] sm:max-w-none">
-          {heading ? (
-            <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">
-              {heading}
-            </h1>
-          ) : (
-            <div className="flex flex-col pl-12 sm:pl-0">
-              <p className="text-lg md:text-2xl pl-5 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">Hello {userData.name}</p>
-              <p className="hidden sm:block text-xs text-gray-500">Welcome to your learning space!</p>
-            </div>
-          )}
+        {/* Left: Heading/Greeting */}
+        <div className="flex-shrink-0 flex flex-col items-start justify-center pl-2 sm:pl-0">
+          <h1 className="text-lg md:text-2xl font-bold text-[#1e293b] leading-tight truncate max-w-[130px] sm:max-w-none">
+            {heading || "Teacher Dashboard"}
+          </h1>
         </div>
 
         {/* Center: Search (Desktop Only) */}

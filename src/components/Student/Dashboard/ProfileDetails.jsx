@@ -79,7 +79,7 @@ const ProfileDetails = ({ onclose }) => {
 
   const modalRef = useRef(null);
   useClickOutside(modalRef, () => {
-    if (!isEditing) onclose();
+    onclose();
   });
 
   React.useEffect(() => {
@@ -170,8 +170,9 @@ const ProfileDetails = ({ onclose }) => {
               </h2>
             </div>
             <button
+              type="button"
               onClick={onclose}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors flex-shrink-0"
+              className="relative z-50 w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors flex-shrink-0 cursor-pointer"
               style={{
                 background: "rgba(255,255,255,0.1)",
                 border: "1px solid rgba(255,255,255,0.18)",

@@ -17,7 +17,7 @@ const Dashboard = () => {
   return (
     <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
       <div className="flex flex-1 gap-4">
-        <div className={`flex flex-col flex-1 px-4 lg:px-5 lg:ml-72`}>
+        <div className={`flex flex-col flex-1 px-4 lg:px-5 lg:ml-80`}>
           <div className="flex h-20 md:px-14 lg:px-0">
             <Navbar />
           </div>
@@ -39,7 +39,7 @@ const Dashboard = () => {
             <div className="flex-[6] flex w-full">
               <MyClasses />
             </div>
-            <div className="flex-[3.5] flex w-full"><LastDeliverables /> </div>
+            <div className="flex-[4] flex w-full"><LastDeliverables /> </div>
           </div>
         </div>
       </div>
