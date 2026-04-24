@@ -31,16 +31,16 @@ const StudentReports = () => {
   return (
     adminUsersDataPending ? <div className="flex justify-center flex-1"> <Loader /> </div> :
       <>
-        <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
-          <div className="flex flex-1">
+        <div className="flex flex-1 bg-[#F9F9F9] font-poppins min-w-0">
+          <div className="flex flex-1 min-w-0">
             <div
-              className={`w-full h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80`}
+              className={`w-full h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80 min-w-0`}
             >
-              <div className="min-h-full">
+              <div className="min-h-full flex flex-col min-w-0">
                 <Navbar heading={"Student Details"} />
-                <div className={`${isBlurred ? "blur" : ""}`}>
-                  <div className="my-8 w-full">
-                    <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6">
+                <div className={`flex flex-col flex-1 min-w-0 ${isBlurred ? "blur" : ""}`}>
+                  <div className="my-6 sm:my-8 w-full min-w-0">
+                    <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4 sm:gap-6 min-w-0">
 
                       {/* --- Search Input Container --- */}
                       <div className="group flex items-center gap-3 bg-white/80 backdrop-blur-sm border border-gray-200 px-5 py-3 rounded-2xl w-full md:max-w-md shadow-sm hover:shadow-md hover:border-blue-400 transition-all duration-300">

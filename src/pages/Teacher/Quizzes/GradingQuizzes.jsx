@@ -48,7 +48,6 @@ const GradingQuizzes = () => {
   };
 
   const toggleProfileDetails = () => {
-    // toggleBlur();
     setIsProfileDetails(!isProfileDetails);
   };
 
@@ -73,7 +72,6 @@ const GradingQuizzes = () => {
   const location = useLocation();
 
   const handleGradeQuiz = () => {
-    // const handleGradeAssignment
     console.log("for submission arry is : ", gradingData);
     let objArray = [];
     let obj = {};
@@ -99,7 +97,9 @@ const GradingQuizzes = () => {
       return inp;
     }))
   }, []);
+
   const queryClient = useQueryClient();
+
   const gradeMutation = useMutation({
     mutationFn: async (data) => {
       console.log("data being sent is : ", data);
@@ -108,7 +108,6 @@ const GradingQuizzes = () => {
     }, onSuccess: () => {
       toast.dismiss();
       toast.success("Grades Added Successfully!");
-      // Invalidate all relevant queries for all roles to ensure reports "progress"
       queryClient.invalidateQueries(["assignment"]);
       queryClient.invalidateQueries(["quiz"]);
       queryClient.invalidateQueries(["reports"]);
@@ -127,7 +126,7 @@ const GradingQuizzes = () => {
       let result = await getMultipleQuizesForGrading(location.state.id);
       return result;
     },
-    staleTime: 0 // always fetch fresh grades
+    staleTime: 0
   });
 
   useEffect(() => {
@@ -154,64 +153,41 @@ const GradingQuizzes = () => {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
-        .grading-root { font-family: 'DM Sans', sans-serif; }
-        .icon-btn-glow:hover { box-shadow: 0 4px 16px rgba(99,102,241,0.18); }
-      `}</style>
+      <div className={`grading-root font-['DM_Sans',sans-serif] min-h-screen flex flex-1 ${isBlurred ? "blur-sm" : ""}`}>
 
-      <div className={`grading-root min-h-screen flex flex-1 ${isBlurred ? "blur-sm" : ""}`}>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div
-            className="min-h-screen"
-            style={{
-              background: "linear-gradient(145deg, #ECEEF8 0%, #F2F0FA 50%, #EEF2F8 100%)",
-              backgroundImage:
-                "radial-gradient(ellipse at 10% 0%, rgba(99,102,241,0.1) 0%, transparent 55%)," +
-                "radial-gradient(ellipse at 90% 100%, rgba(139,92,246,0.08) 0%, transparent 55%)",
-              paddingLeft: "clamp(12px, 4vw, 80px)",
-              paddingRight: "clamp(12px, 4vw, 80px)",
-              paddingTop: 0,
-              marginLeft: "288px",
-            }}
+            className="min-h-screen bg-[linear-gradient(145deg,#ECEEF8_0%,#F2F0FA_50%,#EEF2F8_100%)] bg-[radial-gradient(ellipse_at_10%_0%,rgba(99,102,241,0.1)_0%,transparent_55%),radial-gradient(ellipse_at_90%_100%,rgba(139,92,246,0.08)_0%,transparent_55%)] px-3 xs:px-4 sm:px-6 lg:px-[clamp(24px,4vw,80px)] pt-0 ml-0 lg:ml-[320px]"
           >
+
             {/* ══════════════════════════════════════
-                TOP BAR — Redesigned
+                TOP BAR
             ══════════════════════════════════════ */}
             <div
-              className="sticky top-0 z-40 mb-8 p-6"
-              style={{
-                background: "rgba(255,255,255,0.88)",
-                backdropFilter: "blur(20px)",
-                borderBottom: "1px solid rgba(99,102,241,0.12)",
-                boxShadow: "0 2px 32px rgba(15,20,60,0.07)",
-              }}
+              className="sticky top-0 z-[30] mb-4 sm:mb-8 px-3 xs:px-4 sm:px-6 py-2.5 xs:py-3 sm:py-5 bg-white/88 backdrop-blur-[20px] border-b border-[#6366F1]/12 shadow-[0_2px_32px_rgba(15,20,60,0.07)]"
             >
+              {/* top gradient bar */}
               <div
-                className="absolute top-0 left-0 right-0 h-[2.5px]"
-                style={{ background: "linear-gradient(90deg, #6366F1 0%, #8B5CF6 40%, #EC4899 80%, #F59E0B 100%)" }}
+                className="absolute top-0 left-0 right-0 h-[2.5px] bg-[linear-gradient(90deg,#6366F1_0%,#8B5CF6_40%,#EC4899_80%,#F59E0B_100%)] z-50"
               />
 
-              <div className="flex items-center justify-between" style={{ height: "68px" }}>
-                <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between min-h-[44px] sm:h-[68px]">
+
+                {/* Left — icon + title + breadcrumb */}
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                   <div
-                    className="flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0"
-                    style={{
-                      background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
-                      boxShadow: "0 4px 14px rgba(99,102,241,0.35)",
-                    }}
+                    className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex-shrink-0 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] shadow-[0_4px_14px_rgba(99,102,241,0.35)]"
                   >
-                    <IoBookOutline className="text-white text-[18px]" />
+                    <IoBookOutline className="text-white text-[15px] sm:text-[18px]" />
                   </div>
 
-                  <div className="flex flex-col justify-center gap-0.5">
+                  <div className="flex flex-col justify-center gap-0.5 min-w-0">
                     <p
-                      className="text-[22px] font-bold text-[#0F1441] leading-tight tracking-[-0.4px]"
-                      style={{ fontFamily: "'Syne', sans-serif" }}
+                      className="text-[14px] xs:text-[16px] sm:text-[22px] font-bold text-[#0F1441] leading-tight tracking-[-0.4px] font-['Syne',sans-serif] truncate max-w-[110px] xs:max-w-[140px] sm:max-w-none"
                     >
                       Grading Quizzes
                     </p>
-                    <div className="flex items-center gap-1">
+                    <div className="hidden sm:flex items-center gap-1">
                       <span className="text-[11px] text-[#A0A4BE] font-medium">Home</span>
                       <MdOutlineKeyboardArrowRight className="text-[#CDD0E3] text-[13px]" />
                       <span
@@ -222,11 +198,7 @@ const GradingQuizzes = () => {
                       </span>
                       <MdOutlineKeyboardArrowRight className="text-[#CDD0E3] text-[13px]" />
                       <span
-                        className="text-[11px] font-semibold text-[#6366F1] px-2 py-0.5 rounded-full"
-                        style={{
-                          background: "linear-gradient(135deg, #EEF0FF 0%, #F0EEFF 100%)",
-                          border: "1px solid rgba(99,102,241,0.2)",
-                        }}
+                        className="text-[11px] font-semibold text-[#6366F1] px-2 py-0.5 rounded-full bg-gradient-to-br from-[#EEF0FF] to-[#F0EEFF] border border-[#6366F1]/20"
                       >
                         Grading
                       </span>
@@ -234,58 +206,24 @@ const GradingQuizzes = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* Right — notification + mail buttons */}
+                <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 flex-shrink-0">
                   <button
                     onClick={togglebell}
-                    className="icon-btn-glow relative flex items-center justify-center w-10 h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px"
-                    style={{
-                      background: "linear-gradient(135deg, #F5F6FF 0%, #EDEEFF 100%)",
-                      border: "1px solid rgba(99,102,241,0.15)",
-                      boxShadow: "0 2px 8px rgba(15,20,60,0.06)",
-                    }}
+                    className="relative flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-lg xs:rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
                   >
-                    <img src={IMAGES.Notification} alt="Notifications" className="w-[18px] h-[18px] block" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#EF4444] rounded-full border border-white" />
+                    <img src={IMAGES.Notification} alt="" className="w-[15px] h-[15px] xs:w-4 xs:h-4 sm:w-[18px] sm:h-[18px] block" />
+                    <span className="absolute top-1 right-1 xs:top-1.5 xs:right-1.5 w-1.5 h-1.5 bg-[#EF4444] rounded-full border border-white" />
                   </button>
 
                   <button
                     onClick={toggleMail}
-                    className="icon-btn-glow flex items-center justify-center w-10 h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px"
-                    style={{
-                      background: "linear-gradient(135deg, #F5F6FF 0%, #EDEEFF 100%)",
-                      border: "1px solid rgba(99,102,241,0.15)",
-                      boxShadow: "0 2px 8px rgba(15,20,60,0.06)",
-                    }}
+                    className="flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-lg xs:rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
                   >
-                    <img src={IMAGES.SMS} alt="Messages" className="w-[18px] h-[18px] block" />
+                    <img src={IMAGES.SMS} alt="" className="w-[15px] h-[15px] xs:w-4 xs:h-4 sm:w-[18px] sm:h-[18px] block" />
                   </button>
-
-                  <div className="w-px h-8" style={{ background: "linear-gradient(180deg, transparent, rgba(99,102,241,0.2), transparent)" }} />
-
-                  <div
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-[0_4px_16px_rgba(99,102,241,0.12)]"
-                    style={{
-                      background: "linear-gradient(135deg, #F5F6FF 0%, #EDEEFF 100%)",
-                      border: "1px solid rgba(99,102,241,0.15)",
-                    }}
-                    onClick={toggleProfielMenu}
-                  >
-                    <div className="relative">
-                      <img
-                        src={userData?.profilePic || IMAGES.ProfilePic}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full object-cover"
-                        style={{ border: "2px solid rgba(99,102,241,0.3)" }}
-                      />
-                      <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#22C55E] rounded-full border-2 border-white" />
-                    </div>
-                    <div className="flex flex-col leading-tight">
-                      <span className="text-[13px] font-semibold text-[#1E2250]">{userData.name}</span>
-                      <span className="text-[10px] text-[#9CA3C0] font-medium">Teacher</span>
-                    </div>
-                    <img src={IMAGES.ArrowLeft} alt="" className="w-3.5 h-3.5 opacity-40" />
-                  </div>
                 </div>
+
               </div>
 
               {mail && <Notifications dashboard={false} onclose={toggleMail} />}
@@ -298,72 +236,99 @@ const GradingQuizzes = () => {
                 />
               )}
               {isProfileDetails && (
-                <div className="fixed top-0 right-0 w-96 h-full z-50 overflow-y-auto">
+                <div className="fixed top-0 right-0 w-full xs:w-80 sm:w-96 h-full z-50 overflow-y-auto">
                   <ProfileDetails onclose={toggleProfileDetails} />
                 </div>
               )}
             </div>
-            <div className="py-4">
-              <div className="flex items-center justify-between">
-                <p className="text-black/60 font-medium">Total Submissions: {gradingData.filter(s => s.submission).length} / {gradingData.length}</p>
-                <p className="text-black/60">Total Marks: {location.state?.totalMarks} </p>
-                <div className="flex gap-2">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-3xl">
-                    <BiSearch />
-                    <input
-                      value={searchText}
-                      onChange={(e) => { setSearchText(e.target.value) }}
-                      className="outline-none b"
-                      type="text"
-                      placeholder="Search"
-                    />
-                  </div>
+
+            {/* ══════════════════════════════════════
+                STATS + SEARCH BAR
+            ══════════════════════════════════════ */}
+            <div className="py-1.5 sm:py-4">
+              <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 xs:gap-3 sm:gap-0">
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-[11px] xs:text-[12px] sm:text-[14px] text-black/60 font-medium">
+                    Total Submissions: {gradingData.filter(s => s.submission).length} / {gradingData.length}
+                  </p>
+                  <p className="text-[11px] xs:text-[12px] sm:text-[14px] text-black/60">
+                    Total Marks: {location.state?.totalMarks}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 px-2.5 xs:px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-black/10 rounded-2xl sm:rounded-3xl shadow-sm w-full xs:w-auto xs:max-w-[200px] sm:max-w-xs">
+                  <BiSearch className="text-gray-400 flex-shrink-0 text-[14px] sm:text-[16px]" />
+                  <input
+                    className="outline-none text-[12px] sm:text-[14px] w-full bg-transparent"
+                    type="text"
+                    placeholder="Search students..."
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                  />
                 </div>
               </div>
             </div>
-            <div className="mt-0 h-[80%] overflow-auto custom-scrollbar">
-              <GradeQuizAssignmentRow
-                isQuiz={true}
-                header={true}
-                bgColor={"#F9F9F9"}
-                index={"Sr. No"}
-                name={"Name"}
-                submission={"Submission"}
-                marksObtained={"Marks Obtained"}
-                grade={"Grade"}
-              />
-              {filteredData?.map((submission, index) => (
+
+            {/* ══════════════════════════════════════
+                TABLE
+            ══════════════════════════════════════ */}
+            <div className="mt-1 sm:mt-0 overflow-x-auto overflow-y-auto custom-scrollbar" style={{ maxHeight: "calc(100vh - 260px)" }}>
+              <div className="min-w-[320px]">
                 <GradeQuizAssignmentRow
                   isQuiz={true}
-                  header={false}
-                  index={index + 1}
-                  bgColor={"#FFFFFF"}
-                  grade={submission?.grade}
-                  marks={submission?.marks}
-                  profileLink={submission.studentID.profilePic || IMAGES.Profile}
-                  setInputField={setInputField}
-                  id={submission?.studentID?.id}
-                  feedback={submission?.feedback}
-                  name={submission?.studentID?.name}
-                  marksObtained={submission?.marksObtained}
-                  submission={submission?.submission?.submittedAt || "Not Submitted Yet"}
+                  header={true}
+                  bgColor={"#F9F9F9"}
+                  index={"Sr."}
+                  name={"Name"}
+                  submission={"Submission"}
+                  marksObtained={"Marks"}
+                  grade={"Grade"}
                 />
-              ))}
+                {filteredData?.map((submission, index) => (
+                  <GradeQuizAssignmentRow
+                    key={submission?.studentID?.id || index}
+                    isQuiz={true}
+                    header={false}
+                    index={index + 1}
+                    bgColor={"#FFFFFF"}
+                    grade={submission?.grade}
+                    marks={submission?.marks}
+                    profileLink={submission.studentID.profilePic || IMAGES.Profile}
+                    setInputField={setInputField}
+                    id={submission?.studentID?.id}
+                    feedback={submission?.feedback}
+                    name={submission?.studentID?.name}
+                    marksObtained={submission?.marksObtained}
+                    submission={submission?.submission?.submittedAt || "Not Submitted Yet"}
+                  />
+                ))}
 
-              {/* Removed redundant and buggy search mapping */}
+              </div>
             </div>
 
-            {gradeMutation.isPending && <div> <Loader /> </div>}
+            {/* ══════════════════════════════════════
+                SUBMIT BUTTON
+            ══════════════════════════════════════ */}
+            {gradeMutation.isPending && (
+              <div><Loader /></div>
+            )}
 
-            {!gradeMutation.isPending && <div className="flex justify-end my-4 border-t border-black">
-              <div className="flex justify-end py-4">
-                <p onClick={handleGradeQuiz} className="flex px-8 py-3 text-sm text-white cursor-pointer rounded-3xl bg-[#6A00FF]">Submit</p>
+            {!gradeMutation.isPending && (
+              <div className="flex justify-end my-3 sm:my-4 border-t border-black/10">
+                <div className="flex justify-end py-3 sm:py-4">
+                  <p
+                    onClick={handleGradeQuiz}
+                    className="flex px-6 xs:px-8 py-2.5 xs:py-3 text-[12px] xs:text-sm text-white cursor-pointer rounded-3xl bg-[#6A00FF] transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 shadow-md active:translate-y-0"
+                  >
+                    Submit
+                  </p>
+                </div>
               </div>
-            </div>}
+            )}
+
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

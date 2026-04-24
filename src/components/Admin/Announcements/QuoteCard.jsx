@@ -40,7 +40,7 @@ const QuoteCard = ({ quote, deleteQuote, editQuote, refetch }) => {
     );
 
     return (
-        <div className='group relative bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out mb-4'>
+        <div className='group relative bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out  mb-0 sm:mb-4'>
             <div className='flex flex-col gap-4'>
 
                 {/* Header Section */}

@@ -3,7 +3,6 @@ import pdf from "../../../assets/pdf.png";
 import profile from "../../../assets/profile.png";
 
 import { IoClose } from "react-icons/io5";
-import { GoDotFill } from "react-icons/go";
 import { useUser } from "../../../context/UserContext";
 import { useStudent } from "../../../context/StudentContext";
 import { useQuery } from "@tanstack/react-query";
@@ -12,30 +11,39 @@ import { useGetAnnoucementByUserType } from "../../../api/Teacher/Annoucement";
 import { formatDate } from "../../../constants/formattedDate";
 
 const Notifications = ({ onclose, dashboard, data }) => {
-
-  // console.log("data in notificatio component is : ", data);
   const [activeTab, setActiveTab] = useState("notification");
-
-  // TODO: ---^^
   const { socketContext } = useUser();
   const { allAssignments } = useStudent();
 
   useEffect(() => {
-    console.log("now rendering navbar")
-    // socketContext.emit("")
-    // socketContext.join("")
-  }, [])
+    console.log("now rendering navbar");
+  }, []);
 
-  const chatquery = useQuery({ queryKey: ["chat"], queryFn: getMyChats })
-  //console.log("chat query data is : ", chatquery.data);
+  const chatquery = useQuery({ queryKey: ["chat"], queryFn: getMyChats });
+
+  // Helper: initials from name
+  const getInitials = (name = "") =>
+    name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+
+  const avatarColors = [
+    "linear-gradient(135deg, #667eea, #764ba2)",
+    "linear-gradient(135deg, #f093fb, #f5576c)",
+    "linear-gradient(135deg, #4facfe, #00f2fe)",
+    "linear-gradient(135deg, #43e97b, #38f9d7)",
+    "linear-gradient(135deg, #fa709a, #fee140)",
+  ];
+
+  const getAvatarColor = (name = "") => {
+    const idx = name.charCodeAt(0) % avatarColors.length;
+    return avatarColors[idx];
+  };
 
   const Notification = ({ item, isAssignment = true }) => {
     const [moredetails, setMoredetails] = useState(false);
 
-    // Extract details based on whether it's an assignment or a generic notification
     const teacherName = isAssignment
-      ? (item?.createdBy?.name || "Teacher")
-      : (item?.userID?.name || "Teacher");
+      ? item?.createdBy?.name || "Teacher"
+      : item?.userID?.name || "Teacher";
 
     const timeDisplay = isAssignment
       ? formatDate(item?.dueDate)
@@ -43,145 +51,192 @@ const Notifications = ({ onclose, dashboard, data }) => {
 
     const message = isAssignment
       ? "Added an Assignment"
-      : (item?.message || "Notification");
+      : item?.message || "Notification";
 
     const subjectName = isAssignment
-      ? (item?.subjectID?.name || "Subject")
-      : (item?.subjectName || "");
+      ? item?.subjectID?.name || "Subject"
+      : item?.subjectName || "";
 
     const className = isAssignment
-      ? (item?.classroomID?.name || "Class")
-      : (item?.classroomName || "");
+      ? item?.classroomID?.name || "Class"
+      : item?.classroomName || "";
 
     return (
-      <div className={`flex flex-col gap-2 py-2 `}>
-        <div className="flex gap-2">
-          <img src={profile} alt="" className="h-10 w-11" />
-          <div
-            className="flex flex-col cursor-pointer"
-            onClick={() => setMoredetails(!moredetails)}
-          >
-            <div className="flex justify-between gap-2 text-grey_700">
-              <div className="flex gap-2">
-                <p className="text-sm font-medium">{teacherName}</p>
-                <p className="text-xs">{timeDisplay}</p>
-              </div>
-              <GoDotFill color={true ? "green" : "grey"} />
-            </div>
-            <div className="flex text-xs">
-              <p>
-                {message}{" "}
-                <span className="text-[#007EEA]">
-                  {" "}
-                  {subjectName} {className && `- ${className}`}{" "}
-                </span>
-              </p>
-            </div>
-          </div>
+      <div
+        className="flex gap-3 p-3 rounded-xl cursor-pointer border border-transparent hover:bg-[#f8f9ff] hover:border-[#e0e3f5] transition-all duration-150 mb-1"
+        onClick={() => setMoredetails(!moredetails)}
+      >
+        {/* Avatar */}
+        <div
+          className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white text-sm font-semibold"
+          style={{ background: getAvatarColor(teacherName) }}
+        >
+          {getInitials(teacherName)}
         </div>
-        {moredetails && isAssignment && item?.files?.length > 0 && (
-          <div className="flex items-center gap-2 ml-10">
-            <img src={pdf} alt="" className="w-12 h-12" />
-            <div className="text-grey_700">
-              <a
-                href={item.files[0]?.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium hover:underline"
-              >
-                {item.files[0]?.name || "Assignment File"}
-              </a>
-              <p className="text-xs">{item.title}</p>
+
+        {/* Body */}
+        <div className="flex-1">
+          <div className="flex justify-between items-start gap-2">
+            <span className="text-sm font-semibold text-gray-900">{teacherName}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-gray-400 whitespace-nowrap">{timeDisplay}</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
             </div>
           </div>
-        )}
-        {moredetails && !isAssignment && item?.file && (
-          <div className="flex items-center gap-2 ml-10">
-            <img src={pdf} alt="" className="w-12 h-12" />
-            <div className="text-grey_700">
-              <a href={item.file.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:underline">
-                {item.file.name}
-              </a>
+          <p className="text-xs text-gray-500 mt-0.5 leading-snug">
+            {message}{" "}
+            <span className="text-[#0B1053] font-medium">
+              {subjectName}
+              {className && ` - ${className}`}
+            </span>
+          </p>
+
+          {/* File preview */}
+          {moredetails && isAssignment && item?.files?.length > 0 && (
+            <div className="flex items-center gap-2 mt-2 bg-[#f3f4ff] border border-[#d4d8f5] rounded-lg px-3 py-2">
+              <div className="w-8 h-8 rounded-md bg-red-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                PDF
+              </div>
+              <div>
+                <a
+                  href={item.files[0]?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-[#0B1053] hover:underline block"
+                >
+                  {item.files[0]?.name || "Assignment File"}
+                </a>
+                <p className="text-[11px] text-gray-400">{item.title}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {moredetails && !isAssignment && item?.file && (
+            <div className="flex items-center gap-2 mt-2 bg-[#f3f4ff] border border-[#d4d8f5] rounded-lg px-3 py-2">
+              <div className="w-8 h-8 rounded-md bg-red-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                PDF
+              </div>
+              <div>
+                <a
+                  href={item.file.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-[#0B1053] hover:underline block"
+                >
+                  {item.file.name}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
   const Announcement = () => {
-
-    const { announcementByUsertype, isLoading } = useGetAnnoucementByUserType()
-
-    const [activeAnnouncement, setActiveAnnouncement] = useState(null); // Track the active announcement ID
+    const { announcementByUsertype, isLoading } = useGetAnnoucementByUserType();
+    const [activeAnnouncement, setActiveAnnouncement] = useState(null);
 
     const handleToggleDetails = (id) => {
-      setActiveAnnouncement((prevId) => (prevId === id ? null : id)); // Toggle between opening and closing
+      setActiveAnnouncement((prevId) => (prevId === id ? null : id));
     };
 
     return (
-      <div className={`py-2 w-full h-full`}>
-        <div className=" w-full ">
-          <div className="space-y-6 p-3 bg-gray-50 rounded-lg shadow-lg max-w-4xl mx-auto"> {/* Container styles */}
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">📢 Announcements</h2>
-            {announcementByUsertype && announcementByUsertype.length > 0 ? announcementByUsertype?.map((announcement) => (
+      <div className="py-2 w-full">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">
+          📢 Announcements
+        </p>
+        {announcementByUsertype && announcementByUsertype.length > 0 ? (
+          announcementByUsertype.map((announcement) => (
+            <div
+              key={announcement.id}
+              className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-2.5 hover:shadow-sm transition-shadow duration-200"
+            >
               <div
-                key={announcement.id}
-                className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300" // Card styles
+                className="p-4 cursor-pointer"
+                onClick={() => handleToggleDetails(announcement.id)}
               >
-                {/* Announcement Header */}
-                <div
-                  className="p-5 cursor-pointer flex flex-col justify-between items-center hover:bg-gray-50 transition-colors duration-200" // Header styles
-                  onClick={() => handleToggleDetails(announcement.id)}
-                >
-                  <div>
-                    <p className="text-xs text-center font-medium text-indigo-600 uppercase tracking-wide">{announcement.type}</p>
-                    <h3 className="text-xl font-semibold text-gray-900 mt-1">{announcement.title}</h3>
-                  </div>
-                  <p className="text-sm text-gray-500 whitespace-nowrap">{new Date(announcement.date).toLocaleString()}</p>
-                </div>
-
-                {/* Announcement Details */}
-                {activeAnnouncement === announcement.id && (
-                  <div className="p-5 bg-gray-50 border-t border-gray-200"> {/* Details styles */}
-                    <p className="text-sm text-gray-700 leading-relaxed">{announcement.description}</p>
-                  </div>
-                )}
+                <p className="text-[10px] font-semibold text-indigo-500 uppercase tracking-widest">
+                  {announcement.type}
+                </p>
+                <h3 className="text-sm font-semibold text-gray-900 mt-1">
+                  {announcement.title}
+                </h3>
+                <p className="text-[11px] text-gray-400 mt-1">
+                  {new Date(announcement.date).toLocaleString()}
+                </p>
               </div>
-            )) : <p className="text-center text-gray-500 py-8">No announcements have been created</p>}
-          </div>
-        </div>
 
+              {activeAnnouncement === announcement.id && (
+                <div className="px-4 pb-4 pt-2 bg-[#f8f9ff] border-t border-gray-100">
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    {announcement.description}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-400 text-sm py-10">
+            No announcements have been created
+          </p>
+        )}
       </div>
     );
   };
 
   return (
-    <div className={` ${!dashboard ? "mt-10 h-[calc(100vh-2.5rem)]" : "mt-0 h-full"} z-10 fixed flex px-5 overflow-y-auto no-scrollbar bg-white shadow-xl top-0 right-0 md:right-2 w-80 md:w-96`}>
-      <div className="flex flex-col w-full font-poppins">
-        <div className="flex justify-between py-5 ">
-          {/* Toggle Buttons */}
-          <div className="p-3 border-2 border-black/10 rounded-2xl">
-            <button
-              className={`px-3 py-1 ${activeTab === "notification" ? "bg-[#0B1053] text-white rounded-3xl" : "bg-gray-200"
-                }`}
-              onClick={() => setActiveTab("notification")}
-            >
-              Notification
-            </button>
-            <button
-              className={`px-3 py-1 ${activeTab === "announcement" ? "bg-[#0B1053] text-white rounded-3xl" : "bg-gray-200"
-                }`}
-              onClick={() => setActiveTab("announcement")}
-            >
-              Announcement
-            </button>
-          </div>
-          <IoClose onClick={onclose} className="cursor-pointer" />
+    <div
+      className={`${
+        !dashboard ? "mt-10 h-[calc(100vh-2.5rem)]" : "mt-0 h-full"
+      } z-10 fixed flex flex-col px-0 overflow-hidden bg-white top-0 right-0 md:right-2 w-80 md:w-96`}
+      style={{ boxShadow: "0 8px 32px rgba(11,16,83,0.12)", borderRadius: "0 0 0 16px" }}
+    >
+      {/* Header */}
+      <div className="px-5 pt-5 pb-0 bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-base font-semibold text-[#0B1053]">Inbox</h2>
+          <button
+            onClick={onclose}
+            className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors"
+          >
+            <IoClose size={15} />
+          </button>
         </div>
-        <div className="w-full">
-          {activeTab === "notification" ? (
-            data && data.length > 0 ? (
+
+        {/* Tab bar */}
+        <div className="flex gap-1.5 bg-gray-100 p-1 rounded-xl mb-4">
+          <button
+            className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+              activeTab === "notification"
+                ? "bg-[#0B1053] text-white shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+            onClick={() => setActiveTab("notification")}
+          >
+            Notification
+          </button>
+          <button
+            className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+              activeTab === "announcement"
+                ? "bg-[#0B1053] text-white shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+            onClick={() => setActiveTab("announcement")}
+          >
+            Announcement
+          </button>
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3">
+        {activeTab === "notification" ? (
+          <>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              Recent
+            </p>
+            {data && data.length > 0 ? (
               data
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((not) => (
@@ -192,21 +247,17 @@ const Notifications = ({ onclose, dashboard, data }) => {
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .slice(0, 5)
                 .map((assignment) => (
-                  <Notification
-                    key={assignment.id}
-                    item={assignment}
-                    isAssignment={true}
-                  />
+                  <Notification key={assignment.id} item={assignment} isAssignment={true} />
                 ))
             ) : (
-              <p className="text-center text-gray-500 py-4">
+              <p className="text-center text-gray-400 text-sm py-10">
                 No notifications yet
               </p>
-            )
-          ) : (
-            <Announcement />
-          )}
-        </div>
+            )}
+          </>
+        ) : (
+          <Announcement />
+        )}
       </div>
     </div>
   );

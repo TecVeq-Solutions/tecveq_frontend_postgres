@@ -378,7 +378,7 @@ const AttendanceReportComp = () => {
                     <section ref={reportRef}>
                         {studentReport && studentReport.length > 0 && (
                             <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <div className="flex flex-row justify-between items-center px-2 sm:px-4 mb-4 sm:mb-6 gap-2">
+                                <div className="flex flex-row justify-between items-center px-0 sm:px-4 mb-4 sm:mb-6 gap-2">
                                     <h3 className="text-lg sm:text-2xl font-semibold text-gray-800">
                                         Attendance Report Results
                                     </h3>

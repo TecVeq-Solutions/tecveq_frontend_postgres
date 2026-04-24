@@ -64,7 +64,7 @@ const Navbar = ({ heading }) => {
         {/* Left: Heading */}
         {/* Left: Heading/Greeting */}
         <div className="flex-shrink-0 flex flex-col items-start justify-center pl-2 sm:pl-0">
-          <h1 className="text-lg md:text-2xl font-bold text-[#1e293b] leading-tight truncate max-w-[130px] sm:max-w-none">
+          <h1 className="text-lg md:text-2xl pl-10 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate max-w-[130px] sm:max-w-none">
             {heading || "Teacher Dashboard"}
           </h1>
         </div>

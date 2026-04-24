@@ -106,57 +106,60 @@ const HeadAttendence = () => {
 
                 {/* --- Table Container --- */}
                 <div className="flex-1 min-h-0 bg-white rounded-[2rem] border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col mb-6">
-
-                  {/* Header */}
-                  <div className="bg-gray-50/50 border-b border-gray-100">
-                    <DataRow
-                      isQuiz={true}
-                      index={"#"}
-                      classname={"Classroom Name"}
-                      classesSchedualled={"Schedules"}
-                      students={"Total Students"}
-                      teachers={"Staff"}
-                      createdBy={"Creator"}
-                      status={"Status"}
-                      bgColor={"transparent"}
-                      header={true}
-                    />
-                  </div>
-
-                  {/* Body */}
-                  <div className="flex-1 overflow-y-auto scrollbar-hide">
-                    {filteredClasses.length > 0 ? (
-                      filteredClasses.map((cls, index) => (
-                        <div
-                          key={cls.id || index}
-                          className="hover:bg-indigo-50/30 transition-colors cursor-pointer group"
-                          onClick={() => navigate("/teacher/classroom/attendence/submission", { state: cls })}
-                        >
-                          <DataRow
-                            data={cls}
-                            toggleClassMenu={toggleClassMenuOpen}
-                            index={index + 1 < 10 ? `0${index + 1}` : index + 1}
-                            classname={cls.name}
-                            classesSchedualled={cls.classes.length}
-                            students={cls.students.length}
-                            teachers={cls.teachers.length}
-                            levelName={cls.level?.name || "N/A"}
-                            createdBy={cls.createdBy?.name || "System"}
-                            bgColor={"transparent"}
-                            header={false}
-                            threeDots={searchText ? false : true}
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                          <BiSearch className="text-gray-300 text-2xl" />
-                        </div>
-                        <p className="text-gray-500 font-semibold text-lg">No classrooms found</p>
-                        <p className="text-gray-400 text-sm">Try adjusting your search or check your assignments.</p>
+                  <div className="flex-1 flex flex-col overflow-x-auto custom-scrollbar">
+                    <div className="min-w-[800px] md:min-w-full flex flex-col flex-1">
+                      {/* Header */}
+                      <div className="bg-gray-50/50 border-b border-gray-100">
+                        <DataRow
+                          isQuiz={true}
+                          index={"#"}
+                          classname={"Classroom Name"}
+                          classesSchedualled={"Schedules"}
+                          students={"Total Students"}
+                          teachers={"Staff"}
+                          createdBy={"Creator"}
+                          status={"Status"}
+                          bgColor={"transparent"}
+                          header={true}
+                        />
                       </div>
-                    )}
+
+                      {/* Body */}
+                      <div className="flex-1 overflow-y-auto scrollbar-hide">
+                        {filteredClasses.length > 0 ? (
+                          filteredClasses.map((cls, index) => (
+                            <div
+                              key={cls.id || index}
+                              className="hover:bg-indigo-50/30 transition-colors cursor-pointer group"
+                              onClick={() => navigate("/teacher/classroom/attendence/submission", { state: cls })}
+                            >
+                              <DataRow
+                                data={cls}
+                                toggleClassMenu={toggleClassMenuOpen}
+                                index={index + 1 < 10 ? `0${index + 1}` : index + 1}
+                                classname={cls.name}
+                                classesSchedualled={cls.classes.length}
+                                students={cls.students.length}
+                                teachers={cls.teachers.length}
+                                levelName={cls.level?.name || "N/A"}
+                                createdBy={cls.createdBy?.name || "System"}
+                                bgColor={"transparent"}
+                                header={false}
+                                threeDots={searchText ? false : true}
+                              />
+                            </div>
+                          ))
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                              <BiSearch className="text-gray-300 text-2xl" />
+                            </div>
+                            <p className="text-gray-500 font-semibold text-lg">No classrooms found</p>
+                            <p className="text-gray-400 text-sm">Try adjusting your search or check your assignments.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Footer Stats */}
@@ -166,6 +169,7 @@ const HeadAttendence = () => {
                     </p>
                   </div>
                 </div>
+
 
               </div>
             </div>

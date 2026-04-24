@@ -71,7 +71,7 @@ const GenerateFeeModal = ({ onClose, onSuccess }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 transition-opacity">
             <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in slide-in-from-bottom-4 duration-300">
                 {/* Header */}
-                <div className="relative px-8 pt-8 pb-4">
+                <div className="relative px-3 sm:px-8 pt-8 pb-4">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">Generate Fee</h2>
@@ -92,7 +92,7 @@ const GenerateFeeModal = ({ onClose, onSuccess }) => {
                         <p className="text-[10px] font-black text-[#6A00FF] uppercase tracking-[0.2em] animate-pulse">Initializing Interface</p>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-5">
+                    <form onSubmit={handleSubmit} className="px-3 sm:px-8 pb-8 space-y-5">
 
                         {/* Level & Classroom Group */}
                         <div className="grid grid-cols-2 gap-4">

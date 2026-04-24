@@ -34,12 +34,12 @@ const Navbar = ({ heading }) => {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-100 h-20 flex items-center relative px-4 md:px-6">
+    <nav className="w-full bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center relative px-3 sm:px-4 md:px-6">
       <div className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}>
 
-        {/* Left: Heading - Yahan width fix ki hai taake mobile par gayab na ho */}
+        {/* Left: Heading */}
         <div className="flex-1 min-w-0 flex flex-col items-start justify-center pr-2">
-          <h1 className="text-lg md:text-2xl font-bold text-[#1e293b] leading-tight truncate w-full">
+          <h1 className="text-sm xs:text-base sm:text-lg md:text-2xl pl-11 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate w-full">
             {heading ? heading : "Teacher Dashboard"}
           </h1>
         </div>
@@ -49,8 +49,9 @@ const Navbar = ({ heading }) => {
           <GlobalSearch desktopOnly={true} />
         </div>
 
-        {/* Right Side: Icons & Profile */}
-        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+        {/* Right Side: Icons */}
+        <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3 flex-shrink-0">
+
           {/* Mobile Search */}
           <div className="lg:hidden">
             <GlobalSearch mobileOnly={true} />
@@ -59,40 +60,40 @@ const Navbar = ({ heading }) => {
           {/* Mail Icon */}
           <button
             onClick={toggleMail}
-            className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+            className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl border transition-all duration-300
               ${mail
-                ? "bg-[#0B1053] text-white"
+                ? "bg-[#0B1053] text-white border-[#0B1053]"
                 : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
               }`}
           >
-            <IoMailOutline className="text-xl sm:text-2xl" />
+            <IoMailOutline className="text-base sm:text-xl md:text-2xl" />
           </button>
 
           {/* Bell Icon */}
           <button
             onClick={togglebell}
-            className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+            className={`p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl border transition-all duration-300
               ${bell
-                ? "bg-[#0B1053] text-white"
+                ? "bg-[#0B1053] text-white border-[#0B1053]"
                 : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
               }`}
           >
-            <CiBellOn className="text-xl sm:text-2xl" />
+            <CiBellOn className="text-base sm:text-xl md:text-2xl" />
           </button>
         </div>
       </div>
 
       {/* Dropdowns Container */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-6">
+        <div className="relative w-full h-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
           {bell && (
-            <div className="pointer-events-auto fixed inset-x-4 top-20 sm:absolute sm:inset-auto sm:right-28 sm:mt-20 w-auto sm:w-80 z-[100]">
+            <div className="pointer-events-auto fixed left-3 right-3 top-16 sm:top-20 sm:left-auto sm:right-20 sm:w-80 z-[100]">
               <Notifications dashboard={true} onclose={togglebell} />
             </div>
           )}
 
           {mail && (
-            <div className="pointer-events-auto fixed inset-x-4 top-20 sm:absolute sm:inset-auto sm:right-48 sm:mt-20 w-auto sm:w-80 z-[100]">
+            <div className="pointer-events-auto fixed left-3 right-3 top-16 sm:top-20 sm:left-auto sm:right-36 sm:w-80 z-[100]">
               <RecentMessages dashboard={true} onclose={toggleMail} />
             </div>
           )}

@@ -44,7 +44,7 @@ const Dashboard = () => {
                 <Navbar />
               </div>
               <div
-                className="flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 pt-8 pb-6"
+                className="  flex-col md:px-10 lg:px-0 flex xl:flex-row flex-1 gap-5 pt-4 sm:pt-8 pb-6"
               >
                 <div className="flex-[3] flex w-full">
                   <SubjectsEnrolled />
@@ -54,7 +54,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <div
-                className="flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 my-2"
+                className="flex flex-col md:px-10 lg:px-0 xl:flex-row flex-1 gap-5 my-2"
               >
                 <div className="flex flex-[3]">
                   <ScheduledClasses />

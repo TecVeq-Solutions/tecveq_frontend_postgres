@@ -32,6 +32,7 @@ const Assignments = () => {
   const { data, isPending, isSuccess, isRefetching, refetch } = useQuery({
     queryKey: ["assignments"],
     queryFn: getAllAssignments,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
   const assignmentDellMutate = useMutation({
@@ -56,7 +57,7 @@ const Assignments = () => {
   const totalSubmissions = data?.reduce((acc, a) => acc + (a.submissions?.length || 0), 0) || 0;
   const totalStudents = data?.reduce((acc, a) => acc + (a.classroomID?.students?.length || 0), 0) || 0;
 
-  if (isPending || isRefetching) {
+  if (isPending && !data) {
     return (
       <div className="flex flex-col flex-1 bg-[#F9F9F9] lg:ml-80">
         <Navbar heading="Assignment" />
@@ -69,7 +70,7 @@ const Assignments = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F9F9F9] font-poppins lg:pl-80 transition-all duration-300">
+      <div className="min-h-screen bg-[#F9F9F9] font-poppins lg:ml-80 transition-all duration-300">
         <div className="w-full min-w-0 overflow-x-hidden">
           <Navbar heading="Assignment" />
 
@@ -136,7 +137,7 @@ const Assignments = () => {
               </div>
 
               {/* Table Rows */}
-              {isSuccess && data.length > 0 ? (
+              {isSuccess && data?.length > 0 ? (
                 <div className="divide-y divide-gray-50">
                   {data.map((assignment, index) => {
                     const expectedCount = assignment?.classroomID?.students?.length || 0;

@@ -45,8 +45,8 @@ const Teachers = () => {
     </div>
   ) : (
     <>
-      <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
-        <div className="flex flex-1 ">
+      <div className="flex flex-1 bg-[#F9F9F9] font-poppins overflow-x-hidden w-full">
+        <div className="flex flex-1 w-full max-w-full">
           <div
             className={`sm:w-full w-screen h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80`}
           >
@@ -85,18 +85,19 @@ const Teachers = () => {
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 min-h-[400px]">
-                  <DataRows
-                    index={"Sr No."}
-                    teacherProfile={"Image"}
-                    teacherName={"Name"}
-                    teacherId={"Classroom"}
-                    subject={"Subject"}
-                    classAvg={"Class Average"}
-                    attendance={"Attandence"}
-                    bgColor={"#F9F9F9"}
-                    header={true}
-                  />
+                <div className="mt-4 min-h-[400px] w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="w-full overflow-x-auto">
+                    <DataRows
+                      index={"Sr No."}
+                      teacherProfile={"Image"}
+                      teacherName={"Name"}
+                      teacherId={"Classroom"}
+                      subject={"Subject"}
+                      classAvg={"Class Average"}
+                      attendance={"Attandence"}
+                      bgColor={"#F9F9F9"}
+                      header={true}
+                    />
 
                   {/* When search filter is not applied */}
                     {(() => {
@@ -141,6 +142,7 @@ const Teachers = () => {
                         );
                       });
                     })()}
+                  </div>
                 </div>
               </div>
             </div>

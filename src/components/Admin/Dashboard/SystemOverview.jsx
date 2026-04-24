@@ -17,11 +17,11 @@ const PILL_COLORS = {
 };
 
 const MetricCard = ({ label, value, badge, up }) => (
-  <div className="flex flex-col gap-1 bg-black/5 rounded-lg px-4 py-3">
-    <p className="text-xs text-black/40 m-0">{label}</p>
-    <p className="text-xl font-medium text-black/80 m-0">
+  <div className="flex flex-col gap-1 bg-black/5 rounded-lg px-2 py-2 sm:px-4 sm:py-3">
+    <p className="text-[10px] sm:text-xs text-black/40 m-0 leading-tight">{label}</p>
+    <p className="text-sm sm:text-xl font-medium text-black/80 m-0 flex flex-wrap items-center gap-1 sm:gap-2 sm:block">
       {value.toLocaleString()}
-      <span className={`ml-2 text-[10px] px-2 py-0.5 rounded-full font-medium ${up ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+      <span className={`text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-medium ${up ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
         {badge}
       </span>
     </p>
@@ -78,12 +78,12 @@ const SystemOverview = () => {
   return (
     <div className="w-full bg-white border border-black/10 rounded-xl p-2 sm:p-5">
       {/* Header */}
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex flex-col sm:flex-row items-start justify-between mb-5 gap-3 sm:gap-0">
         <div>
           <p className="text-[15px] font-medium text-black/80 m-0">System Overview</p>
           <p className="text-xs text-black/40 mt-0.5 m-0">Monthly active users — 2024</p>
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           {SERIES.map(({ key }) => {
             const c = PILL_COLORS[key];
             return (
@@ -101,7 +101,7 @@ const SystemOverview = () => {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-3 gap-2.5 mb-5">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5 mb-5">
         <MetricCard label="Total Students" value={totals.Students || 7370} badge="+12%" up />
         <MetricCard label="Total Parents" value={totals.Parents || 6860} badge="+8%" up />
         <MetricCard label="Total Teachers" value={totals.Teachers || 4540} badge="-3%" up={false} />

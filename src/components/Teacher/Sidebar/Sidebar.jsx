@@ -26,8 +26,9 @@ const Sidebar = () => {
   const [isProfileMenu, setIsProfileMenu] = useState(false);
   const [isProfileDetails, setIsProfileDetails] = useState(false);
   const { toggleBlur } = useBlur();
-  const profileMenuRef = useRef(null);
-  useClickOutside(profileMenuRef, () => setIsProfileMenu(false));
+  const mobileProfileMenuRef = useRef(null);
+  const desktopProfileMenuRef = useRef(null);
+  useClickOutside([mobileProfileMenuRef, desktopProfileMenuRef], () => setIsProfileMenu(false));
   const { userData } = useUser();
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const Sidebar = () => {
     }
   ];
 
-  const Menubar = () => (
+  const Menubar = ({ isMobile }) => (
     <div className="admin-sidebar flex flex-col   w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
       <div className=" flex items-center justify-between px-[16px] pt-6 pb-5 border-b 
@@ -105,7 +106,7 @@ const Sidebar = () => {
         <div className="w-full">
           <img className="h-full  w-full" src={logo} alt="TCA Logo" />
           {/* .......................  main teacher profile sidebar .............. */}
-          <div className="relative mt-6 w-full" ref={profileMenuRef}>
+          <div className="relative mt-6 w-full" ref={isMobile ? mobileProfileMenuRef : desktopProfileMenuRef}>
             <div
               className="flex items-center w-full gap-3 p-2 bg-[#eef2f6] rounded-xl cursor-pointer shadow-sm  hover:bg-[#eef2f6] transition-colors duration-200"
               onClick={toggleProfielMenu}
@@ -203,7 +204,8 @@ const Sidebar = () => {
     <div className="flex flex-col">
       {/* Mobile hamburger */}
       <div
-        className="px-3 py-3 cursor-pointer lg:hidden h-16 flex items-center"
+        className="px-3 py-3 cursor-pointer lg:hidden h-16 flex items-center relative z-[60]"
+
         onClick={() => { setIsopen(!isopen); setIsSidebarOpen(!isSidebarOpen); }}
       >
         <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5">
@@ -216,7 +218,7 @@ const Sidebar = () => {
       {/* Mobile overlay */}
       <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
-          <Menubar />
+          <Menubar isMobile={true} />
         </div>
         {isSidebarOpen && (
           <div
@@ -228,7 +230,7 @@ const Sidebar = () => {
 
       {/* Desktop */}
       <div className="max-lg:hidden">
-        <Menubar />
+        <Menubar isMobile={false} />
       </div>
 
       {isProfileDetails && <ProfileDetails onClose={toggleProfileDetails} />}

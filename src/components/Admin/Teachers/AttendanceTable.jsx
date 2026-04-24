@@ -21,9 +21,9 @@ const AttendanceTable = ({ data }) => {
 
     //console.log("data in table attendance is : ", data);
     return (
-        <div className="flex w-full md:flex-1">
-            <div className="flex flex-col w-full md:flex-1 gap-2">
-                <div className="flex flex-1  flex-col w-full border-t-[#0B1053] bg-[#c3c6f6]">
+        <div className="flex w-full md:flex-1 overflow-hidden">
+            <div className="flex flex-col w-full md:flex-1 gap-2 overflow-x-auto">
+                <div className="flex flex-1 flex-col w-full border-t-[#0B1053] bg-[#c3c6f6] min-w-[500px]">
                     <div className='flex py-3'>
                         <td className="flex-[1] flex justify-center md:text-[15px] text-[13px]">Sr No.</td>
                         <td className="flex-[3] flex justify-center md:text-[15px] text-[13px]">Status</td>

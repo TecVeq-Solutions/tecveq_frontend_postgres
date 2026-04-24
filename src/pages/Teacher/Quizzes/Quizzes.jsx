@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useBlur } from "../../../context/BlurContext";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteQuiz, getAllQuizes } from "../../../api/Teacher/Quiz";
-import LargeLoader from "../../../utils/LargeLoader";
+import Loader from "../../../utils/Loader";
 import { ClipboardList, Plus, Users, CheckSquare, Clock, FileText, GraduationCap } from "lucide-react";
 import moment from "moment";
 
@@ -28,9 +28,10 @@ const Quizzes = () => {
   const navigate = useNavigate();
   const { toggleBlur } = useBlur();
 
-  const { data, isPending, isRefetching, refetch } = useQuery({
+  const { data, isPending, isSuccess, isRefetching, refetch } = useQuery({
     queryKey: ["quizes"],
     queryFn: getAllQuizes,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 
   const quizDellMutate = useMutation({
@@ -55,12 +56,12 @@ const Quizzes = () => {
   const totalSubmissions = data?.reduce((acc, q) => acc + (q.submissions?.length || 0), 0) || 0;
   const totalStudents = data?.reduce((acc, q) => acc + (q.classroomID?.students?.length || 0), 0) || 0;
 
-  if (isPending || isRefetching) {
+  if (isPending && !data) {
     return (
-      <div className="flex flex-col flex-1 bg-[#F9F9F9] lg:ml-72 ">
+      <div className="flex flex-col flex-1 bg-[#F9F9F9] lg:ml-80">
         <Navbar heading="Quizzes" />
         <div className="flex flex-1 items-center justify-center py-24">
-          <LargeLoader />
+          <Loader />
         </div>
       </div>
     );
@@ -68,7 +69,7 @@ const Quizzes = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F9F9F9] font-poppins lg:pl-80 transition-all duration-300">
+      <div className="min-h-screen bg-[#F9F9F9] font-poppins lg:ml-80 transition-all duration-300">
         <div className="w-full min-w-0 overflow-x-hidden">
           <Navbar heading="Quizzes" />
 

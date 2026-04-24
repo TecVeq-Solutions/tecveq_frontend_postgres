@@ -177,7 +177,7 @@ const UnifiedSubjectAssign = () => {
       </div>
 
       {/* ── Top Filters ──────────────────────────────────────────────────── */}
-      <div className="bg-white/70 backdrop-blur-xl border border-white shadow-xl shadow-blue-900/5 rounded-[32px] p-8 mb-8">
+      <div className="bg-white/70 backdrop-blur-xl border border-white shadow-xl shadow-blue-900/5 rounded-[32px] sm:p-8 p-4 mb-4 sm:mb-8">
         <div className="flex items-center gap-2 mb-6">
           <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
             <ChevronIcon />
@@ -236,7 +236,7 @@ const UnifiedSubjectAssign = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
 
           {/* Tab Navigation */}
-          <div className="flex p-1.5 bg-slate-200/50 backdrop-blur-md rounded-[22px] w-full max-w-md mb-8">
+          <div className="flex p-1.5 bg-slate-200/50 backdrop-blur-md rounded-[22px] w-full max-w-md mb-4 sm:mb-8">
             {[
               { key: "bulk", label: "Bulk Assign", Icon: BookIcon },
               { key: "single", label: "Individual", Icon: UsersIcon },
@@ -256,7 +256,7 @@ const UnifiedSubjectAssign = () => {
 
           {/* Bulk Tab Content */}
           {activeTab === "bulk" && (
-            <div className="bg-white border border-slate-200 rounded-[32px] p-8 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-[32px] p-4 sm:p-8 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">Curriculum Assignment</h2>
@@ -303,14 +303,14 @@ const UnifiedSubjectAssign = () => {
                 </div>
               )}
 
-              <div className="mt-10 pt-8 border-t border-slate-100 flex items-center justify-between">
+              <div className="sm:mt-10 mt-4 pt-4 sm:pt-8 border-t border-slate-100 flex items-center justify-between">
                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
                   {bulkSelectedSubjects.length} SELECTED
                 </p>
                 <button
                   onClick={handleBulkSubmit}
                   disabled={bulkSelectedSubjects.length === 0 || isAssigningBulk}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-8 py-4 rounded-2xl shadow-xl shadow-blue-600/20 flex items-center gap-3 transition-all active:scale-95"
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-3 sm:px-8 py-2 sm:py-4 rounded-2xl shadow-xl shadow-blue-600/20 flex items-center gap-1 sm:gap-3 transition-all active:scale-95"
                 >
                   {isAssigningBulk ? <SpinnerIcon /> : <CheckIcon />}
                   {isAssigningBulk ? "Processing..." : "Deploy Subjects"}

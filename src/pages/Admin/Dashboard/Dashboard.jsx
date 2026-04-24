@@ -84,9 +84,9 @@ const Dashboard = () => {
   return (
     adminUsersDataPending ? <div className="flex flex-1"> <Loader /> </div> :
       <>
-        <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
-          <div className="flex flex-1 gap-4">
-            <div className={`flex flex-col flex-1 px-3 sm:px-5 ml-0  lg:ml-80 min-h-full`}>
+        <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins overflow-x-hidden w-full">
+          <div className="flex flex-1 gap-4 w-full">
+            <div className={`flex flex-col flex-1 px-3 sm:px-5 ml-0 lg:ml-80 min-h-full min-w-0`}>
               <div className="flex min-h-20 md:px-14 lg:pt-3 lg:px-0">
                 <Navbar heading={"Admin Dashboard"} />
               </div>
@@ -97,13 +97,13 @@ const Dashboard = () => {
 
 
                 {/* grap................................................................ */}
-                <div className="flex flex-[5] flex-col gap-3 ">
+                <div className="flex flex-[5] flex-col gap-3 min-w-0">
                   <p className="text-xl font-semibold">System Overview</p>
                   <SystemOverview />
                 </div>
 
                 {/* total user */}
-                <div className="flex flex-[2] flex-col gap-4">
+                <div className="flex flex-[2] flex-col gap-4 min-w-0">
                   <div className="flex flex-col gap-1 px-1">
                     <p className="text-xl font-semibold text-slate-800 tracking-tight">Students Statistics</p>
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Enrollment Metrics</p>

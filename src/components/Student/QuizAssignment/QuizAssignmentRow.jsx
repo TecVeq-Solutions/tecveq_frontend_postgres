@@ -143,7 +143,7 @@ const QuizAssignmentRow = (props) => {
                     }}
                 />
 
-                <div className="pl-4 pr-4 py-4">
+                <div className="sm:pl-4 sm:pr-4 sm:py-4 pl-3 pr-2 py-4">
                     {/* ── Desktop Grid ── */}
                     <div className="hidden md:grid grid-cols-12 gap-2 items-center">
                         {/* Index */}
@@ -170,8 +170,8 @@ const QuizAssignmentRow = (props) => {
                         {/* Deadline */}
                         <div className="col-span-2 flex flex-col items-center gap-1">
                             <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${isPastDeadline
-                                    ? 'bg-red-50 text-red-600 border border-red-100'
-                                    : 'bg-amber-50 text-amber-700 border border-amber-100'
+                                ? 'bg-red-50 text-red-600 border border-red-100'
+                                : 'bg-amber-50 text-amber-700 border border-amber-100'
                                 }`}>
                                 <AlarmClock size={11} />
                                 {formatDate(props.deadline)}

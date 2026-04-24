@@ -11,7 +11,7 @@ const Announcements = () => {
   ) || [];
 
   const AnnouncementCard = ({ item }) => (
-    <div className="relative bg-white mt-1 p-5 mb-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-500/5 transition-transform duration-300 hover:scale-[1.01] overflow-hidden">
+    <div className="relative bg-white mt-1 p-3 sm:p-5 mb-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-500/5 transition-transform duration-300 hover:scale-[1.01] overflow-hidden">
 
       {/* 1. Default Background Gradient (Ab hamesha dikhega) */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-transparent to-transparent" />

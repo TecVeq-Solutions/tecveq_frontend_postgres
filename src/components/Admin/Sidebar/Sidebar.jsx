@@ -27,8 +27,9 @@ const Sidebar = () => {
   const [isProfileMenu, setIsProfileMenu] = useState(false);
   const [isProfileDetails, setIsProfileDetails] = useState(false);
   const { toggleBlur } = useBlur();
-  const profileMenuRef = useRef(null);
-  useClickOutside(profileMenuRef, () => setIsProfileMenu(false));
+  const mobileProfileMenuRef = useRef(null);
+  const desktopProfileMenuRef = useRef(null);
+  useClickOutside([mobileProfileMenuRef, desktopProfileMenuRef], () => setIsProfileMenu(false));
 
   useEffect(() => {
     const stored = localStorage.getItem("activeButton") || localStorage.getItem("activeTab");
@@ -119,7 +120,7 @@ const Sidebar = () => {
     }
   ];
 
-  const Menubar = () => (
+  const Menubar = ({ isMobile }) => (
     // w-64 
     <div className="admin-sidebar flex flex-col   w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
@@ -128,7 +129,7 @@ const Sidebar = () => {
         <div className="w-full">
           <img className="h-full  w-full" src={logo} alt="TCA Logo" />
           {/* .......................  main admin profile sidebar .............. */}
-          <div className="relative mt-6 w-full" ref={profileMenuRef}>
+          <div className="relative mt-6 w-full" ref={isMobile ? mobileProfileMenuRef : desktopProfileMenuRef}>
             <div
               className="flex items-center w-full gap-3 p-2 bg-[#eef2f6] rounded-xl cursor-pointer shadow-sm  hover:bg-[#eef2f6] transition-colors duration-200"
               onClick={toggleProfielMenu}
@@ -239,7 +240,7 @@ const Sidebar = () => {
       {/* Mobile overlay */}
       <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
-          <Menubar />
+          <Menubar isMobile={true} />
         </div>
         {isSidebarOpen && (
           <div
@@ -251,7 +252,7 @@ const Sidebar = () => {
 
       {/* Desktop */}
       <div className="max-lg:hidden">
-        <Menubar />
+        <Menubar isMobile={false} />
       </div>
 
       {isProfileDetails && <ProfileDetails onClose={toggleProfileDetails} />}

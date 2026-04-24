@@ -136,9 +136,9 @@ const SubjectReport = () => {
   }
 
   return (
-    <div className="flex flex-1 bg-[#F4F6FB] font-poppins min-h-screen relative">
-      <div className="flex flex-1">
-        <div className="flex-grow w-full px-4 sm:px-8 lg:px-16 lg:ml-72 pb-12">
+    <div className="flex flex-1 bg-[#F4F6FB] font-poppins min-h-screen relative overflow-x-hidden w-full">
+      <div className="flex flex-1 w-full max-w-full">
+        <div className="flex-grow w-full px-3 sm:px-4 sm:px-8 lg:px-16 lg:ml-72 pb-12 min-w-0">
           <Navbar heading={"Subjects Report"} />
 
           {/* ── Student Profile Card ── */}
@@ -272,7 +272,7 @@ const SubjectReport = () => {
                   </div>
                   <p className="font-semibold text-gray-800">Assignments</p>
                 </div>
-                <div className="p-4">
+                <div className="p-1 sm:p-4">
                   <QuizAssignmentsTable data={subjectReport.assignments?.data || []} />
                 </div>
               </div>
@@ -285,7 +285,7 @@ const SubjectReport = () => {
                   </div>
                   <p className="font-semibold text-gray-800">Quizzes</p>
                 </div>
-                <div className="p-4">
+                <div className="p-1 sm:p-4">
                   <QuizAssignmentsTable data={subjectReport.quizes?.data || []} />
                 </div>
               </div>
@@ -300,7 +300,7 @@ const SubjectReport = () => {
                   </div>
                   <p className="font-semibold text-gray-800">Attendance</p>
                 </div>
-                <div className="p-4">
+                <div className="p-1 sm:p-4">
                   <AttendanceTable data={subjectReport.attendance?.classes || []} />
                 </div>
               </div>

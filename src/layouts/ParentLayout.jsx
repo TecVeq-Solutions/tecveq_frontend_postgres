@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Sidebar from "../components/Parent/Sidebar/Sidebar"
 
-const ParentLayout = ({children}) => {
+const ParentLayout = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,7 +13,7 @@ const ParentLayout = ({children}) => {
       <div className="fixed top-0 left-0 h-full z-20 flex-shrink-0">
         <Sidebar />
       </div>
-      <div className="flex-1 h-full overflow-y-auto custom-scrollbar relative">
+      <div className="flex-1 h-full overflow-x-hidden  overflow-y-auto  custom-scrollbar relative">
         {children}
       </div>
     </div>

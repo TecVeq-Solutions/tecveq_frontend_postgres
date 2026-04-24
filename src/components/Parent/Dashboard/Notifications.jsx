@@ -109,7 +109,7 @@ const Notifications = ({ onclose, dashboard, data }) => {
     };
 
     return (
-      <div className={`py-2 w-full h-full`}>
+      <div className={`annocment py-2 w-full h-full`}>
         <div className=" w-full ">
           <div className="space-y-6 p-3 bg-gray-50 rounded-lg shadow-lg max-w-4xl mx-auto"> {/* Container styles */}
             <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">📢 Announcements</h2>
@@ -149,7 +149,7 @@ const Notifications = ({ onclose, dashboard, data }) => {
 
   return (
     <div className={` ${!dashboard ? "mt-10" : "mt-0"} z-10 fixed flex h-full px-5 md:overflow-auto custom-scrollbar bg-white shadow-xl top-0 right-0 md:right-2 w-80 md:w-96`}>
-      <div className="flex flex-col w-full font-poppins">
+      <div className=" notification  flex flex-col w-full font-poppins">
         <div className="flex justify-between py-5 ">
           {/* Toggle Buttons */}
           <div className="p-3 border-2 border-black/10 rounded-2xl">

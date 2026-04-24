@@ -21,14 +21,14 @@ const Attendence = () => {
   const [head, setHead] = useState(false);
   const { isBlurred } = useBlur();
 
-  const { data, isLoading: isLoadingClass, refetch } = useQuery({ 
-    queryKey: ["today-classes"], 
-    queryFn: getTodayClasses 
+  const { data, isLoading: isLoadingClass, refetch } = useQuery({
+    queryKey: ["today-classes"],
+    queryFn: getTodayClasses
   });
-  
-  const { data: classrooms, isLoading: isLoadingClassroom } = useQuery({ 
-    queryKey: ["classroom"], 
-    queryFn: getAllClassrooms 
+
+  const { data: classrooms, isLoading: isLoadingClassroom } = useQuery({
+    queryKey: ["classroom"],
+    queryFn: getAllClassrooms
   });
 
   const toggleClassMenuOpen = (data) => {
@@ -72,9 +72,9 @@ const Attendence = () => {
 
   const filteredData = searchText
     ? data?.filter((cls) =>
-        cls.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        cls.subject?.name?.toLowerCase().includes(searchText.toLowerCase())
-      )
+      cls.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      cls.subject?.name?.toLowerCase().includes(searchText.toLowerCase())
+    )
     : data;
 
   if (isLoadingClass || isLoadingClassroom)
@@ -91,12 +91,12 @@ const Attendence = () => {
           <div className="h-screen flex flex-col">
             <Navbar heading={"Attendance Management"} />
 
-            <main className={`px-4 lg:px-10 flex flex-col flex-1 min-h-0 transition-all duration-500 ${isBlurred ? "blur-md scale-[0.99]" : "blur-0"}`}>
-              
+            <main className={`px-3 sm:px-4 lg:px-10 flex flex-col flex-1 min-h-0 transition-all duration-500 ${isBlurred ? "blur-md scale-[0.99]" : "blur-0"}`}>
+
               {/* ── Enhanced Header/Toolbar ── */}
               <div className="py-8">
                 <div className="flex flex-col md:flex-row gap-5 w-full justify-between items-center bg-white border border-gray-100 p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-sm bg-white/80">
-                  
+
                   <div className="flex flex-col gap-1 w-full md:w-auto">
                     <h2 className="text-xl font-bold text-gray-800 tracking-tight">Today's Schedule</h2>
                     <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">Manage and track student presence</p>
@@ -118,7 +118,7 @@ const Attendence = () => {
                     {/* Head Teacher Action */}
                     {head && (
                       <button
-                        className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#6A00FF] hover:bg-[#5a00e0] active:scale-[0.97] text-white text-sm font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-200 transition-all duration-300 overflow-hidden"
+                        className="group relative w-full sm:w-auto inline-flex items-center justify-center  gap-2 bg-[#6A00FF] hover:bg-[#5a00e0] active:scale-[0.97] text-white text-sm font-bold px-3  sm:px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-200 transition-all duration-300 overflow-hidden"
                         onClick={() => navigate("/teacher/classroom/head-attendence", { state: data })}
                       >
                         <BiCalendarCheck className="text-xl transition-transform group-hover:rotate-12" />
@@ -132,73 +132,75 @@ const Attendence = () => {
               {/* ── Professional Data Table ── */}
               <div className="flex-1 min-h-0 mb-8">
                 <div className="bg-white rounded-[32px] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] flex flex-col h-[65vh] overflow-hidden">
-                  
-                  {/* Table Header */}
-                  <div className="bg-gray-50/50 border-b border-gray-100 py-2">
-                    <DataRow
-                      isQuiz={true}
-                      index={"#"}
-                      classname={"Class Name"}
-                      subject={"Subject Name"}
-                      students={"Total Students"}
-                      teachers={"Classroom"}
-                      startDate={null}
-                      header={true}
-                      threeDots={true}
-                      // Use a prop or override in DataRow to ensure bold, gray-600 text for header
-                    />
-                  </div>
-
-                  {/* Table Body */}
-                  <div className="flex-1 overflow-y-auto scrollbar-hide hover:scrollbar-default transition-all">
-                    {filteredData?.length > 0 ? (
-                      <div className="divide-y divide-gray-50">
-                        {filteredData.map((cls, index) => (
-                          <div key={cls.id || index} className="hover:bg-gray-50/80 transition-colors group">
-                            <DataRow
-                              data={cls}
-                              allData={cls}
-                              toggleClassMenu={toggleClassMenuOpen}
-                              index={index + 1 < 10 ? `0${index + 1}` : index + 1}
-                              classname={cls.title}
-                              subject={cls?.subject?.name || cls?.subjectID?.name || "Unassigned"}
-                              students={
-                                cls?.classroom?.students?.length ||
-                                cls?.classroom?.studentDetails?.length ||
-                                0
-                              }
-                              teachers={cls?.classroom?.name || "General"}
-                              startDate={cls.startTime}
-                              bgColor={"transparent"}
-                              header={false}
-                              threeDots={true}
-                            />
-                          </div>
-                        ))}
+                  <div className="flex-1 flex flex-col overflow-x-auto custom-scrollbar">
+                    <div className="min-w-[800px] md:min-w-full flex flex-col flex-1">
+                      {/* Table Header */}
+                      <div className="bg-gray-50/50 border-b border-gray-100 py-2">
+                        <DataRow
+                          isQuiz={true}
+                          index={"#"}
+                          classname={"Class Name"}
+                          subject={"Subject Name"}
+                          students={"Total Students"}
+                          teachers={"Classroom"}
+                          startDate={null}
+                          header={true}
+                          threeDots={true}
+                        />
                       </div>
-                    ) : (
-                      /* Minimalist Empty State */
-                      <div className="flex flex-col items-center justify-center h-full py-20">
-                        <div className="relative mb-6">
-                          <div className="absolute inset-0 bg-purple-100 rounded-full blur-2xl opacity-40 animate-pulse"></div>
-                          <div className="relative w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center border border-gray-50">
-                            <BiFilterAlt className="text-gray-300 text-3xl" />
+
+                      {/* Table Body */}
+                      <div className="flex-1 overflow-y-auto scrollbar-hide hover:scrollbar-default transition-all">
+                        {filteredData?.length > 0 ? (
+                          <div className="divide-y divide-gray-50">
+                            {filteredData.map((cls, index) => (
+                              <div key={cls.id || index} className="hover:bg-gray-50/80 transition-colors group">
+                                <DataRow
+                                  data={cls}
+                                  allData={cls}
+                                  toggleClassMenu={toggleClassMenuOpen}
+                                  index={index + 1 < 10 ? `0${index + 1}` : index + 1}
+                                  classname={cls.title}
+                                  subject={cls?.subject?.name || cls?.subjectID?.name || "Unassigned"}
+                                  students={
+                                    cls?.classroom?.students?.length ||
+                                    cls?.classroom?.studentDetails?.length ||
+                                    0
+                                  }
+                                  teachers={cls?.classroom?.name || "General"}
+                                  startDate={cls.startTime}
+                                  bgColor={"transparent"}
+                                  header={false}
+                                  threeDots={true}
+                                />
+                              </div>
+                            ))}
                           </div>
-                        </div>
-                        <h3 className="text-gray-800 font-bold text-lg">No matches found</h3>
-                        <p className="text-gray-400 text-sm mt-2 max-w-[280px] text-center leading-relaxed">
-                          We couldn't find any classes matching your current search criteria.
-                        </p>
-                        {searchText && (
-                          <button 
-                            onClick={() => setSearchText("")}
-                            className="mt-6 text-[#6A00FF] font-bold text-sm hover:underline"
-                          >
-                            Clear Search
-                          </button>
+                        ) : (
+                          /* Minimalist Empty State */
+                          <div className="flex flex-col items-center justify-center h-full py-20">
+                            <div className="relative mb-6">
+                              <div className="absolute inset-0 bg-purple-100 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+                              <div className="relative w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center border border-gray-50">
+                                <BiFilterAlt className="text-gray-300 text-3xl" />
+                              </div>
+                            </div>
+                            <h3 className="text-gray-800 font-bold text-lg">No matches found</h3>
+                            <p className="text-gray-400 text-sm mt-2 max-w-[280px] text-center leading-relaxed">
+                              We couldn't find any classes matching your current search criteria.
+                            </p>
+                            {searchText && (
+                              <button
+                                onClick={() => setSearchText("")}
+                                className="mt-6 text-[#6A00FF] font-bold text-sm hover:underline"
+                              >
+                                Clear Search
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
-                    )}
+                    </div>
                   </div>
 
                   {/* Footer Stats */}

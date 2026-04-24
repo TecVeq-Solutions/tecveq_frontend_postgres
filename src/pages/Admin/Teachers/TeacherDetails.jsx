@@ -132,9 +132,9 @@ const TeacherDetails = () => {
       .toUpperCase();
 
   return (
-    <div className="flex flex-1 bg-[#F6F5F2] font-poppins min-h-screen">
-      <div className="flex flex-1">
-        <div className="flex-grow w-full lg:ml-80">
+    <div className="flex flex-1 bg-[#F6F5F2] font-poppins min-h-screen overflow-x-hidden w-full">
+      <div className="flex flex-1 w-full max-w-full">
+        <div className="flex-grow w-full lg:ml-80 min-w-0">
 
           {/* ── Top Navbar ── */}
           <Navbar heading={"Teacher Reports"} />
@@ -194,19 +194,19 @@ const TeacherDetails = () => {
           </div>
 
           {/* ── Stats Row ── */}
-          <div className="px-4 sm:px-8 -mt-1">
+          <div className="px-3 sm:px-4 sm:px-8 -mt-1">
             <div className="grid grid-cols-3 gap-3 mb-6">
               {[
                 { label: "Attendance", value: "83%", sub: "10/12 days", badge: "Present", badgeColor: "bg-green-50 text-green-700" },
                 { label: "Classes", value: "24", sub: "This month" },
                 { label: "Avg Rating", value: "4.8", sub: "From feedback" },
               ].map((stat, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-[#E5E3DC] p-4">
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">{stat.label}</p>
-                  <p className="text-2xl font-semibold text-[#0B1053]">{stat.value}</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">{stat.sub}</p>
+                <div key={i} className="bg-white rounded-2xl border border-[#E5E3DC] p-2 sm:p-4 min-w-0 flex flex-col justify-center items-center text-center">
+                  <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-400 mb-1 w-full truncate">{stat.label}</p>
+                  <p className="text-xl sm:text-2xl font-semibold text-[#0B1053]">{stat.value}</p>
+                  <p className="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 w-full truncate">{stat.sub}</p>
                   {stat.badge && (
-                    <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 font-medium ${stat.badgeColor}`}>
+                    <span className={`inline-block text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full mt-1 font-medium ${stat.badgeColor} max-w-full truncate`}>
                       {stat.badge}
                     </span>
                   )}
