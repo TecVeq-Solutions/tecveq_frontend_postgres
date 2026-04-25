@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Loader from "../../../utils/Loader";
 import IMAGES from "../../../assets/images";
 
@@ -47,6 +47,48 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
   });
 
   const updateObj = (key, value) => setQuizAssignmentDataObj((p) => ({ ...p, [key]: value }));
+
+  useEffect(() => {
+    if (open) {
+      if (isEditTrue && data) {
+        setQADate(data?.dueDate ? data.dueDate.split("T")[0] : "");
+        setQATime(data?.dueDate ? data.dueDate.split("T")[1]?.slice(0, 5) : "");
+        setUploadedFileUrl(data?.files?.[0]?.url ? data.files[0].url : "");
+        setQuizAssignmentDataObj({
+          canSubmitAfterTime: data?.canSubmitAfterTime || false,
+          title: data?.title || "",
+          text: data?.text || "",
+          dueDate: data?.dueDate || "",
+          subjectID: data?.subjectID || "",
+          totalMarks: data?.totalMarks || 0,
+          classroomID: data?.classroomID || "",
+          files: "",
+        });
+        setSelectedClassroom([]);
+        setSelectedSubject("");
+      } else {
+        setQADate("");
+        setQATime("");
+        setUploadedFileUrl("");
+        setQuizAssignmentDataObj({
+          canSubmitAfterTime: false,
+          title: "",
+          text: "",
+          dueDate: "",
+          subjectID: "",
+          totalMarks: 0,
+          classroomID: "",
+          files: "",
+        });
+        setSelectedClassroom([]);
+        setSelectedSubject("");
+      }
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      setLoading(false);
+      setDropdownOpen(false);
+    }
+  }, [open, isEditTrue, data]);
 
 
 

@@ -64,11 +64,11 @@ const Levels = () => {
         ) : (
             <div className="flex min-h-screen w-[100%] bg-[#F4F7FE] font-poppins">
                 <div className="flex flex-1 flex-col lg:ml-80 transition-all duration-300">
-                    <div className={`flex-grow px-4 md:px-10 pb-10 ${isBlurred ? "blur-md pointer-events-none" : ""}`}>
+                    <div className="flex-grow px-4 md:px-10 pb-10">
                         {/* Header Section */}
                         <Navbar heading={"Management Levels"} />
 
-                        <div className="mt-8">
+                        <div className={`mt-8 transition-all duration-300 ${isBlurred ? "blur-md pointer-events-none" : ""}`}>
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                                 <div>
                                     <h2 className="text-2xl font-bold text-[#2B3674]">Level List</h2>

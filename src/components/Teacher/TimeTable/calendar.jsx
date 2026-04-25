@@ -78,25 +78,21 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
 
   return (
     <div className="flex">
-      {/* ── Filter Classes Modal ── */}
-      {addModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex justify-center items-start p-4 sm:p-6 overflow-y-auto bg-black/30"
-          onClick={() => setAddModalOpen(false)}
-        >
-          <div 
-            className="bg-white rounded-md shadow-lg max-w-md w-full mt-16 overflow-y-auto max-h-[85vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <FilterClassesModal
-              setaddModalOpen={setaddEventModalOpen}
-              addModalOpen={addModalOpen}
-              classData={data}
-              setAddModalOpen={setAddModalOpen}
-            />
-          </div>
-        </div>
-      )}
+      <div className="">
+        {
+          addModalOpen && (
+            <>
+              <div className={`absolute top-0 right-0 flex-1 z-10 flex py-4 bg-white rounded-md shadow-sm shadow-grey/25`}>
+                <FilterClassesModal
+                  classData={data}
+                  addModalOpen={addModalOpen}
+                  setAddModalOpen={setAddModalOpen}
+                />
+              </div>
+            </>
+          )
+        }
+      </div>
 
       {/* ── Schedule Classes Modal ── */}
       {addScheduleModalOpen && (

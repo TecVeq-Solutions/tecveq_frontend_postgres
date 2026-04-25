@@ -22,11 +22,13 @@ const Fees = () => {
     });
 
     return (
-        <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins min-h-screen max-w-full overflow-hidden">
+        <div className="flex flex-col flex-1 bg-[#f9f9f9]/50 font-poppins min-h-screen max-w-full overflow-hidden">
+            {/* Navbar stays above the blur */}
+            <div className="flex h-20 md:px-14 lg:px-0 lg:ml-80">
+                <Navbar />
+            </div>
+
             <div className={`flex flex-col flex-1 w-full max-w-full px-3 sm:px-4 lg:ml-80 overflow-x-hidden ${isBlurred ? "blur" : ""}`}>
-                <div className="flex h-20 md:px-14 lg:px-0">
-                    <Navbar />
-                </div>
 
                 <div className="py-6 px-0 sm:px-2 sm:px-10 lg:px-0">
                     <h1 className="text-2xl font-bold text-[#0B1053] mb-2 uppercase tracking-tight">Student Fees Portal</h1>

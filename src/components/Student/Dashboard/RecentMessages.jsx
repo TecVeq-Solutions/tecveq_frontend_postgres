@@ -7,9 +7,10 @@ import profile from "../../../assets/profile.png";
 
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoArrowBack } from "react-icons/io5";
 import { RiAttachment2 } from "react-icons/ri";
 import { BsFillSendFill } from "react-icons/bs";
+import { HiOutlineSearch } from "react-icons/hi";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "../../../context/UserContext";
 import { BACKEND_URL_SOCKET } from "../../../constants/api";
@@ -17,19 +18,225 @@ import { getChatsRoomData, getMyChats, getTeachersForChat } from "../../../api/U
 import { useBlur } from "../../../context/BlurContext";
 import useClickOutside from "../../../hooks/useClickOutlise";
 
+const NAVY = "#0B1053";
+
+/* ─── small helpers ─── */
+function getInitials(name = "") {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+}
+
+const AVATAR_COLORS = [
+  "#0B1053", "#1D9E75", "#D4537E", "#378ADD",
+  "#BA7517", "#D85A30", "#534AB7", "#0F6E56",
+];
+function avatarColor(name = "") {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+/* ─── tiny styled primitives (inline-only, no external CSS) ─── */
+const styles = {
+  /* sidebar */
+  sidebar: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "100%",
+    background: "#fff",
+  },
+  sidebarHeader: {
+    padding: "18px 16px 0",
+    borderBottom: "1px solid rgba(0,0,0,.07)",
+  },
+  titleRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+  title: { fontSize: 16, fontWeight: 600, color: "#101828" },
+  closeBtn: {
+    width: 28, height: 28, borderRadius: "50%",
+    background: "#F2F4F7",
+    border: "none", cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    color: "#667085",
+  },
+  searchWrap: {
+    display: "flex", alignItems: "center", gap: 8,
+    background: "#F9FAFB",
+    border: "1px solid #EAECF0",
+    borderRadius: 10, padding: "8px 12px", marginBottom: 14,
+  },
+  searchInput: {
+    border: "none", background: "transparent",
+    fontSize: 13, color: "#344054", outline: "none", width: "100%",
+  },
+  tabBar: {
+    display: "flex",
+    borderBottom: "1px solid rgba(0,0,0,.07)",
+  },
+  tab: (active) => ({
+    flex: 1, padding: "10px 0", fontSize: 13,
+    textAlign: "center", cursor: "pointer",
+    color: active ? NAVY : "#667085",
+    fontWeight: active ? 600 : 400,
+    borderBottom: active ? `2px solid ${NAVY}` : "2px solid transparent",
+    background: "none", border: "none",
+    borderBottom: active ? `2px solid ${NAVY}` : "2px solid transparent",
+    transition: "all .15s",
+  }),
+  chatList: {
+    flex: 1, overflowY: "auto",
+    padding: "6px 0",
+  },
+
+  /* chat item */
+  chatItem: (active) => ({
+    display: "flex", alignItems: "center", gap: 10,
+    padding: "10px 16px", cursor: "pointer",
+    background: active ? "#EEF0FA" : "transparent",
+    transition: "background .12s",
+  }),
+  avatarWrap: { position: "relative", flexShrink: 0 },
+  avatar: (color, group) => ({
+    width: 42, height: 42,
+    borderRadius: group ? 10 : "50%",
+    background: color,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 14, fontWeight: 600, color: "#fff",
+    flexShrink: 0,
+  }),
+  onlineDot: {
+    width: 10, height: 10,
+    background: "#12B76A",
+    border: "2px solid #fff",
+    borderRadius: "50%",
+    position: "absolute", bottom: 1, right: 1,
+  },
+  chatInfo: { flex: 1, minWidth: 0 },
+  nameRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },
+  chatName: {
+    fontSize: 13, fontWeight: 500, color: "#101828",
+    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140,
+  },
+  chatTime: { fontSize: 11, color: "#98A2B3", flexShrink: 0 },
+  previewRow: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4 },
+  chatPreview: {
+    fontSize: 12, color: "#667085",
+    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 170,
+  },
+  badge: {
+    background: NAVY, color: "#fff",
+    fontSize: 10, fontWeight: 600,
+    minWidth: 18, height: 18,
+    borderRadius: 99,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    padding: "0 5px", flexShrink: 0,
+  },
+
+  /* full chat panel */
+  panel: {
+    display: "flex", flexDirection: "column",
+    width: "100%", height: "100%",
+    background: "#fff",
+    position: "relative",
+  },
+  panelHeader: {
+    padding: "14px 18px",
+    borderBottom: "1px solid rgba(0,0,0,.07)",
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+    flexShrink: 0,
+  },
+  panelHeaderLeft: { display: "flex", alignItems: "center", gap: 10 },
+  panelName: { fontSize: 14, fontWeight: 600, color: "#101828" },
+  panelSub: { fontSize: 11, color: "#667085", marginTop: 1 },
+  iconBtn: {
+    width: 32, height: 32, borderRadius: "50%",
+    background: "#F2F4F7",
+    border: "none", cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    color: "#667085",
+  },
+
+  /* messages */
+  messagesArea: {
+    flex: 1, overflowY: "auto",
+    padding: "16px 18px",
+    display: "flex", flexDirection: "column", gap: 4,
+  },
+  dateDivider: {
+    textAlign: "center", fontSize: 11, color: "#98A2B3",
+    margin: "8px 0",
+    display: "flex", alignItems: "center", gap: 8,
+  },
+  msgRow: (mine) => ({
+    display: "flex", alignItems: "flex-end", gap: 8, margin: "2px 0",
+    flexDirection: mine ? "row-reverse" : "row",
+  }),
+  msgAvatar: (color) => ({
+    width: 28, height: 28, borderRadius: "50%",
+    background: color,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 10, fontWeight: 600, color: "#fff", flexShrink: 0,
+  }),
+  bubble: (mine) => ({
+    maxWidth: 220, padding: "9px 12px",
+    fontSize: 13, lineHeight: 1.5, wordBreak: "break-word",
+    background: mine ? NAVY : "#F2F4F7",
+    color: mine ? "#fff" : "#101828",
+    borderRadius: mine ? "12px 4px 12px 12px" : "4px 12px 12px 12px",
+  }),
+  bubbleMeta: (mine) => ({
+    fontSize: 10, color: "#98A2B3",
+    marginTop: 3, padding: "0 4px",
+    textAlign: mine ? "right" : "left",
+  }),
+
+  /* input */
+  inputArea: {
+    padding: "12px 16px",
+    background: "#fff",
+    borderTop: "1px solid rgba(0,0,0,.05)",
+    display: "flex", alignItems: "center", gap: 10,
+    flexShrink: 0,
+    zIndex: 10,
+  },
+  msgInput: {
+    flex: 1,
+    background: "#F9FAFB",
+    border: "1px solid #EAECF0",
+    borderRadius: 10,
+    padding: "9px 12px", fontSize: 13,
+    color: "#344054", outline: "none",
+  },
+  attachBtn: {
+    width: 36, height: 36, borderRadius: "50%",
+    background: "#F2F4F7", border: "none", cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    color: NAVY, flexShrink: 0,
+  },
+  sendBtn: {
+    width: 36, height: 36, borderRadius: "50%",
+    background: NAVY, border: "none", cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    color: "#fff", flexShrink: 0,
+  },
+};
+
+/* ────────────────────────────────────────────────────────── */
 
 const RecentMessages = ({ onclose, dashboard }) => {
-
-
   const ref = useRef(null);
+  const { toggleBlur } = useBlur();
 
-  const { toggleBlur } = useBlur(); // Using toggleBlur for blur control
-
-
-
-  useClickOutside(ref, () => {
-    onclose()
-  });
+  useClickOutside(ref, () => { onclose(); });
 
   const [loading, setLoading] = useState(false);
   const [queryData, setQueryData] = useState(null);
@@ -37,30 +244,22 @@ const RecentMessages = ({ onclose, dashboard }) => {
   const [enableChatQuery, setEnableChatQuery] = useState(true);
   const [individualActive, setIndividualActive] = useState(true);
   const [selectedChatParticipants, setSelectedChatParticipants] = useState([]);
-
   const [msgArray, setMsgArray] = useState([]);
   const [msgArrayDirect, setMsgArrayDirect] = useState([]);
   const [localSocket, setLocalSocket] = useState(null);
   const [selectedChat, setSelectedChat] = useState(null);
   const [showDirectChat, setShowDirectChat] = useState(false);
-  const [subTab, setSubTab] = useState("recent"); // "recent" or "teachers"
-
+  const [subTab, setSubTab] = useState("recent");
+  const [searchText, setSearchText] = useState("");
 
   const { socketContext, setSocketContext, userData } = useUser();
 
-  const toggleGroupActive = () => {
-    setGroupActive(!groupActive);
-    setIndividualActive(false);
-  };
-
-  const toggleIndividualActive = () => {
-    setIndividualActive(!individualActive);
-    setGroupActive(false);
-  };
+  const toggleGroupActive = () => { setGroupActive(!groupActive); setIndividualActive(false); };
+  const toggleIndividualActive = () => { setIndividualActive(!individualActive); setGroupActive(false); };
 
   const handleSendMessage = (msgstr) => {
-    if (msgstr == "") {
-      toast.error("Cannot send empty message!")
+    if (msgstr === "") {
+      toast.error("Cannot send empty message!");
     } else {
       const messageObj = {
         sentBy: userData.id,
@@ -68,14 +267,11 @@ const RecentMessages = ({ onclose, dashboard }) => {
         type: "text",
         message: msgstr,
       };
-
-      // Optimistic update
       if (showFullChat) {
-         setMsgArray((prev) => [...prev, { ...messageObj, sentBy: userData }]);
+        setMsgArray((prev) => [...prev, { ...messageObj, sentBy: userData }]);
       } else if (showDirectChat) {
-         setMsgArrayDirect((prev) => [...prev, { ...messageObj, sentBy: userData }]);
+        setMsgArrayDirect((prev) => [...prev, { ...messageObj, sentBy: userData }]);
       }
-      
       if (localSocket) {
         if (showFullChat) {
           localSocket.emit("message", { room: selectedChat?.id, message: messageObj });
@@ -84,15 +280,11 @@ const RecentMessages = ({ onclose, dashboard }) => {
         }
       }
     }
-  }
+  };
 
   const [showFullChat, setShowFullChat] = useState(false);
 
-  const handleShowFullChat = () => {
-    // close full chat modal
-    console.log("clicking full chat");
-    setShowFullChat(!showFullChat);
-  }
+  const handleShowFullChat = () => { setShowFullChat(!showFullChat); };
 
   const openFullchat = async (data) => {
     setLoading(true);
@@ -105,10 +297,9 @@ const RecentMessages = ({ onclose, dashboard }) => {
     setSelectedChatParticipants(data.participants);
     conn.emit("join", { room: data.id });
     const result = await getChatsRoomData(data.id);
-    //console.log("result form sever is : ", result);
     setMsgArray(result.messages);
     setLoading(false);
-  }
+  };
 
   const openDirectChat = async (data) => {
     setLoading(true);
@@ -124,104 +315,81 @@ const RecentMessages = ({ onclose, dashboard }) => {
       setMsgArrayDirect(chats?.messages);
     });
     setLoading(false);
-  }
+  };
 
   const getParticipantData = (pid) => {
     if (pid === userData.id) return userData;
     let user = {};
-    selectedChatParticipants.forEach((item) => {
-      if (item.id === pid) {
-        user = item;
-      }
-    })
+    selectedChatParticipants.forEach((item) => { if (item.id === pid) user = item; });
     return user;
-  }
-
-
+  };
 
   useEffect(() => {
     if (localSocket) {
       localSocket.on("message", (data) => {
-        // If the message is from us, we already added it optimistically
         if (data.message.sentBy === userData.id) return;
-        
         let user = getParticipantData(data.message.sentBy);
-        
         if (showFullChat) {
           setMsgArray((prev) => [...prev, { ...data.message, sentBy: user }]);
         } else if (showDirectChat) {
           setMsgArrayDirect((prev) => [...prev, { ...data.message, sentBy: user }]);
         }
-      })
+      });
     }
   }, [localSocket, showFullChat, showDirectChat, userData.id]);
 
-  const Message = ({ data, onpress }) => {
+  /* ── ChatListItem ── */
+  const ChatListItem = ({ data, onpress, isGroup, isActive }) => (
+    <div
+      style={styles.chatItem(isActive)}
+      onClick={onpress}
+      onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#F9FAFB"; }}
+      onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+    >
+      <div style={styles.avatarWrap}>
+        <div style={styles.avatar(avatarColor(data?.name), isGroup)}>
+          {getInitials(data?.name)}
+        </div>
+        {data?.online && <div style={styles.onlineDot} />}
+      </div>
+      <div style={styles.chatInfo}>
+        <div style={styles.nameRow}>
+          <span style={styles.chatName}>{data?.name}</span>
+          <span style={styles.chatTime}>{moment(data?.lastMsg?.time).format("hh:mm a")}</span>
+        </div>
+        <div style={styles.previewRow}>
+          <span style={styles.chatPreview}>{data?.lastMsg?.message}</span>
+          {data?.unread > 0 && <span style={styles.badge}>{data.unread}</span>}
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ── GroupMsg bubble ── */
+  const GroupMsg = ({ msg }) => {
+    const mine = msg?.sentBy?.id === userData.id;
+    const name = msg?.sentBy?.name || "You";
+    const color = avatarColor(name);
+
     return (
-      <div className={`flex flex-col gap-2 py-2 `} onClick={onpress}>
-        <div className="flex gap-2">
-          <img src={profile} alt="" className="h-10 w-11" />
-          <div
-            className="flex flex-col flex-1 cursor-pointer"
-            onClick={() => { }}
-          >
-            <div className="flex justify-between gap-2 text-grey_700">
-              <div className="flex gap-2">
-                <p className="text-sm font-medium">{data?.name}</p>
-              </div>
-            </div>
-            <div className="flex justify-between flex-1 text-xs">
-              <p>{data?.lastMsg?.message}</p>
-              <p className="text-xs">{moment(data?.lastMsg?.time).format("hh:mm a")}</p>
-            </div>
-          </div>
+      <div>
+        <div style={styles.msgRow(mine)}>
+          {!mine && (
+            <div style={styles.msgAvatar(color)}>{getInitials(name)}</div>
+          )}
+          <div style={styles.bubble(mine)}>{msg.message}</div>
+        </div>
+        <div style={styles.bubbleMeta(mine)}>
+          {mine ? "You" : name} · {moment(msg.time).format("hh:mm a")}
         </div>
       </div>
     );
   };
 
-
-  const GroupMsg = ({ msg }) => {
-
-    return <>
-      <div className="px-10 py-5">
-        {msg?.sentBy?.id !== userData.id ?
-          <div className="flex items-start gap-4 py-2">
-            <div>
-              <img src={msg.sentBy.profilePic || IMAGES.ProfilePic} alt="alt" className="w-10 h-10 rounded-full object-cover" />
-            </div>
-            <div className="flex flex-col gap-1 w-72">
-              <div className="flex justify-between items-center text-sm">
-                <p className="font-medium ">{msg.sentBy.name} </p>
-                <p className="">{moment(msg.time).format("hh:mm a")} </p>
-              </div>
-              <div className="text-sm text-[#101828] flex font-medium  bg-[#F2F4F7] flex-wrap px-2 py-3 rounded-tr-lg rounded-br-lg rounded-bl-lg">
-                <p>{msg.message}</p>
-              </div>
-            </div>
-          </div>
-          :
-          <div className="py-2">
-            <div className="flex items-start gap-4 justify-end">
-              <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-center text-sm">
-                  <p className="font-medium ">You</p>
-                  <p className="">{moment(msg.time).format("dddd hh:mm a")} </p>
-                </div>
-                <div className="text-sm text-white flex font-medium w-60 bg-[#0B1053] flex-wrap px-2 py-3 rounded-br-lg rounded-bl-lg rounded-tl-lg">
-                  <p>{msg.message} </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </>
-  }
-
+  /* ── FullChat panel ── */
   const FullChat = ({ onclose, data, type }) => {
     const [msgstr, setmsgStr] = useState("");
-
+    const messagesEndRef = useRef(null);
 
     const handleKeyDown = (e) => {
       if (e.key === "Enter") {
@@ -229,118 +397,218 @@ const RecentMessages = ({ onclose, dashboard }) => {
         handleSendMessage(msgstr);
         setmsgStr("");
       }
-    }
+    };
 
     const currentMsgArray = type === "group" ? msgArray : msgArrayDirect;
 
-    return <>
-      <div className="w-72 sm:w-96 flex flex-col justify-between pb-5 bg-white shadow-xl z-50 pointer-events-auto" >
+    useEffect(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [currentMsgArray]);
 
-        <div className="h-full">
-          <div className="shadow-xl">
-            <div className="flex justify-between px-10 py-5 items-center">
-              <div className="flex gap-2 items-center">
-                <img src={IMAGES.ProfilePic} alt="" className="h-10 w-10 rounded-full object-cover" />
-                <p>{data.name} </p>
+    return (
+      <div style={styles.panel}>
+        {/* header */}
+        <div style={styles.panelHeader}>
+          <div style={styles.panelHeaderLeft}>
+            <button style={styles.iconBtn} onClick={onclose} className="sm:hidden">
+              <IoArrowBack size={16} />
+            </button>
+            <div style={styles.avatar(avatarColor(data?.name), type === "group")}>
+              {getInitials(data?.name)}
+            </div>
+            <div>
+              <div style={styles.panelName}>{data?.name}</div>
+              <div style={styles.panelSub}>
+                {type === "group" ? `${data?.participants?.length ?? ""} members` : "Online"}
               </div>
-              <IoClose onClick={onclose} className="cursor-pointer" />
             </div>
           </div>
-
-          {loading ? <div><Loader /></div> :
-            <div className="h-[70vh] overflow-y-auto register-scrollbar">
-              {currentMsgArray.map((item, index) => {
-                return <GroupMsg key={index} msg={item} />
-              })}
-            </div>
-          }
-
+          <button style={styles.iconBtn} onClick={onclose}>
+            <IoClose size={16} />
+          </button>
         </div>
-        <div className="px-5 sm:px-10">
-          <div className="flex items-center gap-2">
-            <input type="text" value={msgstr} onChange={(e) => { setmsgStr(e.target.value) }} onKeyDown={handleKeyDown} placeholder="Message" className="flex-1 border-black/20 border rounded-lg py-2 px-2 outline-none w-full" />
-            <RiAttachment2 className=" text-[#0B1053] cursor-pointer shrink-0" size={24} />
-            <BsFillSendFill className="bg-[#0B1053] text-white p-2 rounded-md cursor-pointer shrink-0" size={34} onClick={() => { handleSendMessage(msgstr); setmsgStr(""); }} />
+
+        {/* messages */}
+        {loading ? (
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Loader />
           </div>
-        </div>
+        ) : (
+          <div style={styles.messagesArea}>
+            <div style={styles.dateDivider}>
+              <span style={{ flex: 1, height: 1, background: "rgba(0,0,0,.07)" }} />
+              <span>Today</span>
+              <span style={{ flex: 1, height: 1, background: "rgba(0,0,0,.07)" }} />
+            </div>
+            {currentMsgArray.map((item, index) => (
+              <GroupMsg key={index} msg={item} />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
 
+        {/* input */}
+        <div style={styles.inputArea}>
+          <input
+            type="text"
+            value={msgstr}
+            onChange={(e) => setmsgStr(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type a message..."
+            style={styles.msgInput}
+          />
+          <button style={styles.attachBtn}>
+            <RiAttachment2 size={18} />
+          </button>
+          <button
+            style={styles.sendBtn}
+            onClick={() => { handleSendMessage(msgstr); setmsgStr(""); }}
+          >
+            <BsFillSendFill size={14} />
+          </button>
+        </div>
       </div>
-    </>
-  }
+    );
+  };
 
+  /* ── queries ── */
   const chatquery = useQuery({ queryKey: ["chat"], queryFn: getMyChats, staleTime: 30000, enabled: enableChatQuery });
   const teacherquery = useQuery({ queryKey: ["teachers-for-chat"], queryFn: getTeachersForChat, staleTime: 30000, enabled: individualActive });
 
   useEffect(() => {
-    console.log("now rendering navbar")
-    if (!queryData) {
-      setEnableChatQuery(true);
-    }
-    if (!chatquery.isPending) {
-      setQueryData(chatquery?.data);
-      //console.log("query data is : ", chatquery.data);
-      setEnableChatQuery(false);
-    }
-  }, [chatquery.isPending])
+    if (!queryData) setEnableChatQuery(true);
+    if (!chatquery.isPending) { setQueryData(chatquery?.data); setEnableChatQuery(false); }
+  }, [chatquery.isPending]);
 
-  return (
-    <div ref={ref} className="fixed  right-0 z-50 flex flex-row-reverse items-start pointer-events-none h-screen">
-      <div
-        className={` ${!dashboard ? "mt-10" : "mt-0"
-          } flex flex-col px-5 overflow-auto bg-white border-l border-black/20 shadow-xl sm:w-96 w-72 pointer-events-auto h-full`}
-      >
-        <div className={`flex flex-col flex-1 font-poppins`}>
-          <div className="flex justify-between py-5 ">
-            <p className="text-lg font-semibold">Recent Messages</p>
-            <IoClose onClick={onclose} className="cursor-pointer" />
-          </div>
-          <div className="pb-2 border-b rounded-sm border-black/10">
-            <div className="flex justify-between gap-2 p-1 rounded-md bg-[#EAECF0] border-2 border-[#00000010]">
-              <div
-                onClick={() => { }}
-                className={`cursor-pointer flex items-center justify-center flex-1 gap-2 ${individualActive ? "bg-white" : "transparent"
-                  } rounded-md`}
-              >
-                <p className="">Recent</p>
-              </div>
-            </div>
-          </div>
-          {individualActive && (
-             <div className="flex gap-4 py-2 border-b border-black/5 justify-around">
-               <p 
-                className={`text-sm cursor-pointer ${subTab === "recent" ? "text-[#0B1053] font-bold border-b-2 border-[#0B1053]" : "text-grey"}`}
-                onClick={() => setSubTab("recent")}
-               >Group Chats</p>
-               <p 
-                className={`text-sm cursor-pointer ${subTab === "teachers" ? "text-[#0B1053] font-bold border-b-2 border-[#0B1053]" : "text-grey"}`}
-                onClick={() => setSubTab("teachers")}
-               >Teachers</p>
-            </div>
-          )}
+  /* ── search filter ── */
+  const filterBySearch = (arr) =>
+    arr?.filter((d) => d?.name?.toLowerCase().includes(searchText.toLowerCase())) ?? [];
 
-          {chatquery.isPending && subTab === "recent" && <div className=""> <Loader /> </div>}
-          {teacherquery.isPending && subTab === "teachers" && <div className=""> <Loader /> </div>}
-
-          {!chatquery.isPending && subTab === "recent" &&
-            <div className="py-2">
-              {chatquery?.data?.map((item) => {
-                return <Message data={item} onpress={() => { openFullchat(item) }} />;
-              })}
-            </div>
-          }
-
-          {!teacherquery.isPending && subTab === "teachers" &&
-            <div className="py-2">
-              {teacherquery?.data?.map((item) => {
-                return <Message data={item} onpress={() => { openDirectChat(item) }} />;
-              })}
-            </div>
-          }
-
+  /* ── sidebar panel ── */
+  const SidebarPanel = () => (
+    <div style={styles.sidebar}>
+      {/* header */}
+      <div style={styles.sidebarHeader}>
+        <div style={styles.titleRow}>
+          <span style={styles.title}>Messages</span>
+          <button style={styles.closeBtn} onClick={onclose}>
+            <IoClose size={14} />
+          </button>
         </div>
+
+        {/* search */}
+        <div style={styles.searchWrap}>
+          <HiOutlineSearch size={15} color="#98A2B3" />
+          <input
+            style={styles.searchInput}
+            type="text"
+            placeholder="Search conversations..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
+
+        {/* tabs */}
+        {individualActive && (
+          <div style={styles.tabBar}>
+            <button
+              style={styles.tab(subTab === "recent")}
+              onClick={() => setSubTab("recent")}
+            >
+              Group Chats
+            </button>
+            <button
+              style={styles.tab(subTab === "teachers")}
+              onClick={() => setSubTab("teachers")}
+            >
+              Teachers
+            </button>
+          </div>
+        )}
       </div>
-      {showFullChat && <FullChat onclose={() => setShowFullChat(false)} data={selectedChat} type="group" />}
-      {showDirectChat && <FullChat onclose={() => setShowDirectChat(false)} data={selectedChat} type="direct" />}
+
+      {/* list */}
+      <div style={styles.chatList}>
+        {chatquery.isPending && subTab === "recent" && <Loader />}
+        {teacherquery.isPending && subTab === "teachers" && <Loader />}
+
+        {!chatquery.isPending && subTab === "recent" && (
+          <>
+            {filterBySearch(chatquery?.data).map((item) => (
+              <ChatListItem
+                key={item.id}
+                data={item}
+                isGroup
+                isActive={selectedChat?.id === item.id && showFullChat}
+                onpress={() => openFullchat(item)}
+              />
+            ))}
+          </>
+        )}
+
+        {!teacherquery.isPending && subTab === "teachers" && (
+          <>
+            {filterBySearch(teacherquery?.data).map((item) => (
+              <ChatListItem
+                key={item.id}
+                data={item}
+                isGroup={false}
+                isActive={selectedChat?.id === item.id && showDirectChat}
+                onpress={() => openDirectChat(item)}
+              />
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  /* ── root ── */
+  return (
+    <div
+      ref={ref}
+      className="fixed right-0 inset-y-0 z-[250] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden"
+    >
+      <style>
+        {`
+          @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0.5; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+          .animate-chat-slide {
+            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+        `}
+      </style>
+      {/* sidebar — hidden on mobile when chat is open */}
+      <div
+        className={`
+          ${(showFullChat || showDirectChat) ? "hidden sm:flex" : "flex"}
+          flex-col overflow-hidden bg-white border-l border-black/10 shadow-2xl sm:w-96 w-full pointer-events-auto h-full
+          animate-chat-slide
+        `}
+        style={{ boxShadow: "-4px 0 24px rgba(11,16,83,.10)" }}
+      >
+        <SidebarPanel />
+      </div>
+
+      {/* full chat */}
+      {showFullChat && (
+        <div
+          className="w-full sm:w-96 pointer-events-auto h-full overflow-hidden animate-chat-slide"
+          style={{ boxShadow: "-4px 0 24px rgba(11,16,83,.10)" }}
+        >
+          <FullChat onclose={() => setShowFullChat(false)} data={selectedChat} type="group" />
+        </div>
+      )}
+      {showDirectChat && (
+        <div
+          className="w-full sm:w-96 pointer-events-auto h-full overflow-hidden animate-chat-slide"
+          style={{ boxShadow: "-4px 0 24px rgba(11,16,83,.10)" }}
+        >
+          <FullChat onclose={() => setShowDirectChat(false)} data={selectedChat} type="direct" />
+        </div>
+      )}
     </div>
   );
 };

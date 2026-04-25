@@ -93,7 +93,7 @@ const Navbar = ({ heading }) => {
           )}
 
           {mail && (
-            <div className="pointer-events-auto fixed left-3 right-3 top-16 sm:top-20 sm:left-auto sm:right-36 sm:w-80 z-[100]">
+            <div className="pointer-events-auto fixed inset-y-0 right-0 sm:left-auto sm:right-36 sm:w-96 z-[250]">
               <RecentMessages dashboard={true} onclose={toggleMail} />
             </div>
           )}

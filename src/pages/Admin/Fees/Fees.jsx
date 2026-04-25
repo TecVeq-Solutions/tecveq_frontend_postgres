@@ -49,8 +49,10 @@ const Fees = () => {
 
     return (
         <div className="w-full bg-[#F3F4F6] font-poppins min-h-screen">
-            <div className={`lg:ml-80 lg:px-10 sm:px-6 px-4 py-0 sm:py-6 transition-all duration-300 ${isBlurred ? "blur-md scale-[0.99]" : ""}`}>
+            <div className="lg:ml-80 lg:px-10 sm:px-6 px-4 py-0 sm:py-6 transition-all duration-300">
                 <Navbar heading={"Fees Management"} />
+
+                <div className={`transition-all duration-300 ${isBlurred ? "blur-md scale-[0.99]" : ""}`}>
 
                 {/* --- Action Bar --- */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-5 my-2 sm:my-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
@@ -165,6 +167,7 @@ const Fees = () => {
                         </div>
                     </div>
                 )}
+                </div>
             </div>
 
             {isGenerateModal && (
