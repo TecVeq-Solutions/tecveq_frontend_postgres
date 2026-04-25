@@ -71,11 +71,11 @@ const Announcements = () => {
 
     return (
         <div className='flex min-h-screen w-full bg-[#F3F4F6] font-poppins'>
-            <div className={`flex-grow w-full px-3 sm:px-6 lg:px-10 pb-10 lg:ml-80 transition-all duration-300 ${isBlurred ? "blur-sm" : ""}`}>
+            <div className={`flex-grow w-full px-3 sm:px-6 lg:px-10 pb-10 lg:ml-80 transition-all duration-300`}>
 
                 <Navbar heading={"Announcements"} />
 
-                <div className="mt-4 sm:mt-6">
+                <div className={`mt-4 sm:mt-6 transition-all duration-300 ${isBlurred ? "blur-sm" : ""}`}>
 
                     {/* ── Action Bar ── */}
                     <div className='bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-gray-100 mb-5 sm:mb-8 flex flex-col gap-3'>

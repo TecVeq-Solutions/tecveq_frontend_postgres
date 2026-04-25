@@ -148,34 +148,18 @@ const Navbar = ({ heading }) => {
       </div>
 
       {/* Overlay layer for Dropdowns (Not affected by blur) */}
-      <div className="absolute top-0 right-0 w-full h-full pointer-events-none" ref={overlayRef}>
-        <div className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-6">
-          {mail && (
-            <div className="pointer-events-auto">
-              {/* Mobile: full width */}
-              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
-                <RecentMessages dashboard={true} onclose={closeMail} />
-              </div>
-              {/* Desktop: right-aligned dropdown */}
-              <div className="hidden sm:block absolute right-24 md:right-28 mt-20 w-80 z-[100]">
-                <RecentMessages dashboard={true} onclose={closeMail} />
-              </div>
-            </div>
-          )}
+      <div className="fixed inset-0 pointer-events-none z-[250]" ref={overlayRef}>
+        {mail && (
+          <div className="pointer-events-auto absolute inset-y-0 right-0 w-full sm:w-96">
+            <RecentMessages dashboard={true} onclose={closeMail} />
+          </div>
+        )}
 
-          {bell && (
-            <div className="pointer-events-auto">
-              {/* Mobile: full width */}
-              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
-                <Notifications data={data} dashboard={true} onclose={handleBellClick} />
-              </div>
-              {/* Desktop: right-aligned dropdown */}
-              <div className="hidden sm:block absolute right-6 md:right-10 mt-20 w-80 z-[100]">
-                <Notifications data={data} dashboard={true} onclose={handleBellClick} />
-              </div>
-            </div>
-          )}
-        </div>
+        {bell && (
+          <div className="pointer-events-auto absolute inset-y-0 right-0 w-full sm:w-80">
+            <Notifications data={data} dashboard={true} onclose={handleBellClick} />
+          </div>
+        )}
       </div>
     </nav>
   );

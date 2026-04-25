@@ -9,7 +9,7 @@ import { Calendar, SlidersHorizontal } from "lucide-react";
 import moment from "moment";
 import useClickOutside from "../../../hooks/useClickOutlise";
 
-const FilterClassesModal = ({ setAddModalOpen, setaddModalOpen, classData, isPending }) => {
+const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
   const [filteredClasses, setFilteredClasses] = useState([]);
   const [filterEndDate, setFilterEndDate] = useState("");
@@ -292,7 +292,7 @@ const FilterClassesModal = ({ setAddModalOpen, setaddModalOpen, classData, isPen
           <button
             onClick={() => {
               handleClearFilters();
-              setaddModalOpen(false);
+              setAddModalOpen(false);
             }}
             className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-all"
           >

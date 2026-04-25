@@ -118,12 +118,12 @@ const Navbar = ({ heading }) => {
 
       {/* Overlays */}
       {mail && (
-        <div className="absolute right-0 top-20 w-80 z-50">
+        <div className="fixed inset-y-0 right-0 w-full sm:w-96 z-[250]">
           <RecentMessages dashboard={true} onclose={toggleMail} />
         </div>
       )}
       {bell && (
-        <div className="absolute right-0 top-20 w-80 z-50">
+        <div className="fixed inset-y-0 right-0 w-full sm:w-80 z-[250]">
           <Notifications data={allNotfications} dashboard={true} onclose={toggleBell} />
         </div>
       )}

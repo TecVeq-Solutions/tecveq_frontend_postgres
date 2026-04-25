@@ -122,57 +122,116 @@ const RecentMessages = ({ onclose, dashboard }) => {
     </div>
   );
 
-  return (
-    <>
-      <div
-        ref={ref}
-        className={`${!dashboard ? "mt-10" : "mt-0"} fixed z-[200] flex flex-col h-[calc(100vh-80px)] bg-white/95 backdrop-blur-md border-l border-gray-200 shadow-2xl top-20 transition-all duration-300 ${showFullChat ? "right-96" : "right-0"} sm:w-96 w-full`}
-      >
-        {/* Header */}
-        <div className="p-6 pb-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-extrabold text-gray-800 tracking-tight">Messages</h2>
-            <button onClick={onclose} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-              <IoClose size={22} className="text-gray-600" />
-            </button>
-          </div>
-
-          {/* Custom Tabs */}
-          <div className="flex p-1.5 bg-gray-100 rounded-2xl mb-4">
-            <button
-              onClick={toggleIndividualActive}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${individualActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              DIRECT
-            </button>
-            <button
-              onClick={toggleGroupActive}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${groupActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              GROUPS
-            </button>
-          </div>
+  const SidebarPanel = () => (
+    <div className="flex flex-col w-full h-full bg-white">
+      {/* Header */}
+      <div className="p-6 pb-4 border-b border-gray-100">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-extrabold text-gray-800 tracking-tight">Messages</h2>
+          <button onClick={onclose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+            <IoClose size={22} className="text-gray-500" />
+          </button>
         </div>
 
-        {/* Chat List */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6 register-scrollbar">
-          {(individualIsPending || groupIsPending) ? (
-            <div className="flex justify-center py-10"><Loader /></div>
-          ) : (
-            <>
-              {individualActive && individualChats?.map((item) => (
-                <MessageItem key={item.id} data={item} onpress={() => openFullchat(item, false)} />
-              ))}
-              {groupActive && groupChats?.map((item) => (
-                <MessageItem key={item.id} data={item} onpress={() => openFullchat(item, true)} />
-              ))}
-            </>
-          )}
+        {/* Custom Tabs */}
+        <div className="flex p-1 bg-gray-100 rounded-2xl mb-2">
+          <button
+            onClick={toggleIndividualActive}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${individualActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            DIRECT
+          </button>
+          <button
+            onClick={toggleGroupActive}
+            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${groupActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+          >
+            GROUPS
+          </button>
         </div>
       </div>
 
-      {showFullChat && <FullChat onclose={handleShowFullChat} data={selectedChat} />}
-    </>
+      {/* Chat List */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 register-scrollbar">
+        {(individualIsPending || groupIsPending) ? (
+          <div className="flex justify-center py-10"><Loader /></div>
+        ) : (
+          <>
+            {individualActive && individualChats?.map((item) => (
+              <MessageItem key={item.id} data={item} onpress={() => openFullchat(item, false)} />
+            ))}
+            {groupActive && groupChats?.map((item) => (
+              <MessageItem key={item.id} data={item} onpress={() => openFullchat(item, true)} />
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div 
+      className={`fixed inset-y-0 right-0 z-[250] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden`}
+    >
+      <style>{`
+        @keyframes chatSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .animate-chat-panel { animation: chatSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      `}</style>
+
+      {/* Main List Panel */}
+      <div 
+        ref={ref}
+        className={`
+          ${showFullChat ? "hidden sm:flex" : "flex"}
+          flex-col bg-white border-l border-gray-200 shadow-2xl sm:w-96 w-full pointer-events-auto h-full animate-chat-panel ${!dashboard ? "pt-20" : "pt-0"}
+        `}
+      >
+        <SidebarPanel />
+      </div>
+
+      {/* Chat Detail Panel */}
+      {showFullChat && (
+        <div className={`flex flex-col bg-[#F8FAFC] sm:w-96 w-full h-full shadow-2xl border-l border-gray-200 pointer-events-auto animate-chat-panel ${!dashboard ? "pt-20" : "pt-0"}`}>
+          <div className="p-4 bg-white border-b flex justify-between items-center shadow-sm">
+            <div className="flex items-center gap-3">
+              <button onClick={handleShowFullChat} className="p-2 hover:bg-gray-100 rounded-full sm:hidden">
+                <IoClose size={20} className="text-gray-500" />
+              </button>
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                {selectedChat?.name?.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="font-bold text-gray-800 text-sm truncate max-w-[150px]">{selectedChat?.name}</p>
+                <p className="text-[10px] text-green-500 font-medium">Online</p>
+              </div>
+            </div>
+            <button onClick={handleShowFullChat} className="p-2 hover:bg-gray-100 rounded-full hidden sm:block">
+              <IoClose size={20} className="text-gray-500" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto py-6 register-scrollbar">
+            {loading ? (
+              <div className="h-full flex items-center justify-center"><Loader /></div>
+            ) : msgArray.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+                <p className="text-sm italic">No messages yet</p>
+              </div>
+            ) : (
+              msgArray.map((item, index) => <ChatBubble key={index} msg={item} />)
+            )}
+          </div>
+
+          <div className="p-4 bg-white border-t">
+            <div className="flex items-center gap-2 bg-gray-100 px-4 py-2.5 rounded-full">
+              <input placeholder="Type a message..." className="bg-transparent text-sm w-full outline-none text-gray-700" />
+              <button className="text-blue-500 hover:text-blue-600 transition-colors">
+                <IoSend size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
