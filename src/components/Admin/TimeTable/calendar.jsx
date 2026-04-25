@@ -118,15 +118,13 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
           addModalOpen && (
             <>
 
-              <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
-                <div className="bg-white w-96 h-full overflow-y-auto shadow-lg">
-                  <FilterClassesModal
-                    setaddModalOpen={setaddEventModalOpen}
-                    classData={data}
-                    addModalOpen={addModalOpen}
-                    setAddModalOpen={setAddModalOpen}
-                  />
-                </div>
+              <div className={`absolute top-0 right-0 flex-1 z-10 flex py-4 bg-white rounded-md shadow-sm shadow-grey/25`}>
+                <FilterClassesModal
+                  setaddModalOpen={setaddEventModalOpen}
+                  classData={data}
+                  addModalOpen={addModalOpen}
+                  setAddModalOpen={setAddModalOpen}
+                />
               </div>
             </>
           )

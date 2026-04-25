@@ -22,7 +22,7 @@ const setupAxios = () => {
           "An unexpected error occurred";
 
         // Skip toast for specific expected "errors" like teacher not being in a classroom yet
-        const skipToast = errMsg === "Teacher not found in any classroom." || errMsg === "No subjects found for the given teacher.";
+        const skipToast = errMsg === "Teacher not found in any classroom." || errMsg === "No subjects found for the given teacher." || errMsg === "Setting not found";
 
         if (!skipToast) {
           toast.error(errMsg, {

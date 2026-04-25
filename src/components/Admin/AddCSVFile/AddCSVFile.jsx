@@ -9,8 +9,8 @@ const AddCSVFileComponent = () => {
     const [file, setFile] = useState(null);
     const [fileName, setFileName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-      const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
-    
+    const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
+
 
 
 
@@ -86,7 +86,7 @@ const AddCSVFileComponent = () => {
                 </button>
             </div>
             <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-                <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6 border border-gray-200">
+                <div className="w-full max-w-md bg-white shadow-md rounded-lg p-3 sm:p-6 border border-gray-200">
                     {/* Header */}
                     <h2 className="text-xl font-semibold text-center flex items-center justify-center gap-2 mb-4">
                         <Upload className="w-6 h-6 text-blue-500" />

@@ -59,9 +59,10 @@ const Classroom = () => {
   }
 
   const { data, isPending, refetch, isRefetching } = useQuery({ queryKey: ["classroom"], queryFn: getAllClassroom });
-
+  // Perceived Performance: Only show big loader on initial load (isPending)
+  // Subsequent refetches (isRefetching) will happen in the background
   return (
-    isPending || isRefetching ? (
+    isPending ? (
       <div className="flex flex-1 justify-center items-center min-h-screen">
         <Loader />
       </div>
@@ -69,107 +70,127 @@ const Classroom = () => {
       <>
         <div className="flex flex-col flex-1 bg-[#F9F9F9] font-poppins w-full">
           <div className="flex flex-1">
-           <div className="w-full lg:px-10 px-4 flex-grow lg:ml-72 transition-all duration-300 min-w-0 overflow-x-hidden">
+            <div className="w-full lg:px-10 px-4 flex-grow lg:ml-80 transition-all duration-300 min-w-0 overflow-x-hidden">
               <div className="min-h-screen pb-6">
                 <Navbar heading={"Classroom"} />
 
                 <div className={`${isBlurred ? "blur" : ""}`}>
                   {/* Search & Add Classroom Section */}
                   <div className="py-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                      {/* Left Section */}
-                      <div>
-                        <p className="text-black/60 text-sm">Manage your classrooms efficiently</p>
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 p-1">
+                      {/* Left Section: Context & Title */}
+                      <div className="space-y-1">
+                        <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Classrooms</h2>
+                        <p className="text-slate-500 text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                          Manage your classrooms efficiently
+                        </p>
                       </div>
 
-                      {/* Right Section */}
-                      <div className="flex flex-wrap md:flex-row gap-3 w-full md:w-auto">
-                        {/* Search Input */}
-                        <div className="flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full w-full md:w-72 shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-purple-400">
-                          <BiSearch className="text-gray-400" />
+                      {/* Right Section: Actions */}
+                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+
+                        {/* Search Input Group */}
+                        <div className="relative group w-full sm:w-80">
+                          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                            <BiSearch className="text-gray-400 group-focus-within:text-purple-600 transition-colors duration-300 size-5" />
+                          </div>
                           <input
-                            className="outline-none w-full text-gray-700 placeholder-gray-400 bg-transparent"
                             type="text"
-                            placeholder="Search"
+                            placeholder="Search classrooms..."
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
+                            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm transition-all duration-300 
+                   outline-none focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-purple-400 
+                   placeholder:text-gray-400 text-gray-700 shadow-sm"
                           />
                         </div>
 
                         {/* Add Classroom Button */}
                         <button
                           onClick={onAddClass}
-                          className="px-6 py-2 text-sm font-medium text-white bg-[#6A00FF] rounded-full shadow-md hover:shadow-lg transition-all"
+                          className="relative flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 
+                 bg-gradient-to-r from-[#6A00FF] to-[#8B33FF] 
+                 text-white text-sm font-semibold rounded-2xl
+                 shadow-[0_10px_20px_-5px_rgba(106,0,255,0.3)]
+                 hover:shadow-[0_15px_25px_-5px_rgba(106,0,255,0.4)]
+                 hover:-translate-y-0.5 active:translate-y-0
+                 transition-all duration-300 group overflow-hidden"
                         >
-                          Add Classroom
+                          <span className="absolute inset-0 w-full h-full bg-white/10 group-hover:bg-transparent transition-colors"></span>
+                          <span className="relative flex items-center gap-2">
+                            <span className="text-lg">+</span> Add Classroom
+                          </span>
                         </button>
                       </div>
                     </div>
                   </div>
 
                   {/* Data Table Container */}
-                  <div className="mt-4 w-full bg-white rounded-xl shadow-sm border border-black/10 overflow-hidden">
+                  {/* Data Table Container */}
+                  <div className="mt-6 w-full bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto w-full">
-                      <div className="min-w-[550px] lg:min-w-full">
-                      <DataRow
-                        header={true}
-                        isQuiz={true}
-                        index={"Sr. No"}
-                        bgColor={"#F9F9F9"}
-                        students={"Students"}
-                        teachers={"Teachers"}
-                        createdBy={"Created By"}
-                        classname={"Classroom"}
-                        classesSchedualled={"Classes Scheduled"}
-                      />
+                      <div className="min-w-[600px] lg:min-w-full">
+                        <DataRow
+                          header={true}
+                          index={"#"}
+                          classname={"Classroom"}
+                          classesSchedualled={"Scheduled"}
+                          students={"Students"}
+                          teachers={"Teachers"}
+                          createdBy={"Created By"}
+                        />
 
-                      {searchText === "" &&
-                        data.map((cls, index) => (
-                          <DataRow
-                            data={cls}
-                            key={cls.id}
-                            header={false}
-                            index={index + 1}
-                            bgColor={"#FFFFFF"}
-                            classname={cls.name}
-                            students={cls.students.length}
-                            teachers={cls.teachers.length}
-                            createdBy={cls.createdBy.userType}
-                            toggleClassMenu={toggleClassMenuOpen}
-                            classesSchedualled={cls?.classes?.length}
-                          />
-                        ))}
+                        {/* Logic for Search (Unchanged) */}
+                        {searchText === "" && Array.isArray(data) &&
+                          data.map((cls, index) => (
+                            <DataRow
+                              data={cls}
+                              key={cls.id}
+                              header={false}
+                              index={index + 1}
+                              classname={cls.name}
+                              students={cls._count?.students || 0}
+                              teachers={cls._count?.teachers || 0}
+                              createdBy={cls.createdBy?.userType || "N/A"}
+                              toggleClassMenu={toggleClassMenuOpen}
+                              classesSchedualled={cls?._count?.classes || 0}
+                            />
+                          ))}
 
-                      {searchText &&
-                        data.map((cls, index) => {
-                          if (
-                            cls.name.toLowerCase().includes(searchText.toLowerCase()) ||
-                            cls.createdBy.userType.toLowerCase().includes(searchText.toLowerCase())
-                          ) {
-                            return (
-                              <DataRow
-                                data={cls}
-                                key={cls.id}
-                                header={false}
-                                index={index + 1}
-                                bgColor={"#FFFFFF"}
-                                classname={cls.name}
-                                students={cls.students.length}
-                                teachers={cls.teachers.length}
-                                createdBy={cls.createdBy.userType}
-                                toggleClassMenu={toggleClassMenuOpen}
-                                classesSchedualled={cls.classes.length}
-                              />
-                            );
-                          }
-                        })}
+                        {searchText && Array.isArray(data) &&
+                          data.map((cls, index) => {
+                            if (
+                              cls?.name?.toLowerCase()?.includes(searchText.toLowerCase()) ||
+                              cls?.createdBy?.userType?.toLowerCase()?.includes(searchText.toLowerCase())
+                            ) {
+                              return (
+                                <DataRow
+                                  data={cls}
+                                  key={cls.id}
+                                  header={false}
+                                  index={index + 1}
+                                  classname={cls.name}
+                                  students={cls._count?.students || 0}
+                                  teachers={cls._count?.teachers || 0}
+                                  createdBy={cls.createdBy?.userType || "N/A"}
+                                  toggleClassMenu={toggleClassMenuOpen}
+                                  classesSchedualled={cls?._count?.classes || 0}
+                                />
+                              );
+                            }
+                            return null;
+                          })}
 
-                      {data.length === 0 && (
-                        <div className="text-center py-8 text-xl font-medium text-gray-400">
-                          No classrooms to display!
-                        </div>
-                      )}
-                    </div>
+                        {/* Empty State */}
+                        {Array.isArray(data) && data.length === 0 && (
+                          <div className="text-center py-20 bg-gray-50/50">
+                            <p className="text-xl font-semibold text-gray-300 italic">
+                              No classrooms found!
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

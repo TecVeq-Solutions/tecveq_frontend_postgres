@@ -1,172 +1,181 @@
-import React, { useEffect, useState } from "react";
-import ProfileMenu from "./ProfileMenu";
+import React, { useEffect, useRef, useState } from "react";
 import Notifications from "./Notifications";
-import ProfileDetails from "./ProfileDetails";
-import profile from "../../assets/images/profilepic.png";
 import RecentMessages from "./Dashboard/RecentMessages";
 import GlobalSearch from "../../commonComponents/GlobalSearch";
-
 import { CiBellOn } from "react-icons/ci";
-import { useNavigate } from "react-router-dom";
 import { IoMailOutline } from "react-icons/io5";
-import { FaChevronDown } from "react-icons/fa6";
-import { userLogout } from "../../api/ForAllAPIs";
-import { useUser } from "../../context/UserContext";
 import { useBlur } from "../../context/BlurContext";
 import { useQuery } from "@tanstack/react-query";
 import { getAllNotifications } from "../../api/Admin/NotificationApi";
-import moment from "moment";
-import { Dot } from "recharts";
-import { useSidebar } from "../../context/SidebarContext";
-
 
 const Navbar = ({ heading }) => {
-
-  const [mail, setmail] = useState(false);
+  const [mail, setMail] = useState(false);
   const [bell, setBell] = useState(false);
-  const [isProfileMenu, setIsProfileMenu] = useState(false);
-  const [isProfileDetails, setIsProfileDetails] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
-  const navigate = useNavigate();
-  const { userData } = useUser();
   const { isBlurred, toggleBlur } = useBlur();
-  const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
 
+  const mailRef = useRef(null);
+  const bellRef = useRef(null);
+  const overlayRef = useRef(null);
 
-  const { data } = useQuery({ queryKey: ["chat"], queryFn: getAllNotifications });
-
+  const { data } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: getAllNotifications,
+  });
 
   useEffect(() => {
     const storedNotificationId = localStorage.getItem("lastNotificationId");
-
     if (data && data.length > 0) {
-      // Get the latest notification ID
-      const latestNotificationId = data[0].id; // Assuming latest notification is first in the list
-
-      // Compare with stored ID
+      const latestNotificationId = data[0].id;
       if (storedNotificationId !== latestNotificationId) {
-        // New notification found
         setHasNewNotifications(true);
-        localStorage.setItem("lastNotificationId", latestNotificationId); // Update storage
       }
     }
   }, [data]);
 
-  // Handle bell click
-  const handleBellClick = () => {
-    setHasNewNotifications(false); // Hide notification
-    localStorage.setItem("notificationChecked", "true"); // Persist user check
-    togglebell(); // Call the toggle function
-  };
-
-  // Restore notification visibility on refresh
+  // ✅ Fix 1: Outside click se dono dropdowns band ho jayein
   useEffect(() => {
-    const isChecked = localStorage.getItem("notificationChecked") === "true";
-    if (isChecked) {
-      setHasNewNotifications(false); // Don't show notification if already checked
-    }
-  }, []);
-  const toggleProfielMenu = () => {
-    setIsProfileMenu(!isProfileMenu);
-    setmail(false);
-    setBell(false);
-  };
+    const handleClickOutside = (e) => {
+      // If the target is no longer in the document, it was likely an internal element
+      // (like a tab or button) that was removed during a state update.
+      // In this case, we should NOT treat it as an outside click.
+      if (!document.body.contains(e.target)) return;
 
+      // Check if click is inside icons or sidebars
+      const isInsideMailIcon = mailRef.current && mailRef.current.contains(e.target);
+      const isInsideBellIcon = bellRef.current && bellRef.current.contains(e.target);
+      const isInsideOverlay = overlayRef.current && overlayRef.current.contains(e.target);
+
+      const isOutsideAll = !isInsideMailIcon && !isInsideBellIcon && !isInsideOverlay;
+
+      if (mail && isOutsideAll) {
+        setMail(false);
+        if (isBlurred) toggleBlur();
+      }
+      if (bell && isOutsideAll) {
+        setBell(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mail, bell, isBlurred]);
+
+  // ✅ Fix 2: toggleMail — blur sahi se handle ho
   const toggleMail = () => {
-    toggleBlur();
-    setmail(!mail);
-    setIsProfileMenu(false);
+    const isOpening = !mail;
+    setMail(isOpening);
     setBell(false);
+    // Blur sirf tab toggle ho jab state change ho
+    if (isOpening !== isBlurred) {
+      toggleBlur();
+    }
   };
 
-  const togglebell = () => {
+  const closeMail = () => {
+    setMail(false);
+    if (isBlurred) toggleBlur();
+  };
+
+  const handleBellClick = () => {
     setBell(!bell);
-    setmail(false);
-    setIsProfileMenu(false);
+    setMail(false);
+    // Mail open tha aur blur tha to blur hata do
+    if (mail && isBlurred) toggleBlur();
     setHasNewNotifications(false);
   };
 
-  const toggleProfileDetails = () => {
-    toggleBlur();
-    setIsProfileDetails(!isProfileDetails);
-  };
-
-  const onProfileClick = () => {
-    toggleProfielMenu();
-    toggleProfileDetails();
-  };
-
-  const onSettingsClick = () => { };
-
-  const onLogoutClick = async () => {
-    localStorage.clear();
-    await userLogout();
-    navigate("/");
-  };
-
   return (
-    <>
-      <div className="flex justify-end flex-1 h-20">
-        <div className={`flex justify-between flex-1 sm:py-5 ml-3 lg:ml-auto ${isBlurred ? "blur" : ""}`}>
-          {/* justify-normal sm: */}
-          <div className="flex flex-col justify-center px-2">
-            <p className="text-[14px]  ml-10 md:ml-0 md:text-2xl sm:font-medium font-normal">{heading} </p>
-          </div>
-          <GlobalSearch />
-          <div className="flex  items-center gap-1">
-            <div className="flex gap-2">
-              <div
-                className={`p-2 border cursor-pointer rounded-md border-black/50 transition-all duration-500 ${mail ? "bg-[#0B1053] text-white" : ""
-                  }`}
-                onClick={toggleMail}
-              >
-                <IoMailOutline />
-              </div>
-              <div className={`relative ${isSidebarOpen ? "-z-50" : "z-auto"}`}>
-                <div
-                  className={`p-2 border cursor-pointer rounded-md border-black/50 transition-all duration-500 `}
-                  onClick={handleBellClick}
-                >
-                  <div className={`${hasNewNotifications ? "animate-bellShake text-green_dark" : ""}`}>
-                    <CiBellOn />
-                  </div>
+    <nav className=" admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+      {/* Background layer that blurs */}
+      <div
+        className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""
+          }`}
+      >
+        {/* Left: Heading */}
+        <div className="flex-shrink-0 max-w-[150px] sm:max-w-none">
+          <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">
+            {heading}
+          </h1>
+        </div>
 
-                </div>
-                {hasNewNotifications && (
-                  <div className="absolute top-1 right-1 w-[9px] h-[9px] rounded-full bg-green"><Dot /></div>
-                )}
+        {/* Center: Search (Desktop Only) */}
+        <div className="hidden lg:block flex-1 max-w-md mx-8">
+          <GlobalSearch desktopOnly={true} />
+        </div>
+
+        {/* Right Side: Icons */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Mobile Search */}
+          <div className="lg:hidden">
+            <GlobalSearch mobileOnly={true} />
+          </div>
+
+          {/* Mail Icon */}
+          <div className="relative" ref={mailRef}>
+            <button
+              onClick={toggleMail}
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+                ${mail
+                  ? "bg-[#0B1053] text-white"
+                  : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
+                }`}
+            >
+              <IoMailOutline className="text-xl sm:text-2xl" />
+            </button>
+          </div>
+
+          {/* Bell Icon */}
+          <div className="relative" ref={bellRef}>
+            <button
+              onClick={handleBellClick}
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+                ${bell
+                  ? "bg-[#0B1053] text-white"
+                  : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
+                }`}
+            >
+              <div className={hasNewNotifications ? "animate-bellShake" : ""}>
+                <CiBellOn className="text-xl sm:text-2xl" />
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <p className="font-medium hidden md:block">{userData.name}</p>
-              <img
-                src={userData.profilePic || profile}
-                alt="Profile"
-                className="w-12 h-12 cursor-pointer rounded-full"
-                onClick={toggleProfielMenu}
-              />
-              <FaChevronDown
-                className="cursor-pointer"
-                onClick={toggleProfielMenu}
-              />
-            </div>
-            {bell && <Notifications dashboard={true} onclose={togglebell} />}
-            {isProfileMenu &&
-              <ProfileMenu
-                onProfileClick={onProfileClick}
-                onSettingsClick={onSettingsClick}
-                onLogoutClick={onLogoutClick}
-                dashboard={true}
-                userData={userData}
-                onClose={() => setIsProfileMenu(false)}
-              />}
+              {hasNewNotifications && (
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
+              )}
+            </button>
           </div>
         </div>
       </div>
-      {mail && <RecentMessages dashboard={true} onclose={toggleMail} />}
-      {isProfileDetails && <ProfileDetails onClose={toggleProfileDetails} />}
-    </>
 
+      {/* Overlay layer for Dropdowns (Not affected by blur) */}
+      <div className="absolute top-0 right-0 w-full h-full pointer-events-none" ref={overlayRef}>
+        <div className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-6">
+          {mail && (
+            <div className="pointer-events-auto">
+              {/* Mobile: full width */}
+              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
+                <RecentMessages dashboard={true} onclose={closeMail} />
+              </div>
+              {/* Desktop: right-aligned dropdown */}
+              <div className="hidden sm:block absolute right-24 md:right-28 mt-20 w-80 z-[100]">
+                <RecentMessages dashboard={true} onclose={closeMail} />
+              </div>
+            </div>
+          )}
+
+          {bell && (
+            <div className="pointer-events-auto">
+              {/* Mobile: full width */}
+              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
+                <Notifications dashboard={true} onclose={handleBellClick} />
+              </div>
+              {/* Desktop: right-aligned dropdown */}
+              <div className="hidden sm:block absolute right-6 md:right-10 mt-20 w-80 z-[100]">
+                <Notifications dashboard={true} onclose={handleBellClick} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 };
 

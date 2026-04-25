@@ -8,14 +8,15 @@ import { FaChevronDown } from "react-icons/fa6";
 import { useAdmin } from "../../../context/AdminContext";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import FilterButton from "./FilterButton";
+
+// ─── CustomEvent ──────────────────────────────────────────────────────────────
 export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
   const [detailsModalOpen, setdetailsModalOpen] = useState(false);
 
-  // Calculate event duration in hours for height scaling
   const startTime = new Date(event.startTime);
   const endTime = new Date(event.endTime);
   const durationHours = calculateDurationHours(startTime, endTime);
-  const eventHeight = Math.max(100, durationHours * 100); // Minimum 100px, scale by 100px per hour
+  const eventHeight = Math.max(100, durationHours * 100);
 
   return (
     <div className="relative flex flex-1 w-full">
@@ -29,65 +30,159 @@ export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
       />
 
       <div
-        className="cursor-pointer rounded-lg w-full transition-all duration-200 hover:shadow-md  text-[#0B1053] border-2 border-[#0B1053] mb-1 overflow-hidden"
-        style={{ height: `${eventHeight - 4}px`, minHeight: `${eventHeight - 4}px` }}
         onClick={() => {
           console.log("Admin event clicked:", event);
           setdetailsModalOpen(true);
         }}
+        className="cursor-pointer w-full mb-1 overflow-hidden group"
+        style={{
+          height: `${eventHeight - 4}px`,
+          minHeight: `${eventHeight - 4}px`,
+          background: "linear-gradient(135deg, #EEF0FF 0%, #F5F3FF 100%)",
+          border: "1.5px solid #C7C9F0",
+          borderLeft: "3px solid #6A00FF",
+          borderRadius: "10px",
+          boxShadow: "0 1px 4px rgba(106,0,255,0.06)",
+          transition: "all 0.18s ease",
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.boxShadow = "0 4px 16px rgba(106,0,255,0.15)";
+          e.currentTarget.style.borderColor = "#8B2FFF";
+          e.currentTarget.style.borderLeftColor = "#6A00FF";
+          e.currentTarget.style.transform = "translateY(-1px)";
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.boxShadow = "0 1px 4px rgba(106,0,255,0.06)";
+          e.currentTarget.style.borderColor = "#C7C9F0";
+          e.currentTarget.style.borderLeftColor = "#6A00FF";
+          e.currentTarget.style.transform = "translateY(0)";
+        }}
       >
-        <div className="flex flex-col h-[20px] justify-start items-start p-1 space-y-1">
-          <div className="text-[10px] leading-tight">
-            <span className="font-normal text-slate-800" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.8)' }}>T.Name:</span>
-            <div className="font-normal text-slate-900 truncate" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.6)' }}>
-              {event?.teacher?.name ?? ""}
-            </div>
+        {/* Top accent bar */}
+        <div style={{
+          height: "2px",
+          background: "linear-gradient(90deg, #6A00FF, #A855F7)",
+          opacity: 0.5,
+        }} />
+
+        <div className="flex flex-col justify-start items-start px-2 pt-1 pb-1 gap-[3px]">
+          {/* Teacher */}
+          <div className="flex items-center gap-1 w-full">
+            <span style={{
+              fontSize: "8px",
+              fontWeight: 600,
+              color: "#8B5CF6",
+              textTransform: "uppercase",
+              letterSpacing: "0.4px",
+            }}>Teacher</span>
+            <span style={{
+              fontSize: "9px",
+              color: "#1E1B4B",
+              fontWeight: 500,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: "70%",
+            }}>
+              {event?.teacher?.name ?? "—"}
+            </span>
           </div>
-          <div className="text-[10px] leading-tight">
-            <span className="font-bold text-slate-800" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.8)' }}>Title:</span>
-            <div className="font-semibold text-slate-900" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.6)' }}>
-              {event.title ? event.title : ""}
-            </div>
+
+          {/* Title */}
+          <div style={{
+            fontSize: "10px",
+            fontWeight: 700,
+            color: "#3B0764",
+            lineHeight: "1.2",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            width: "100%",
+          }}>
+            {event.title ? event.title : "Untitled"}
           </div>
-          <div className="text-[10px] leading-tight overflow-hidden">
-            <span className="font-normal text-slate-800" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.8)' }}>Subject:</span>
-            <div className="font-normal text-slate-900 truncate" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.6)' }}>
-              {event?.subject?.name ?? ""}
+
+          {/* Subject chip */}
+          {event?.subject?.name && (
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              background: "rgba(106,0,255,0.08)",
+              borderRadius: "4px",
+              padding: "1px 5px",
+              maxWidth: "100%",
+            }}>
+              <span style={{
+                fontSize: "8px",
+                color: "#6A00FF",
+                fontWeight: 600,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}>
+                {event?.subject?.name}
+              </span>
             </div>
-          </div>
+          )}
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
 
-
+// ─── SideTime ─────────────────────────────────────────────────────────────────
 export const SideTime = (props) => {
   const times = props.slotMetrics.groups;
 
   return (
-    <div className="flex flex-col w-[110px]">
+    <div className="flex flex-col" style={{ width: "110px" }}>
       {times.map((time, index) => {
         const startTime = moment.utc(time[0]).tz("Asia/Karachi");
-        // Calculate end time based on slot duration or use next slot start
         const endTime = index < times.length - 1
           ? moment.utc(times[index + 1][0]).tz("Asia/Karachi")
-          : startTime.clone().add(1, "hour"); // Default to 1 hour for last slot
+          : startTime.clone().add(1, "hour");
 
         return (
           <div
             key={`${time}`}
-            className="flex w-[110px] justify-center items-center border-b border-gray-200 py-2"
-            style={{ height: '100px', minHeight: '100px' }}
+            style={{
+              width: "110px",
+              height: "100px",
+              minHeight: "100px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderBottom: "1px solid #EDE9FE",
+              padding: "8px 4px",
+              background: index % 2 === 0 ? "#FAFAFA" : "#FFFFFF",
+            }}
           >
-            <div className="text-center">
-              <p className="text-[10px] text-grey font-medium">
-                {startTime.format("h:mm a")}
+            <div style={{ textAlign: "center" }}>
+              <p style={{
+                fontSize: "11px",
+                fontWeight: 600,
+                color: "#6A00FF",
+                margin: 0,
+                lineHeight: 1.3,
+              }}>
+                {startTime.format("h:mm")}
+                <span style={{ fontSize: "9px", fontWeight: 400, marginLeft: "2px", color: "#8B5CF6" }}>
+                  {startTime.format("a")}
+                </span>
               </p>
-              <p className="text-[8px] text-grey opacity-60">-</p>
-              <p className="text-[10px] text-grey font-medium">
-                {endTime.format("h:mm a")}
+              <p style={{ fontSize: "10px", color: "#C4B5FD", margin: "1px 0" }}>│</p>
+              <p style={{
+                fontSize: "11px",
+                fontWeight: 500,
+                color: "#9CA3AF",
+                margin: 0,
+                lineHeight: 1.3,
+              }}>
+                {endTime.format("h:mm")}
+                <span style={{ fontSize: "9px", marginLeft: "2px" }}>
+                  {endTime.format("a")}
+                </span>
               </p>
             </div>
           </div>
@@ -98,40 +193,103 @@ export const SideTime = (props) => {
 };
 
 
+// ─── SideTimeHeader ───────────────────────────────────────────────────────────
 export const SideTimeHeader = (props) => {
-  const times = props;
   return (
-    <>
-      <div className="flex items-center justify-center w-full h-full">
-        <p className="text-sm text-black/70 ">GTM +5</p>
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      height: "100%",
+    }}>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "4px",
+        background: "linear-gradient(135deg, #F3EEFF, #EDE9FE)",
+        border: "1px solid #DDD6FE",
+        borderRadius: "8px",
+        padding: "4px 10px",
+      }}>
+        <div style={{
+          width: "6px",
+          height: "6px",
+          borderRadius: "50%",
+          background: "#6A00FF",
+          boxShadow: "0 0 0 2px rgba(106,0,255,0.2)",
+        }} />
+        <p style={{
+          fontSize: "11px",
+          fontWeight: 600,
+          color: "#6A00FF",
+          margin: 0,
+          letterSpacing: "0.3px",
+        }}>GMT +5</p>
       </div>
-    </>
-  );
-};
-
-export const Header = (props) => {
-  const day = moment(props.date).format("dddd");
-  const currentDate = moment(Date.now()).date();
-  const currentMonth = moment(Date.now()).month();
-
-  const date = moment(props.date).date();
-  const month = moment(props.date).month();
-
-  return (
-    <div
-      className={`flex flex-col items-center justify-between  font-normal ${currentDate === date && currentMonth === month
-        ? "text-[#6A00FF]"
-        : "text-grey"
-        } `}
-    >
-      <p className="text-lg text-center">{date}</p>
-      <p className="text-xs text-start">{day}</p>
     </div>
   );
 };
 
-export const CustomToolbar = (props) => {
 
+// ─── Header ───────────────────────────────────────────────────────────────────
+export const Header = (props) => {
+  const day = moment(props.date).format("ddd");
+  const currentDate = moment(Date.now()).date();
+  const currentMonth = moment(Date.now()).month();
+  const date = moment(props.date).date();
+  const month = moment(props.date).month();
+  const isToday = currentDate === date && currentMonth === month;
+
+  return (
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "6px 2px",
+      gap: "4px",
+    }}>
+      <div style={{
+        width: "34px",
+        height: "34px",
+        borderRadius: "10px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: isToday
+          ? "linear-gradient(135deg, #6A00FF, #9333EA)"
+          : "transparent",
+        boxShadow: isToday ? "0 4px 12px rgba(106,0,255,0.3)" : "none",
+        transition: "all 0.2s ease",
+      }}>
+        <p style={{
+          margin: 0,
+          fontSize: "16px",
+          fontWeight: isToday ? 700 : 500,
+          color: isToday ? "#FFFFFF" : "#374151",
+          lineHeight: 1,
+        }}>
+          {date}
+        </p>
+      </div>
+      <p style={{
+        margin: 0,
+        fontSize: "10px",
+        fontWeight: 500,
+        color: isToday ? "#6A00FF" : "#9CA3AF",
+        textTransform: "uppercase",
+        letterSpacing: "0.5px",
+      }}>
+        {day}
+      </p>
+    </div>
+  );
+};
+
+
+// ─── CustomToolbar ────────────────────────────────────────────────────────────
+export const CustomToolbar = (props) => {
   const {
     onTeacherSelect,
     setAddModalOpen,
@@ -139,120 +297,202 @@ export const CustomToolbar = (props) => {
     addScheduleModalOpen,
     setAddScheduleModalOpen
   } = props;
-  //   const { currentUser } = useContext(AuthContext);
 
-  const [fields, setfields] = useState([]);
-  const [teacherID, setTeacherID] = useState("")
-
-
-
-
-  const goToBack = () => {
-    props.onNavigate("PREV");
-  };
-  const goToNext = () => {
-    props.onNavigate("NEXT");
-  };
-  const goToCurrent = () => {
-    toolbar.onNavigate("TODAY");
-  };
-
-  //   const handleGetFields = () => {
-  //     getFields({ id: currentUser?.id })
-  //       .then((res) => {
-  //         setfields(
-  //           res.map((r) => {
-  //             return {
-  //               name: r.fieldName,
-  //               value: r.id,
-  //             };
-  //           })
-  //         );
-  //       })
-  //       .catch((err) => {});
-  //   };
+  const [teacherID, setTeacherID] = useState("");
   const { adminUsersData } = useAdmin();
+
+  const goToBack = () => props.onNavigate("PREV");
+  const goToNext = () => props.onNavigate("NEXT");
+
+  // Current visible date from calendar (updates on navigate)
+  const visibleDate = props.date ? moment(props.date) : moment();
 
   const handleTeacherChange = (e) => {
     const id = e.target.value;
     setTeacherID(id);
-    onTeacherSelect(id); // Send to parent component
+    onTeacherSelect(id);
   };
 
-
   return (
-    <>
-      <div className="flex flex-col lg:flex-row flex-wrap w-full items-center justify-start sm:justify-between gap-6 lg:gap-3 my-4">
-        <div className=" flex flex-1 justify-normal sm:justify-center">
-          <div className="flex items-center justify-normal sm:justify-center w-full gap-2 lg:gap-1">
-            {/* <button
-              className="px-3 py-1 rounded-md bg-custom-light-1"
-              onClick={goToCurrent}
-            >
-              Today
-            </button> */}
-            <button
-              className="w-6 h-6 p-1 sm:w-8 sm:h-8 sm:p-2 bg-white border border-grey/50 rounded-2xl"
-              onClick={goToBack}
-            >
-              <MdKeyboardArrowLeft />
-            </button>
+    <div style={{
+      display: "flex",
+      flexWrap: "wrap",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "12px",
+      padding: "14px 20px",
+      background: "#FFFFFF",
+      borderRadius: "16px",
+      boxShadow: "0 1px 12px rgba(106,0,255,0.07), 0 1px 3px rgba(0,0,0,0.04)",
+      border: "1px solid #EDE9FE",
+      marginBottom: "16px",
+    }}>
 
-            <p className="mx-2 text-lg sm:text-2xl lg:text-[14px] 2xl:text-[16px] font-semibold text-[#6A00FF]">
-              {moment.utc(Date.now()).format("DD MMMM, YYYY")}
-              <span className="ml-2 text-lg lg:text-[10px] 2xl:text-[12px] font-normal text-grey/70">Today</span>
-            </p>
+      {/* ── Date Navigator ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <button
+          onClick={goToBack}
+          style={{
+            width: "34px",
+            height: "34px",
+            borderRadius: "10px",
+            border: "1.5px solid #E5E7EB",
+            background: "#FAFAFA",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+            color: "#374151",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "#F3EEFF";
+            e.currentTarget.style.borderColor = "#DDD6FE";
+            e.currentTarget.style.color = "#6A00FF";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "#FAFAFA";
+            e.currentTarget.style.borderColor = "#E5E7EB";
+            e.currentTarget.style.color = "#374151";
+          }}
+        >
+          <MdKeyboardArrowLeft size={18} />
+        </button>
 
-            <button
-              className="w-6 h-6 p-1 sm:w-8 sm:h-8 sm:p-2 bg-white border rounded-2xl border-grey/50"
-              onClick={goToNext}
-            >
-              <MdKeyboardArrowRight />
-            </button>
-          </div>
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "1px",
+        }}>
+          <p style={{
+            margin: 0,
+            fontSize: "15px",
+            fontWeight: 700,
+            color: "#6A00FF",
+            letterSpacing: "-0.3px",
+          }}>
+            {visibleDate.format("DD MMMM, YYYY")}
+          </p>
+          <p style={{
+            margin: 0,
+            fontSize: "10px",
+            fontWeight: 500,
+            color: "#A78BFA",
+            textTransform: "uppercase",
+            letterSpacing: "0.8px",
+          }}>
+            {visibleDate.isSame(moment(), "day") ? "Today" : visibleDate.format("dddd")}
+          </p>
         </div>
-        <div className="flex flex-1 items-start gap-2 justify-normal sm:justify-center">
-          {/* <div className="flex justify-between text-sm py-2 cursor-pointer px-2 w-36 border-[1.5px] border-[#00000020] rounded-xl ">
-            Teacher <FaChevronDown size={16} color="black" />
-          </div> */}
-          <div className="">
-            <div className="flex items-center gap-1 justify-between cursor-pointer py-2 text-sm px-3 w-48 border-[1.5px] border-[#00000020] rounded-xl ">
-              <select className="outline-none w-full h-full cursor-pointer"
-                onChange={handleTeacherChange}
-              >
-                <option value={""}>
-                  Search Teacher
-                </option>
 
-                {adminUsersData?.allTeachers?.map((item) => (
-                  <option key={JSON.stringify(item)} className="p-2" value={item.id}>{item?.name}</option>
-                ))}
-              </select>
-            </div>
-            {/* <div className=" text-lg md:text-auto py-1 mt-3 text-xs text-black/70 flex-wrap w-[75%]">
-              <p>Selcet the time table you want to view</p>
-            </div> */}
-          </div>
-
-        </div>
-        <div className="flex flex-2 flex-row flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-6 lg:gap-2 mb-6 lg:mb-0">
-          <FilterButton
-            className={"px-2 sm:px-4 py-2 text-sm sm:text-base"}
-            icon={true}
-            text={"Filter Classes"}
-            clickHandler={() => {
-              setAddModalOpen(!addModalOpen);
-            }}
-          />
-          <FilterButton
-            className={"px-2 sm:px-4 py-2 text-sm sm:text-base"}
-            text={"Schedule Classes"}
-            clickHandler={() => {
-              setAddScheduleModalOpen(!addScheduleModalOpen);
-            }}
-          />
-        </div>
+        <button
+          onClick={goToNext}
+          style={{
+            width: "34px",
+            height: "34px",
+            borderRadius: "10px",
+            border: "1.5px solid #E5E7EB",
+            background: "#FAFAFA",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+            color: "#374151",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "#F3EEFF";
+            e.currentTarget.style.borderColor = "#DDD6FE";
+            e.currentTarget.style.color = "#6A00FF";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "#FAFAFA";
+            e.currentTarget.style.borderColor = "#E5E7EB";
+            e.currentTarget.style.color = "#374151";
+          }}
+        >
+          <MdKeyboardArrowRight size={18} />
+        </button>
       </div>
-    </>
+
+      {/* ── Teacher Select ── */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        background: "#F9F7FF",
+        border: "1.5px solid #DDD6FE",
+        borderRadius: "12px",
+        padding: "8px 14px",
+        minWidth: "190px",
+      }}>
+        <FaSearch size={11} color="#A78BFA" style={{ flexShrink: 0 }} />
+        <select
+          onChange={handleTeacherChange}
+          value={teacherID}
+          style={{
+            outline: "none",
+            border: "none",
+            background: "transparent",
+            fontSize: "13px",
+            fontWeight: 500,
+            color: "#374151",
+            cursor: "pointer",
+            width: "100%",
+            // Hide native arrow — we show our own icon
+            appearance: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+          }}
+        >
+          <option value="">Search Teacher</option>
+          {adminUsersData?.allTeachers?.map((item) => (
+            <option key={JSON.stringify(item)} value={item.id}>
+              {item?.name}
+            </option>
+          ))}
+        </select>
+        <FaChevronDown size={10} color="#A78BFA" style={{ flexShrink: 0, pointerEvents: "none" }} />
+      </div>
+
+      {/* ── Action Buttons ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <FilterButton
+          className={"px-2 sm:px-4 py-2 text-sm sm:text-base"}
+          icon={true}
+          text={"Filter Classes"}
+          clickHandler={() => setAddModalOpen(!addModalOpen)}
+          style={{
+            background: "#F3EEFF",
+            color: "#6A00FF",
+            border: "1.5px solid #DDD6FE",
+            borderRadius: "12px",
+            fontWeight: 600,
+            fontSize: "13px",
+            padding: "8px 16px",
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+          }}
+        />
+        <FilterButton
+          className={"px-2 sm:px-4 py-2 text-sm sm:text-base"}
+          text={"Schedule Classes"}
+          clickHandler={() => setAddScheduleModalOpen(!addScheduleModalOpen)}
+          style={{
+            background: "linear-gradient(135deg, #6A00FF, #9333EA)",
+            color: "#FFFFFF",
+            border: "none",
+            borderRadius: "12px",
+            fontWeight: 600,
+            fontSize: "13px",
+            padding: "8px 16px",
+            cursor: "pointer",
+            boxShadow: "0 4px 14px rgba(106,0,255,0.25)",
+            transition: "all 0.15s ease",
+          }}
+        />
+      </div>
+    </div>
   );
 };

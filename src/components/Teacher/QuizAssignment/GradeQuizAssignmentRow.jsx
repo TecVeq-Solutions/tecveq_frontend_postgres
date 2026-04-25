@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { formatDate } from "../../../constants/formattedDate";
 import moment from "moment";
 
 const GradeQuizAssignmentRow = React.memo((props) => {
@@ -8,12 +7,10 @@ const GradeQuizAssignmentRow = React.memo((props) => {
   const [timeLeft, setTimeLeft] = useState("");
   const [arrowActive, setArrowActive] = useState(false);
 
-
   const handleChange = (field) => (event) => {
-    console.log("field data is : ", field, event.target.value)
+    console.log("field data is : ", field, event.target.value);
     props.setInputField(props.id, field, event.target.value);
   };
-
 
   const toggleArrowActive = () => {
     setArrowActive(!arrowActive);
@@ -27,27 +24,23 @@ const GradeQuizAssignmentRow = React.memo((props) => {
       setTimePassed(true);
     } else {
       setTimePassed(false);
-      // Calculate the difference in milliseconds
       const difference = eventDateTime - currentDateTime;
-      // Convert the difference to days, hours, minutes, and seconds
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
       const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((difference / (1000 * 60)) % 60);
       const seconds = Math.floor((difference / 1000) % 60);
-      // Update the timeLeft state with days included
       setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
     }
   };
 
-
   useEffect(() => {
     const formattedDateTimeString = props.submission
-      .replace(/(\d+)(st|nd|rd|th)/, "$1") // Removes 'st', 'nd', 'rd', 'th'
+      .replace(/(\d+)(st|nd|rd|th)/, "$1")
       .replace(",", "")
       .replace(
         /(\d+)([ap]m)$/i,
         (match, p1, p2) => `${p1} ${p2.toUpperCase()}`
-      ); // Ensures AM/PM is capitalized and properly spaced
+      );
 
     compareDateAndTime(formattedDateTimeString);
 
@@ -58,138 +51,161 @@ const GradeQuizAssignmentRow = React.memo((props) => {
     return () => clearInterval(intervalId);
   }, [props.deadline]);
 
-  // const [grade, setGrade] = useState("");
-  // const [marks, setMarks] = useState("");
-  // const [feedback, setFeedback] = useState("");
-
-  // useEffect(() => {
-
-  //   let val = (props.marks / props?.dataGrade?.totalMarks) * 100;
-  //   console.log(" val is : ", val);
-  //   console.log("grade data : ", props?.dataGrade);
-  //   console.log("marks are : ", parseFloat(props.marks))
-  //   if (val >= 90) {
-  //     props.setGradeStr("A+")
-  //   } else if (val >= 80) {
-  //     props.setGradeStr("A-")
-  //   } else if (val >= 70) {
-  //     props.setGradeStr("B+")
-  //   } else if (val >= 60) {
-  //     props.setGradeStr("B-")
-  //   } else if (val >= 50) {
-  //     props.setGradeStr("C+");
-  //   } else {
-  //     props.setGradeStr("F")
-  //   }
-
-  // }, [props.marks]);
-
-  // useEffect(() => {
-  //   props?.handleChangeData({marks, grade, feedback})
-  // }, [marks, grade, feedback])
-
-  return (
-    <div className="min-w-full">
+  /* ─── HEADER ROW ─────────────────────────────────────────── */
+  if (props.header) {
+    return (
       <div
         style={{ backgroundColor: props.bgColor }}
-        className={`min-w-full border-b flex flex-col border-grey justify-center`}
+        className="w-full border-b border-grey"
       >
-        <div className="flex items-center min-w-full">
-          <div className="flex flex-row items-center flex-1 py-2 mt-2 overflow-x-auto  md:py-5 md:pl-3 md:pr-5 space-x-5">
-            <p
-              className={`w-full md:flex-1 flex-1 md:text-[14px] text-[11px] text-center md:text-left ${props.header ? "font-semibold" : ""
-                }`}
-            >
-              {props.index + "."}
-            </p>
-            <p
-              className={`w-full md:flex-[3] my-1 md:my-0 items-center flex gap-4 text-center md:text-center md:text-[14px]  text-[11px] ${props.header ? "font-semibold" : ""
-                }`}
-            >
-              {!props.header ? (
-                <img src={props?.profileLink} alt="profile link" className="sm:w-12 w-8 h-8 sm:h-12 rounded-full object-cover" />
-              ) : (
-                <></>
-              )}
-              {props?.name}
-            </p>
-            <p
-              className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-center  md:text-[14px]  text-[11px] ${props.header ? "font-semibold " : ""
-                }`}
-            >
-              {props.header ? props?.submission : props?.submission == "Not Submitted Yet" ? "Not Submitted Yet" : moment(props.submission).format("Do MMM YYYY hh:mm a")}
-            </p>
-            <p
-              className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-center  md:text-[14px]  text-[11px] ${props.header ? "font-semibold " : ""
-                }`}
-            >
-              {!props.header ? (
-                <input
-                  type="number"
-                  placeholder="Marks"
-                  value={props.marks}
-                  onChange={handleChange('marks')}
-                  className="w-20 px-2 py-2 border rounded-md outline-none border-black/20"
-                />
-              ) : (
-                props?.marksObtained
-              )}
-            </p>
-            <p
-              className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-center  md:text-[14px]  text-[11px] ${props.header ? "font-semibold " : ""
-                }`}
-            >
-              {!props.header ? (
-                <input
-                  type="text"
-                  value={props.grade}
-                  placeholder="Grade"
-                  onChange={handleChange('grade')}
-                  className="w-20 px-2 py-2 border rounded-md outline-none border-black/20"
-                />
-              ) : (
-                props?.grade
-              )}
-            </p>
+        <div className="flex items-center px-2 xs:px-3 sm:px-4 py-2 sm:py-3">
+
+          {/* Sr */}
+          <div className="w-5 xs:w-7 sm:w-10 flex-shrink-0">
+            <span className="text-[10px] xs:text-[11px] sm:text-[13px] font-bold text-black">
+              {props.index}
+            </span>
           </div>
-          <div className="flex w-4 mr-5 cursor-pointer">
-            <p
-              onClick={() => {
-                console.log("download the resource");
-              }}
-              className={`w-full my-1 md:my-0 text-center md:text-center md:text-[20px] text-[14px] ${props.header ? "" : ""
-                }`}
-            >
-              {!props.header ? (
-                !arrowActive ? (
-                  <IoIosArrowDown onClick={toggleArrowActive} />
-                ) : (
-                  <IoIosArrowUp onClick={toggleArrowActive} />
-                )
-              ) : (
-                <></>
-              )}
-            </p>
+
+          {/* Name */}
+          <div className="flex-1 min-w-0 px-1 xs:px-2">
+            <span className="text-[10px] xs:text-[11px] sm:text-[13px] font-bold text-black">
+              {props.name}
+            </span>
           </div>
+
+          {/* Submission — hidden on mobile, visible sm+ */}
+          <div className="hidden sm:block w-[110px] md:w-[130px] flex-shrink-0 px-1">
+            <span className="text-[11px] sm:text-[13px] font-bold text-black">
+              {props.submission}
+            </span>
+          </div>
+
+          {/* Marks */}
+          <div className="w-[48px] xs:w-[56px] sm:w-[80px] flex-shrink-0 text-center px-0.5 xs:px-1">
+            <span className="text-[9px] xs:text-[10px] sm:text-[13px] font-bold text-black leading-tight">
+              {props.marksObtained}
+            </span>
+          </div>
+
+          {/* Grade */}
+          <div className="w-[38px] xs:w-[46px] sm:w-[70px] flex-shrink-0 text-center px-0.5 xs:px-1">
+            <span className="text-[10px] xs:text-[11px] sm:text-[13px] font-bold text-black">
+              {props.grade}
+            </span>
+          </div>
+
+          {/* Arrow spacer */}
+          <div className="w-6 xs:w-7 sm:w-8 flex-shrink-0" />
         </div>
-        {arrowActive ?
-          <div
-            className={`${props.header
-              ? "hidden"
-              : "py-4 flex gap-4 items-center px-10 flex-1"
-              }`}
-          >
-            <p>Feedback: </p>
+      </div>
+    );
+  }
+
+  /* ─── DATA ROW ───────────────────────────────────────────── */
+  return (
+    <div
+      style={{ backgroundColor: props.bgColor }}
+      className="w-full border-b border-grey flex flex-col"
+    >
+      <div className="flex items-center px-2 xs:px-3 sm:px-4 py-2 sm:py-4">
+
+        {/* Sr. No */}
+        <div className="w-5 xs:w-7 sm:w-10 flex-shrink-0">
+          <span className="text-[9px] xs:text-[11px] sm:text-[13px] text-gray-500">
+            {props.index}.
+          </span>
+        </div>
+
+        {/* Profile + Name */}
+        <div className="flex-1 min-w-0 flex items-center gap-1.5 xs:gap-2 px-1 xs:px-2">
+          <img
+            src={props?.profileLink}
+            alt=""
+            className="w-6 h-6 xs:w-7 xs:h-7 sm:w-9 sm:h-9 rounded-full object-cover border border-gray-100 shadow-sm flex-shrink-0"
+          />
+          <span className="text-[9px] xs:text-[11px] sm:text-[13px] font-medium text-gray-800 truncate leading-tight">
+            {props?.name}
+          </span>
+        </div>
+
+        {/* Submission Date — hidden on mobile, visible sm+ */}
+        <div className="hidden sm:block w-[110px] md:w-[130px] flex-shrink-0 px-1">
+          <span className="text-[11px] sm:text-[13px] text-gray-500 whitespace-nowrap">
+            {props?.submission === "Not Submitted Yet" ? (
+              <span className="text-gray-400 text-[10px] sm:text-[12px]">Not Submitted</span>
+            ) : (
+              moment(props.submission).format("DD MMM, YY")
+            )}
+          </span>
+        </div>
+
+        {/* Marks input */}
+        <div className="w-[48px] xs:w-[56px] sm:w-[80px] flex-shrink-0 flex justify-center px-0.5 xs:px-1">
+          <input
+            type="number"
+            placeholder="0"
+            value={props.marks}
+            onChange={handleChange("marks")}
+            className="w-full max-w-[40px] xs:max-w-[46px] sm:max-w-[68px] px-1 py-1 xs:py-1.5 text-[9px] xs:text-[11px] sm:text-[13px] border rounded-md xs:rounded-lg outline-none border-gray-200 focus:border-[#6366F1] transition-colors text-center"
+          />
+        </div>
+
+        {/* Grade input */}
+        <div className="w-[38px] xs:w-[46px] sm:w-[70px] flex-shrink-0 flex justify-center px-0.5 xs:px-1">
+          <input
+            type="text"
+            value={props.grade}
+            placeholder="A+"
+            onChange={handleChange("grade")}
+            className="w-full max-w-[32px] xs:max-w-[38px] sm:max-w-[58px] px-0.5 xs:px-1 py-1 xs:py-1.5 text-[9px] xs:text-[11px] sm:text-[13px] border rounded-md xs:rounded-lg outline-none border-gray-200 focus:border-[#6366F1] transition-colors uppercase text-center"
+          />
+        </div>
+
+        {/* Expand arrow */}
+        <div
+          className="w-6 xs:w-7 sm:w-8 flex-shrink-0 flex items-center justify-center h-6 xs:h-7 sm:h-8 rounded-full hover:bg-gray-100 transition-colors cursor-pointer text-gray-400"
+          onClick={toggleArrowActive}
+        >
+          {arrowActive ? <IoIosArrowUp size={14} /> : <IoIosArrowDown size={14} />}
+        </div>
+      </div>
+
+      {/* Submission date shown when expanded on mobile */}
+      {arrowActive && props?.submission !== "Not Submitted Yet" && (
+        <div className="sm:hidden px-2 xs:px-3 pb-1">
+          <span className="text-[9px] xs:text-[10px] text-gray-400">
+            Submitted: {moment(props.submission).format("DD MMM, YYYY")}
+          </span>
+        </div>
+      )}
+
+      {/* Not submitted badge when expanded on mobile */}
+      {arrowActive && props?.submission === "Not Submitted Yet" && (
+        <div className="sm:hidden px-2 xs:px-3 pb-1">
+          <span className="text-[9px] xs:text-[10px] text-gray-400">
+            Not Submitted Yet
+          </span>
+        </div>
+      )}
+
+      {/* Feedback row */}
+      {arrowActive && (
+        <div className="px-2 pb-2 xs:px-3 xs:pb-3 sm:px-6 sm:pb-5">
+          <div className="flex flex-col gap-1.5 xs:gap-2 p-2 xs:p-3 bg-gray-50 rounded-lg xs:rounded-xl border border-gray-100">
+            <p className="text-[10px] xs:text-[11px] sm:text-[12px] font-semibold text-gray-600 whitespace-nowrap flex-shrink-0">
+              Feedback:
+            </p>
             <input
               type="text"
-              placeholder="Feedback"
+              placeholder="Write feedback for the student..."
               value={props.feedback}
-              onChange={handleChange('feedback')}
-              className="flex w-4/5 px-2 py-2 border rounded-lg outline-none border-black/20"
+              onChange={handleChange("feedback")}
+              className="w-full px-2 xs:px-3 py-1.5 xs:py-2 text-[10px] xs:text-[12px] sm:text-[13px] bg-white border border-gray-200 rounded-md xs:rounded-lg outline-none focus:border-[#6366F1] transition-colors shadow-sm"
             />
           </div>
-          : <></>}
-      </div>
+        </div>
+      )}
     </div>
   );
 });

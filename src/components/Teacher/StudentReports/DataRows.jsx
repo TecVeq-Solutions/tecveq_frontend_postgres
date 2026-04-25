@@ -1,6 +1,21 @@
 import React from "react";
-import IMAGES from "../../../assets/images";
 
+const getAttendanceLevel = (pct) => {
+  if (pct >= 75) return { bar: "from-emerald-500 to-green-600", text: "text-green-600", bg: "bg-green-50", label: pct >= 85 ? "Excellent" : "Good" };
+  if (pct >= 60) return { bar: "from-amber-400 to-yellow-500", text: "text-amber-600", bg: "bg-amber-50", label: "Average" };
+  return { bar: "from-red-400 to-red-600", text: "text-red-600", bg: "bg-red-50", label: "At Risk" };
+};
+
+const getInitials = (name = "") =>
+  name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+
+const avatarColors = [
+  "bg-indigo-100 text-indigo-700",
+  "bg-amber-100 text-amber-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-pink-100 text-pink-700",
+  "bg-sky-100 text-sky-700",
+];
 
 const DataRows = ({
   index,
@@ -9,68 +24,77 @@ const DataRows = ({
   studentProfile,
   studentClass,
   attendance,
-  bgColor,
   header,
   onClickFunction,
 }) => {
+  if (header) {
+    return (
+      <div className="grid grid-cols-[32px_32px_1.5fr_1fr_1fr_140px] sm:grid-cols-[48px_48px_1.5fr_1fr_1fr_190px] gap-2 sm:gap-4 items-center px-3 sm:px-5 py-3 bg-[#F8F9FF] border-b border-[#E8EAEF] min-w-[560px] sm:min-w-[640px] lg:min-w-full">
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-[#8B92B3]">#</span>
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-[#8B92B3]">Pic</span>
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-[#8B92B3]">Student Name</span>
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-[#8B92B3]">Class</span>
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-[#8B92B3]">Subject</span>
+        <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-[#8B92B3]">Attendance</span>
+      </div>
+    );
+  }
+
+  const level = getAttendanceLevel(attendance);
+  const avatarColor = avatarColors[(index - 1) % avatarColors.length];
+
   return (
-    <div className="min-w-[700px] md:min-w-full">
-      <div
-        style={{ backgroundColor: bgColor, cursor: "pointer" }}
-        onClick={onClickFunction}
-        className={` py-[4px] md:pl-5 md:pr-10 flex flex-row items-center justify-around border-b border-grey`}
-      >
-        <p
-          className={`w-full md:flex-[1] flex-[1] md:text-[16px] lg:text-[14px] text-[14px] text-center md:text-left ${header ? "font-semibold" : ""
-            }`}
-        >
-          {index + "."}
-        </p>
-        <p
-          className={`w-full md:flex-[1] flex-[1] md:text-[16px] lg:text-[14px] text-[14px] text-center md:text-left ${header ? "hidden" : "flex"
-            }`}
-        >
+    <div
+      onClick={onClickFunction}
+      className="grid grid-cols-[32px_32px_1.5fr_1fr_1fr_140px] sm:grid-cols-[48px_48px_1.5fr_1fr_1fr_190px] gap-2 sm:gap-4 items-center px-3 sm:px-5 py-3 sm:py-4 border-b border-[#F0F2F8] cursor-pointer hover:bg-[#F8F9FF] transition-colors duration-150 last:border-b-0 min-w-[560px] sm:min-w-[640px] lg:min-w-full"
+    >
+      {/* Index */}
+      <span className="text-xs sm:text-sm font-semibold text-[#B0B6D3]">
+        {String(index).padStart(2, "0")}
+      </span>
+
+      {/* Profile */}
+      <div className="flex justify-start">
+        {studentProfile ? (
           <img
-            className=" rounded-full md:h-7 md:w-7 sm:h-5 sm:w-5 object-cover"
-            src={studentProfile || IMAGES.Profile}
-            alt="Student Profile"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-gray-100"
+            src={studentProfile}
+            alt={studentName}
           />
-        </p>
-        <p
-          className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-[16px] lg:text-[14px] text-[14px] md:text-left ${header ? "font-semibold md:ml-14 text-center" : ""
-            }`}
-        >
-          {studentName}
-        </p>
-        <p
-          className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-left md:text-[16px] lg:text-[14px]  text-[14px] ${header ? "font-semibold" : ""
-            }`}
-        >
-          {studentClass}
-        </p>
-        <p
-          className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-[16px] text-[14px] lg:text-[14px] md:text-left ${header ? "font-semibold" : ""
-            }`}
-        >
-          {subject}
-        </p>
-        {header ? (
-          <p
-            className={`w-full md:flex-[3] my-1 md:my-0 text-center md:text-left md:text-[16px] lg:text-[14px] text-[14px] ${header ? "font-semibold" : ""
-              }`}
-          >
-            {attendance}
-          </p>
         ) : (
-          <div className="md:flex-[3] w-full bg-grey/50 rounded-3xl overflow-hidden">
-            <div
-              className="text-xs h-4 bg-gradient-to-r from-[#0B1053] to-[#007EEA] rounded-3xl flex justify-center items-center text-white md:text-[16px] text-[14px]"
-              style={{ width: `${attendance}%` }}
-            >
-              {`${Number(attendance).toFixed(2)}%`}
-            </div>
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-bold ${avatarColor}`}>
+            {getInitials(studentName)}
           </div>
         )}
+      </div>
+
+      {/* Student Name */}
+      <div className="min-w-0">
+        <p className="text-xs sm:text-sm font-semibold text-[#0B1053] truncate">{studentName}</p>
+      </div>
+
+      {/* Class */}
+      <div className="min-w-0">
+        <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">{studentClass}</p>
+      </div>
+
+      {/* Subject */}
+      <div className="min-w-0">
+        <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">{subject}</p>
+      </div>
+
+      {/* Attendance bar */}
+      <div className="flex flex-col gap-1">
+        <div className={`flex justify-between text-[10px] sm:text-xs font-semibold ${level.text}`}>
+          <span>{level.label}</span>
+          <span>{Number(attendance).toFixed(1)}%</span>
+        </div>
+        <div className="bg-[#F0F2F8] rounded-full h-1.5 sm:h-2 overflow-hidden">
+          <div
+            className={`h-full rounded-full bg-gradient-to-r ${level.bar} transition-all duration-500`}
+            style={{ width: `${attendance}%` }}
+          />
+        </div>
       </div>
     </div>
   );

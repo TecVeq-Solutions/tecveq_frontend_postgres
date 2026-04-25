@@ -17,7 +17,7 @@ import FilterClassesModal from "./FilterClassesModal";
 
 const localizer = momentLocalizer(moment);
 
-const MyCalendar = ({ data, isPending, refetch }) => {
+const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
   console.log(data, "events data is:");
 
   const [events, setEvents] = useState([]);
@@ -52,79 +52,73 @@ const MyCalendar = ({ data, isPending, refetch }) => {
   };
 
   useEffect(() => {
-    if (!isPending) {
+    if (!isPending && data) {
+      setEvents((prevEvents) => {
+        const newEvents = data.map((item) => ({
+          ...item,
+          start: new Date(item.startTime),
+          end: new Date(item.endTime),
+        }));
 
-      let allclassfilter = data?.map((item) => {
-        let newdate = new Date(item?.startTime);
-        // newdate.setHours(newdate.getHours() - 5); // Subtract 5 hours
-        let end = new Date(item.endTime);
-        // end.setHours(end.getHours() - 5);
-        let returnobj = { ...item, end: end, start: newdate }
-        return returnobj
-      })
-
-      console.log("all class filter is : ", allclassfilter);
-      setEvents(allclassfilter);
+        // Only update if events have changed to avoid re-renders
+        return JSON.stringify(prevEvents) === JSON.stringify(newEvents)
+          ? prevEvents
+          : newEvents;
+      });
     }
-  }, [currentWeek, isPending, data]);
+  }, [isPending, data]);
 
+  const { teacherID } = useTeacherData();
 
-  const { teacherID, updateTeacherID } = useTeacherData();
-
-
-  const { data: teacherData, isPending: isPendingTeacher, refetch: refetchTeacher, isRefetching } = useQuery({
+  const { data: teacherData, isPending: isPendingTeacher, refetch: refetchTeacher } = useQuery({
     queryKey: ["timetable", teacherID], // Use teacherID in query key to avoid unnecessary refetches
     queryFn: () => getAllClasses(teacherID), // Fetch classes based on teacherID
     enabled: teacherID !== undefined, // Only fetch if teacherID is neither undefined nor null
   });
 
-  const [addEventModalOpen, setaddEventModalOpen] = useState(false);
-
-
-
-
   return (
     <div className="flex">
+      {/* ── Filter Classes Modal ── */}
+      {addModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex justify-center items-start p-4 sm:p-6 overflow-y-auto bg-black/30"
+          onClick={() => setAddModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-md shadow-lg max-w-md w-full mt-16 overflow-y-auto max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <FilterClassesModal
+              setaddModalOpen={setaddEventModalOpen}
+              addModalOpen={addModalOpen}
+              classData={data}
+              setAddModalOpen={setAddModalOpen}
+            />
+          </div>
+        </div>
+      )}
 
-      <div className="">
-        {
-          addModalOpen && (
-            <>
+      {/* ── Schedule Classes Modal ── */}
+      {addScheduleModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex justify-center items-start p-4 sm:p-6 overflow-y-auto bg-black/30"
+          onClick={() => setAddScheduleModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-md shadow-lg max-w-md w-full mt-16 overflow-y-auto max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SchedualClasses
+              data={teacherData}
+              isPending={isPendingTeacher}
+              refetch={refetchTeacher}
+              addScheduleModalOpen={addScheduleModalOpen}
+              setAddScheduleModalOpen={setAddScheduleModalOpen}
+            />
+          </div>
+        </div>
+      )}
 
-              <div className={`absolute top-0 right-0 flex-1 z-10 flex py-4 bg-white rounded-md shadow-sm shadow-grey/25`}
-              >
-                <FilterClassesModal
-                  setaddModalOpen={setaddEventModalOpen}
-                  addModalOpen={addModalOpen}
-                  classData={data}
-                  setAddModalOpen={setAddModalOpen}
-                />
-              </div>
-            </>
-          )
-        }
-      </div>
-
-      <div >
-        {
-          addScheduleModalOpen && (
-            <>
-              <div
-                className={`absolute top-0 right-0 flex-1 z-10 flex py-4 bg-white rounded-md shadow-sm shadow-grey/25`}
-              >
-                <SchedualClasses
-                  data={teacherData}
-                  isPending={isPendingTeacher}
-                  refetch={refetchTeacher}
-                  addScheduleModalOpen={addScheduleModalOpen}
-                  setAddScheduleModalOpen={setAddScheduleModalOpen}
-
-                />
-              </div>
-            </>
-          )
-        }
-      </div>
       <div className="w-full h-[700px] sm:h-[800px] lg:h-[calc(100vh-200px)] min-h-[500px] overflow-x-auto overflow-y-hidden border border-grey/20 rounded-lg">
         <Calendar
           style={{}}
@@ -133,7 +127,6 @@ const MyCalendar = ({ data, isPending, refetch }) => {
           max={new Date(0, 0, 0, 23, 59, 59)}
           view="week"
           views={{ week: true }}
-          onView={() => { }}
           localizer={localizer}
           events={events}
           startAccessor="start"
@@ -141,30 +134,27 @@ const MyCalendar = ({ data, isPending, refetch }) => {
           onNavigate={handleNavigate}
           className="w-full"
           dayLayoutAlgorithm="no-overlap"
-        step={60}
-        timeslots={1}
-        components={{
-          toolbar: (toolbar) => (
-            <CustomToolbar
-              loading={loading}
-              activeFilteredField={activeFilteredField}
-              setActiveFilteredField={setActiveFilteredField}
-              setEvents={setEvents}
-              addModalOpen={addModalOpen}
-              setAddModalOpen={setAddModalOpen}
-              addScheduleModalOpen={addScheduleModalOpen}
-              setAddScheduleModalOpen={setAddScheduleModalOpen}
-              toolbar={toolbar}
-            />
-          ),
-          event: (eventProps) => (
-            <CustomEvent setEvents={setEvents} event={eventProps.event} refetch={refetch} />
-          ),
-          timeGutterHeader: SideTimeHeader,
-          timeGutterWrapper: SideTime,
-          header: Header,
-        }}
-      />
+          step={60}
+          timeslots={1}
+          components={{
+            toolbar: (toolbarProps) => (
+              <CustomToolbar
+                {...toolbarProps}
+                addModalOpen={addModalOpen}
+                setAddModalOpen={setAddModalOpen}
+                addScheduleModalOpen={addScheduleModalOpen}
+                setAddScheduleModalOpen={setAddScheduleModalOpen}
+                toolbar={toolbarProps}
+              />
+            ),
+            event: (eventProps) => (
+              <CustomEvent setevents={setEvents} event={eventProps.event} refetch={refetch} isRefetching={isRefetching} />
+            ),
+            timeGutterHeader: SideTimeHeader,
+            timeGutterWrapper: SideTime,
+            header: Header,
+          }}
+        />
       </div>
     </div>
   );

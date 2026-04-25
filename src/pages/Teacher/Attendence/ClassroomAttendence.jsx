@@ -89,12 +89,12 @@ const ClassroomAttendence = () => {
   return (
     <div className="flex flex-1 bg-[#FDFDFD] font-poppins min-h-screen">
       <div className="flex flex-1 min-w-0">
-        <div className={`w-full flex-grow lg:ml-72 min-w-0`}>
+        <div className={`w-full flex-grow lg:ml-80 min-w-0`}>
           <div className="h-screen flex flex-col">
             <Navbar heading={"Mark Attendance"} />
-            
-            <div className={`flex flex-col flex-1 px-4 lg:px-10 py-6 transition-all duration-300 ${isBlurred ? "blur-md" : ""}`}>
-              
+
+            <div className={`flex flex-col flex-1 px-3 sm:px-4 lg:px-10 py-6 transition-all duration-300 ${isBlurred ? "blur-md" : ""}`}>
+
               {/* ── Header Toolbar ── */}
               <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="relative w-full md:w-96 group">
@@ -107,7 +107,7 @@ const ClassroomAttendence = () => {
                     onChange={(e) => setSearchText(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="flex items-center gap-3 w-full md:w-auto">
                   <div className="relative flex-1 md:flex-none">
                     <BiCalendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -123,40 +123,46 @@ const ClassroomAttendence = () => {
 
               {/* ── Attendance List Card ── */}
               <div className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] flex flex-col overflow-hidden">
-                <div className="bg-gray-50/50 border-b border-gray-100">
-                  <DataRow
-                    isQuiz={true}
-                    header={true}
-                    index={"#"}
-                    classname={"Student Name"}
-                    bgColor={"transparent"}
-                    students={"Status"}
-                    teachers={"Remarks"}
-                  />
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-2 scrollbar-hide">
-                  {filteredStudents.length > 0 ? (
-                    filteredStudents.map((student, index) => (
-                      <div key={student.id || index} className="hover:bg-gray-50/50 transition-colors rounded-xl overflow-hidden mb-1">
-                        <DataRow
-                          data={student}
-                          header={false}
-                          classname={student.name}
-                          profile={student.profilePic}
-                          index={index + 1}
-                          bgColor={"transparent"}
-                          attendeceData={attendenceData}
-                          setAttendenceData={setAttendenceData}
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                       <BiInfoCircle size={40} className="mb-2 opacity-20" />
-                       <p className="font-medium">No students found for this subject</p>
+                <div className="flex-1 flex flex-col overflow-x-auto custom-scrollbar">
+                  <div className="min-w-[850px] md:min-w-full flex flex-col flex-1">
+                    {/* Header */}
+                    <div className="bg-gray-50/50 border-b border-gray-100">
+                      <DataRow
+                        isQuiz={true}
+                        header={true}
+                        index={"#"}
+                        classname={"Student Name"}
+                        bgColor={"transparent"}
+                        students={"Status"}
+                        teachers={"Remarks"}
+                      />
                     </div>
-                  )}
+
+                    {/* Body */}
+                    <div className="flex-1 overflow-y-auto p-2 scrollbar-hide">
+                      {filteredStudents.length > 0 ? (
+                        filteredStudents.map((student, index) => (
+                          <div key={student.id || index} className="hover:bg-gray-50/50 transition-colors rounded-xl overflow-hidden mb-1">
+                            <DataRow
+                              data={student}
+                              header={false}
+                              classname={student.name}
+                              profile={student.profilePic}
+                              index={index + 1}
+                              bgColor={"transparent"}
+                              attendeceData={attendenceData}
+                              setAttendenceData={setAttendenceData}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                          <BiInfoCircle size={40} className="mb-2 opacity-20" />
+                          <p className="font-medium">No students found for this subject</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* ── Action Footer ── */}
@@ -164,13 +170,13 @@ const ClassroomAttendence = () => {
                   <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
                     Total: {filteredStudents.length} Students
                   </div>
-                  
+
                   {attendenceMutation.isPending ? (
                     <div className="px-10"><Loader /></div>
                   ) : (
                     <button
                       onClick={!getAttandence ? attendenceMutation.mutate : () => setShowPopup(true)}
-                      className="flex items-center gap-2 px-10 py-3 text-sm font-bold text-white rounded-2xl bg-[#0B1053] hover:bg-[#161d7a] active:scale-95 shadow-lg shadow-indigo-100 transition-all"
+                      className="flex items-center gap-2 px-2 sm:px-10 py-3 text-sm font-bold text-white rounded-2xl bg-[#0B1053] hover:bg-[#161d7a] active:scale-95 shadow-lg shadow-indigo-100 transition-all"
                     >
                       <BiCheckCircle className="text-lg" />
                       {!getAttandence ? "Submit Attendance" : "Update Attendance"}

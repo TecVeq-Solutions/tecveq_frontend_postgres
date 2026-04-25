@@ -16,9 +16,9 @@ export default function ViewEventDetailsModal({
 }) {
   const [confirmDeleteModalOpen, setconfirmDeleteModalOpen] = useState(false);
   const ref = useRef(null);
-  
+
   useClickOutside(ref, () => setopen(false));
-  
+
   const [isMeetingTime, setIsMeetingTime] = useState(false);
 
   const handleDeleteEvent = () => {
@@ -48,14 +48,14 @@ export default function ViewEventDetailsModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 transition-all">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
         onClick={() => setopen(false)}
       />
-      
+
       <div
         ref={ref}
-        className="relative bg-white p-6 sm:p-8 w-full max-w-[450px] text-black rounded-3xl shadow-2xl transform transition-all"
+        className="relative bg-white p-3 sm:p-6 sm:p-8 w-full max-w-[450px] text-black rounded-3xl shadow-2xl transform transition-all"
       >
         <ConfirmModal
           isOpen={confirmDeleteModalOpen}
@@ -70,7 +70,7 @@ export default function ViewEventDetailsModal({
             setconfirmDeleteModalOpen(false);
           }}
         />
-        
+
         <div className="flex flex-col w-full gap-6">
           {/* Header Section */}
           <div className="flex items-start justify-between">
@@ -80,7 +80,7 @@ export default function ViewEventDetailsModal({
                 {event?.name || event?.subject?.name || event?.subject || event?.title || "No Subject"}
               </h2>
             </div>
-            <button 
+            <button
               onClick={() => setopen(false)}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
             >
@@ -108,12 +108,12 @@ export default function ViewEventDetailsModal({
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-poppins">Session Date</p>
               <div className="flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-2xl">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 text-indigo-600 font-bold">
-                        📅
-                    </div>
-                    <p className="text-sm font-bold text-gray-700 font-poppins">
-                      {moment.utc(event.start).format("dddd, DD MMMM YYYY")}
-                    </p>
+                  <div className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 text-indigo-600 font-bold">
+                    📅
+                  </div>
+                  <p className="text-sm font-bold text-gray-700 font-poppins">
+                    {moment.utc(event.start).format("dddd, DD MMMM YYYY")}
+                  </p>
                 </div>
               </div>
             </div>

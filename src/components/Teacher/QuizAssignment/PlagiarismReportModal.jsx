@@ -38,7 +38,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-6 border-b flex justify-between items-center bg-gradient-to-r from-[#0B1053] to-[#1a237e] text-white">
+            <div className="p-3 sm:p-6 border-b flex justify-between items-center bg-gradient-to-r from-[#0B1053] to-[#1a237e] text-white">
               <div>
                 <h2 className="text-2xl font-black tracking-tight">{isGlobal ? "Class-wide Integrity Report" : "Detailed AI & Plagiarism Scan"}</h2>
                 <p className="text-sm opacity-90 font-medium">
@@ -54,7 +54,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth">
+            <div className="flex-1 overflow-y-auto p-2 sm:p-8 space-y-8 scroll-smooth">
               {/* Overall Risk Banner */}
               {analysis?.overallRisk && (
                 <div className={`px-6 py-4 rounded-2xl border flex items-center justify-between ${getRiskColor(analysis.overallRisk)}`}>
@@ -70,7 +70,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
 
               {/* Overview Summary */}
               {(analysis?.summary || data?.aiSummary || data?.message) && (
-                <div className="bg-indigo-50/50 border border-indigo-100 p-5 rounded-2xl flex gap-4">
+                <div className="bg-indigo-50/50 border border-indigo-100 p-3 sm:p-5 rounded-2xl flex gap-4">
                   <div className="bg-indigo-600 p-2 rounded-lg h-fit mt-1 self-start">
                     <AiOutlineInfoCircle className="text-white" size={20} />
                   </div>
@@ -171,7 +171,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
 
               {/* No Suspicious Patterns Found */}
               {((!isGlobal && analysis?.plagiarism?.suspiciousPairs?.length === 0) || (isGlobal && data?.results?.length === 0)) && (
-                <div className="flex items-center gap-4 text-green-700 bg-green-50/50 border border-green-100 p-6 rounded-2xl font-bold animate-in fade-in slide-in-from-bottom-2 duration-700">
+                <div className="flex items-center gap-4 text-green-700 bg-green-50/50 border border-green-100 p-3 sm:p-6 rounded-2xl font-bold animate-in fade-in slide-in-from-bottom-2 duration-700">
                   <div className="bg-green-600 p-2 rounded-full text-white shadow-sm shadow-green-200">
                     <AiOutlineCheckCircle size={28} />
                   </div>

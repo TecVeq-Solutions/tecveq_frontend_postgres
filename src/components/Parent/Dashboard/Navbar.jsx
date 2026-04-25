@@ -1,189 +1,183 @@
-import React, { useEffect, useState } from "react";
-import ProfileMenu from "./ProfileMenu";
+import React, { useEffect, useState, useRef } from "react";
 import Notifications from "./Notifications";
 import ProfileDetails from "./ProfileDetails";
-import IMAGES from "../../../assets/images";
-import { logout } from "../../../api/User/UserApi";
-
+import RecentMessages from "./RecentMessages";
+import GlobalSearch from "../../../commonComponents/GlobalSearch";
 import { CiBellOn } from "react-icons/ci";
-import { FaChevronDown } from "react-icons/fa6";
 import { IoMailOutline } from "react-icons/io5";
 import { useBlur } from "../../../context/BlurContext";
 import { useUser } from "../../../context/UserContext";
-import RecentMessages from "./RecentMessages";
 import { useQuery } from "@tanstack/react-query";
-import GlobalSearch from "../../../commonComponents/GlobalSearch";
 import { getAllNotifications } from "../../../api/Admin/NotificationApi";
-import moment from "moment";
-import { Dot } from "recharts";
-import { useNavigate } from "react-router-dom";
-import { useSidebar } from "../../../context/SidebarContext";
-
 
 const Navbar = ({ heading }) => {
-
-  const [mail, setmail] = useState(false);
+  const [mail, setMail] = useState(false);
   const [bell, setBell] = useState(false);
-  const [isProfileMenu, setIsProfileMenu] = useState(false);
-  const [isProfileDetails, setIsProfileDetails] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
-  const navigate = useNavigate()
-
-
   const { isBlurred, toggleBlur } = useBlur();
+  const { userData } = useUser();
 
-  const { data } = useQuery({ queryKey: ["chat"], queryFn: getAllNotifications });
+  const mailRef = useRef(null);
+  const bellRef = useRef(null);
+  const overlayRef = useRef(null);
 
-
+  const { data } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: getAllNotifications,
+  });
 
   useEffect(() => {
     const storedNotificationId = localStorage.getItem("lastNotificationId");
-
     if (data && data.length > 0) {
-      // Get the latest notification ID
-      const latestNotificationId = data[0].id; // Assuming latest notification is first in the list
-
-      // Compare with stored ID
+      const latestNotificationId = data[0].id;
       if (storedNotificationId !== latestNotificationId) {
-        // New notification found
         setHasNewNotifications(true);
-        localStorage.setItem("lastNotificationId", latestNotificationId); // Update storage
       }
     }
   }, [data]);
 
-  // Handle bell click
-  const handleBellClick = () => {
-    setHasNewNotifications(false); // Hide notification
-    localStorage.setItem("notificationChecked", "true"); // Persist user check
-    togglebell(); // Call the toggle function
-  };
-
-  // Restore notification visibility on refresh
+  // Outside click handler
   useEffect(() => {
-    const isChecked = localStorage.getItem("notificationChecked") === "true";
-    if (isChecked) {
-      setHasNewNotifications(false); // Don't show notification if already checked
-    }
-  }, []);
+    const handleClickOutside = (e) => {
+      if (!document.body.contains(e.target)) return;
 
-  const toggleProfielMenu = () => {
-    setIsProfileMenu(!isProfileMenu);
-    setmail(false);
-    setBell(false);
-  };
+      const isInsideMailIcon = mailRef.current && mailRef.current.contains(e.target);
+      const isInsideBellIcon = bellRef.current && bellRef.current.contains(e.target);
+      const isInsideOverlay = overlayRef.current && overlayRef.current.contains(e.target);
+
+      const isOutsideAll = !isInsideMailIcon && !isInsideBellIcon && !isInsideOverlay;
+
+      if (mail && isOutsideAll) {
+        setMail(false);
+        if (isBlurred) toggleBlur();
+      }
+      if (bell && isOutsideAll) {
+        setBell(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mail, bell, isBlurred]);
 
   const toggleMail = () => {
-    setmail(!mail);
-    setIsProfileMenu(false);
+    const isOpening = !mail;
+    setMail(isOpening);
     setBell(false);
-  };
-
-  const togglebell = () => {
-    setBell(!bell);
-    setmail(false);
-    setIsProfileMenu(false);
-  };
-
-  const toggleProfileDetails = () => {
-    toggleBlur();
-    setIsProfileDetails(!isProfileDetails);
-  };
-
-  const onProfileClick = () => {
-    toggleProfielMenu();
-    toggleProfileDetails();
-  };
-  const onSettingsClick = () => { };
-
-
-
-
-  const onLogoutClick = async () => {
-    // setLoading(true);
-    localStorage.clear();
-    const response = await logout();
-    if (response == "error") {
-      console.log("error loggin out")
-      navigate("/")
-    } else {
-      localStorage.clear()
-      navigate("/")
+    if (isOpening !== isBlurred) {
+      toggleBlur();
     }
-    // setLoading(false);
   };
 
+  const closeMail = () => {
+    setMail(false);
+    if (isBlurred) toggleBlur();
+  };
 
-  const { userData } = useUser();
-  const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
-
-
+  const handleBellClick = () => {
+    setBell(!bell);
+    setMail(false);
+    if (mail && isBlurred) toggleBlur();
+    setHasNewNotifications(false);
+  };
 
   return (
-    <div className="flex flex-1 items-center justify-center h-20">
-      <div className={`flex justify-between items-center gap-2  md:justify-between flex-1 py-3 md:py-5 ${isBlurred ? "blur" : ""}`}>
-        {heading ?
-          <div className="flex justify-start items-center text-base sm:text-xl md:text-3xl font-semibold ml-[3rem] sm:ml-[1.4rem] lg:ml-[0rem] ">{heading}</div>
-          :
-          <div className=" flex-col  md:flex">
-            <p className="text-lg sm:text-xl font-semibold ml-[2.5rem]  md:ml-[0rem] ">Hello {userData.name} </p>
-            <p className="hidden md:block ">Welcome to your learning space!</p>
-          </div>
-        }
-        <GlobalSearch />
-        <div className="flex items-center  gap-2">
-          <div className="flex gap-2 sm:gap-4">
-            {/* p-1 sm:p-2 border cursor-pointer  rounded-md border-black/50 transition-all duration-500  */}
-            <div
-              className={`p-1 sm:p-2 sm:auto border cursor-pointer rounded-md border-black/50 transition-all duration-500 ${mail ? "bg-[#0B1053] text-white" : ""
-                }`}
-              onClick={toggleMail}
-            >
-              <IoMailOutline />
+    <nav className="admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+      {/* Background layer that blurs */}
+      <div
+        className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}
+      >
+        {/* Left: Heading */}
+        <div className="flex-shrink-0 max-w-[150px] sm:max-w-none">
+          {heading ? (
+            <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">
+              {heading}
+            </h1>
+          ) : (
+            <div className="flex flex-col pl-12 sm:pl-0">
+              <p className="text-lg md:text-xl font-bold text-[#1e293b]">Hello {userData.name}</p>
+              <p className="hidden sm:block text-xs text-gray-500">Welcome to your dashboard!</p>
             </div>
-            <div className={`relative ${isSidebarOpen ? "-z-50" : "z-auto"}`}>
-              <div
-                className={`p-1 sm:p-2  sm:auto border cursor-pointer rounded-md border-black/50 transition-all duration-500 `}
-                onClick={handleBellClick}
-              >
-                <div className={`${hasNewNotifications ? "animate-bellShake text-green_dark" : ""} `}>
-                  <CiBellOn />
-                </div>
+          )}
+        </div>
 
+        {/* Center: Search (Desktop Only) */}
+        <div className="hidden lg:block flex-1 max-w-md mx-8">
+          <GlobalSearch desktopOnly={true} />
+        </div>
+
+        {/* Right Side: Icons */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Mobile Search */}
+          <div className="lg:hidden">
+            <GlobalSearch mobileOnly={true} />
+          </div>
+
+          {/* Mail Icon */}
+          <div className="relative" ref={mailRef}>
+            <button
+              onClick={toggleMail}
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+                ${mail
+                  ? "bg-[#0B1053] text-white"
+                  : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
+                }`}
+            >
+              <IoMailOutline className="text-xl sm:text-2xl" />
+            </button>
+          </div>
+
+          {/* Bell Icon */}
+          <div className="relative" ref={bellRef}>
+            <button
+              onClick={handleBellClick}
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+                ${bell
+                  ? "bg-[#0B1053] text-white"
+                  : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
+                }`}
+            >
+              <div className={hasNewNotifications ? "animate-bellShake" : ""}>
+                <CiBellOn className="text-xl sm:text-2xl" />
               </div>
               {hasNewNotifications && (
-                <div className="absolute top-1 right-1 w-[9px] h-[9px] rounded-full bg-green"><Dot /></div>
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
               )}
-            </div>
+            </button>
           </div>
-          <div className="flex items-center gap-2">
-            <p className="font-medium hidden md:block">M. {userData.name} </p>
-            <img
-              alt="profile"
-              src={IMAGES.Profile}
-              onClick={toggleProfielMenu}
-              className="sm:w-12 w-8 h-8 sm:h-12 cursor-pointer"
-            />
-            <FaChevronDown
-              className="cursor-pointer"
-              onClick={toggleProfielMenu}
-            />
-          </div>
-          {isProfileMenu &&
-            <ProfileMenu
-              dashboard={true}
-              onLogoutClick={onLogoutClick}
-              onProfileClick={onProfileClick}
-              onSettingsClick={onSettingsClick}
-              onClose={() => setIsProfileMenu(false)}
-            />
-          }
         </div>
       </div>
-      {bell && <Notifications data={data} dashboard={true} onclose={togglebell} />}
-      {mail && <RecentMessages dashboard={true} onclose={toggleMail} />}
-      {isProfileDetails && <ProfileDetails onclose={toggleProfileDetails} />}
-    </div>
+
+      {/* Overlay layer for Dropdowns (Not affected by blur) */}
+      <div className="absolute top-0 right-0 w-full h-full pointer-events-none" ref={overlayRef}>
+        <div className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-6">
+          {mail && (
+            <div className="pointer-events-auto">
+              {/* Mobile: full width */}
+              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
+                <RecentMessages dashboard={true} onclose={closeMail} />
+              </div>
+              {/* Desktop: right-aligned dropdown */}
+              <div className="hidden sm:block absolute right-24 md:right-28 mt-20 w-80 z-[100]">
+                <RecentMessages dashboard={true} onclose={closeMail} />
+              </div>
+            </div>
+          )}
+
+          {bell && (
+            <div className="pointer-events-auto">
+              {/* Mobile: full width */}
+              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
+                <Notifications data={data} dashboard={true} onclose={handleBellClick} />
+              </div>
+              {/* Desktop: right-aligned dropdown */}
+              <div className="hidden sm:block absolute right-6 md:right-10 mt-20 w-80 z-[100]">
+                <Notifications data={data} dashboard={true} onclose={handleBellClick} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 };
 

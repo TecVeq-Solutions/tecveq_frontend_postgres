@@ -21,20 +21,23 @@ export const UserProvider = ({ children }) => {
   const { setTeacherLogedIn } = useTeacher();
   const { setStudentLogedIn } = useStudent();
 
+  useEffect(() => {
+    if (userData) {
+      localStorage.setItem("tcauser", JSON.stringify(userData));
+    }
+  }, [userData]);
 
   useEffect(() => {
     if (userData) {
-      if (userData.userType == "admin") {
-        setAdminLogedIn(true);
-      }
-      if (userData.userType == "student") {
-        setStudentLogedIn(true);
-      }
-      if (userData.userType == "teacher") {
-        setTeacherLogedIn(true);
-      }
+      setAdminLogedIn(userData.userType === "admin");
+      setTeacherLogedIn(userData.userType === "teacher");
+      setStudentLogedIn(userData.userType === "student");
+    } else {
+      setAdminLogedIn(false);
+      setTeacherLogedIn(false);
+      setStudentLogedIn(false);
     }
-  }, [])
+  }, [userData, setAdminLogedIn, setTeacherLogedIn, setStudentLogedIn]);
 
   return (
     <UserContext.Provider value={{ userData, setUserData, addUserToLS, socketContext, setSocketContext }}>

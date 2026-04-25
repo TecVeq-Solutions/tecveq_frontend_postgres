@@ -1,171 +1,357 @@
 import React, { useRef, useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit2, FiCamera, FiPhone, FiMail, FiLock, FiUser, FiSave, FiHash } from "react-icons/fi";
+import { FaGraduationCap } from "react-icons/fa6";
 import IMAGES from "../../../assets/images";
-import { GoPerson } from "react-icons/go";
+import profile from "../../../assets/images/profilepic.png";
 import { useParent } from "../../../context/ParentContext";
-import { useBlur } from "../../../context/BlurContext";
 import useClickOutside from "../../../hooks/useClickOutlise";
 import { handleProfileImageUpdate } from "../../../utils/Admin/profileImageUtils";
 import Loader from "../../../utils/Loader";
 
+/* ─── Reusable Input Card (Admin style) ───────────────────────────────── */
+const CustomInput = ({
+  label,
+  value,
+  status,
+  icon,
+  name,
+  valuesObj,
+  setValuesObj,
+  isEmail,
+}) => (
+  <div className="mb-4 w-full">
+    <label className="block text-[10px] font-semibold text-slate-400 mb-2 ml-1 uppercase tracking-[2px]">
+      {label}
+    </label>
+    <div
+      className={`flex items-center gap-3 w-full border-[1.5px] transition-all duration-300 rounded-2xl px-4 py-3.5
+        ${status && !isEmail
+          ? "border-[#149B9A] bg-white shadow-[0_0_0_4px_rgba(20,155,154,0.08)]"
+          : "border-slate-100 bg-slate-50"
+        }
+        ${isEmail ? "opacity-60 cursor-not-allowed" : ""}
+      `}
+    >
+      <span
+        className={`text-base flex-shrink-0 ${status && !isEmail ? "text-[#149B9A]" : "text-slate-300"
+          }`}
+      >
+        {icon}
+      </span>
+      <input
+        type="text"
+        value={value || ""}
+        readOnly={!status || isEmail}
+        disabled={isEmail}
+        className="flex-1 bg-transparent outline-none text-[14px] font-medium text-slate-700 placeholder:text-slate-300 disabled:cursor-not-allowed w-full min-w-0"
+        onChange={(e) =>
+          setValuesObj({ ...valuesObj, [name]: e.target.value })
+        }
+      />
+      {isEmail && <FiLock className="text-slate-300 flex-shrink-0 text-sm" />}
+    </div>
+  </div>
+);
 
+/* ─── Main Component ──────────────────────────────────────────────────── */
 const ProfileDetails = ({ onclose }) => {
-  const [allowedEdit, setAllowedEdit] = useState(false);
-  // const { isBlurred, toggleBlur } = useBlur();
-  const { allSubjects, setAllSubjects, selectedChild } = useParent();
-
-  const [profileImage, setProfileImage] = useState(selectedChild?.profilePic || IMAGES.Profile);
+  const { selectedChild } = useParent();
+  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [userDataObj, setUserDataObj] = useState({
+    name: selectedChild?.name || "",
+    email: selectedChild?.email || "",
+    phoneNumber: selectedChild?.phoneNumber || "",
+    guardianName: selectedChild?.guardianName || "",
+    guardianEmail: selectedChild?.guardianEmail || "",
+    guardianPhoneNumber: selectedChild?.guardianPhoneNumber || "",
+    profilePic: selectedChild?.profilePic || "",
+    rollNo: selectedChild?.rollNo || "",
+  });
 
-  const fileInputRef = useRef(null);
+  const modalRef = useRef(null);
+  useClickOutside(modalRef, () => {
+    if (!isEditing) onclose();
+  });
 
-  const handleImageClick = () => {
-    fileInputRef.current.click(); // Opens the file dialog
-  };
+  React.useEffect(() => {
+    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
+  }, [previewUrl]);
 
-  const handleImageChange = async (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setPreviewUrl(url); // Updates the preview
-
-      // Use the separated utility to handle the upload
-      await handleProfileImageUpdate(file, (uploadedUrl) => {
-        console.log("Uploaded Image URL:", uploadedUrl);
-        setProfileImage(uploadedUrl);
-      }, setLoading);
+      setPreviewUrl(url);
+      await handleProfileImageUpdate(
+        file,
+        (uploadedUrl) => {
+          setUserDataObj((prev) => ({ ...prev, profilePic: uploadedUrl }));
+        },
+        setLoading
+      );
     }
   };
 
-  const ref = useRef(null);
-
-  const { toggleBlur } = useBlur(); // Using toggleBlur for blur control
-
-
-
-  useClickOutside(ref, () => {
-    onclose()
-  });
-
-
-
-
-  //console.log(selectedChild, "curent children object");
-
-
-  const handleEditClick = () => {
-    setAllowedEdit(true);
-  };
-
   const handleSaveDetails = () => {
-  }
-
-  const CusotmInput = ({ label, value, status, icon }) => {
-    return (
-      <div className="text-sm">
-        <div className="flex flex-col ">
-          <p className="">{label}</p>
-          <div
-            className={`flex px-2 py-1 border justify-between rounded-md items-center border-grey/70 ${status ? "text-black" : "text-grey"
-              }`}
-          >
-            <input
-              type="text"
-              className="py-1 outline-none"
-              placeholder={value}
-              value={value}
-            />
-            <GoPerson />
-          </div>
-        </div>
-      </div>
-    );
+    // Save logic can be added here
+    setIsEditing(false);
   };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setPreviewUrl(null);
+  };
+
+  const initials = (selectedChild?.name || "P").charAt(0).toUpperCase();
 
   return (
-    <div className="absolute top-0 right-0 z-10 flex bg-white border-b-black/10 rounded-md shadow-lg sm:w-96 w-72" ref={ref}>
-      <div className="flex flex-col bg-white">
-        <div className="flex justify-between px-5  py-5 border-b border-b-black/10">
-          <p className="text-xl font-medium">My Profile</p>
-          <IoClose onClick={onclose} className="cursor-pointer" />
-        </div>
-        <div className="flex flex-col">
-          <div className="flex flex-col justify-center px-4 ">
-            <div className="flex justify-end mt-3">
-              <div className="p-2 border-grey/10">
-                <FiEdit onClick={handleEditClick} className="cursor-pointer" />
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center text-center">
-              <label htmlFor="profile" className="cursor-pointer">
-                <img src={previewUrl || profileImage} alt="" className="sm:w-28 sm:h-28 w-20 h-20 rounded-full object-cover" />
-              </label>
-              <input id="profile" type="file" className="hidden" onChange={handleImageChange} accept="image/*" ref={fileInputRef} />
-              <p>{selectedChild.name}</p>
-              <p>Bio</p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                Maxime, sint?
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-3 sm:p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" />
+
+      <div
+        ref={modalRef}
+        className="relative bg-white w-full max-w-[440px] rounded-[28px] sm:rounded-[32px] shadow-[0_30px_80px_-10px_rgba(0,0,0,0.35)] overflow-hidden"
+        style={{ maxHeight: "95vh", display: "flex", flexDirection: "column" }}
+      >
+        {/* ── Gradient Header ── */}
+        <div
+          className="relative px-6 sm:px-7 pt-6 pb-20 flex-shrink-0 overflow-hidden"
+          style={{
+            background:
+              "linear-gradient(135deg, #0B1053 0%, #0d1a6e 45%, #149B9A 100%)",
+          }}
+        >
+          {/* Decorative circles */}
+          <div
+            className="absolute -top-14 -right-14 w-48 h-48 rounded-full"
+            style={{ background: "rgba(20,155,154,0.18)" }}
+          />
+          <div
+            className="absolute bottom-4 -left-10 w-36 h-36 rounded-full"
+            style={{ background: "rgba(255,255,255,0.04)" }}
+          />
+
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold tracking-[3px] uppercase text-[#149B9A] mb-1">
+                Account
               </p>
+              <h2 className="text-[18px] sm:text-[20px] font-bold text-white tracking-tight">
+                Profile Settings
+              </h2>
             </div>
-            <div className="flex flex-col gap-1 px-5 py-1 overflow-auto h-96 custom-scrollbar">
-              <CusotmInput
-                label={"Roll No."}
-                value={"SP21-BCS-072"}
-                status={allowedEdit}
-                icon={"person"}
-              />
-              <CusotmInput
-                label={"Name"}
-                value={selectedChild.name}
-                status={allowedEdit}
-                icon={"person"}
-              />
-              <CusotmInput
-                label={"Email"}
-                value={selectedChild.email}
-                status={allowedEdit}
-                icon={"mail"}
-              />
-              <CusotmInput
-                label={"Phone No."}
-                value={selectedChild.phoneNumber}
-                status={allowedEdit}
-                icon={"phone"}
-              />
-              {/* <CusotmInput
-                label={"Class"}
-                value={"IG Basics"}
-                status={allowedEdit}
-                icon={"cap"}
-              /> */}
-              <CusotmInput
-                label={"Parent Name"}
-                value={selectedChild.guardianName}
-                status={allowedEdit}
-                icon={"person"}
-              />
-              <CusotmInput
-                label={"Parent Email"}
-                value={selectedChild.guardianEmail}
-                status={allowedEdit}
-                icon={"mail"}
-              />
-              <CusotmInput
-                label={"Parent Phone No."}
-                value={selectedChild.guardianPhoneNumber}
-                status={allowedEdit}
-                icon={"phone"}
-              />
-              {loading && <div className="flex justify-center my-2"><Loader /></div>}
-              {allowedEdit && !loading ? <div className="flex justify-center my-4">
-                <p onClick={handleSaveDetails} className="flex items-center justify-center w-1/2 px-1 py-2 text-center text-white cursor-pointer rounded-3xl bg-[#0B1053]">Save</p>
-              </div> : ""}
-            </div>
+            <button
+              onClick={onclose}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors flex-shrink-0"
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.18)",
+              }}
+            >
+              <IoClose size={20} />
+            </button>
           </div>
         </div>
+
+        {/* ── Scrollable Body ── */}
+        <div className="overflow-y-auto pt-2 flex-1 custom-scrollbar">
+          {/* ── Avatar Section ── */}
+          <div className="flex flex-col items-center px-3 sm:px-7 pb-2">
+            {/* Avatar ring */}
+            <div
+              className={`p-[3px] rounded-full ${loading ? "animate-pulse" : ""}`}
+              style={{
+                background:
+                  "linear-gradient(135deg, #149B9A, #0B1053, #149B9A)",
+                boxShadow: "0 8px 32px rgba(20,155,154,0.35)",
+              }}
+            >
+              <div className="bg-white p-[3px] rounded-full relative">
+                <img
+                  src={previewUrl || userDataObj.profilePic || profile}
+                  alt="Profile"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover block"
+                />
+                {isEditing && (
+                  <label
+                    className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #149B9A, #0B1053)",
+                      border: "2px solid #fff",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                    }}
+                  >
+                    <FiCamera size={14} className="text-white" />
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={handleFileChange}
+                      accept="image/*"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Name & role */}
+            <h3 className="mt-4 text-[20px] sm:text-[22px] font-bold text-slate-800 tracking-tight text-center">
+              {userDataObj.name || "Child Name"}
+            </h3>
+            <div
+              className="mt-2 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-[1.8px]"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(20,155,154,0.1), rgba(11,16,83,0.07))",
+                border: "1px solid rgba(20,155,154,0.25)",
+                color: "#0B1053",
+              }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ background: "#149B9A" }}
+              />
+              Parent View
+            </div>
+
+            {/* Edit link */}
+            {!isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="mt-3 flex items-center gap-1.5 text-[13px] font-semibold text-[#149B9A] hover:opacity-70 transition-opacity"
+              >
+                <FiEdit2 size={13} />
+                Edit Information
+              </button>
+            )}
+          </div>
+
+          {/* ── Status badge ── */}
+          <div
+            className="mx-3 sm:mx-7 mt-4 mb-1 px-4 py-2.5 rounded-xl flex items-center gap-2.5 text-[12px] font-medium"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(20,155,154,0.08), rgba(11,16,83,0.04))",
+              border: "1px solid rgba(20,155,154,0.18)",
+              color: "#149B9A",
+            }}
+          >
+            <span
+              className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse"
+              style={{ background: "#149B9A" }}
+            />
+            Account active &nbsp;·&nbsp; Child Profile
+          </div>
+
+          {/* ── Child Info Fields ── */}
+          <div className="px-3 sm:px-7 pt-4 pb-2">
+            <p className="text-[10px] font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-[2px]">Child Info</p>
+            <CustomInput
+              label="Full Name"
+              name="name"
+              value={userDataObj.name}
+              status={isEditing}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiUser />}
+            />
+            <CustomInput
+              label="Roll No."
+              name="rollNo"
+              value={userDataObj.rollNo}
+              status={false}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiHash />}
+              isEmail
+            />
+            <CustomInput
+              label="Email Address"
+              name="email"
+              value={userDataObj.email}
+              status={false}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiMail />}
+              isEmail
+            />
+            <CustomInput
+              label="Phone Number"
+              name="phoneNumber"
+              value={userDataObj.phoneNumber}
+              status={isEditing}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiPhone />}
+            />
+          </div>
+
+          {/* ── Guardian Info Fields ── */}
+          <div className="px-3 sm:px-7 pt-2 pb-4">
+            <p className="text-[10px] font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-[2px]">Guardian Info</p>
+            <CustomInput
+              label="Parent Name"
+              name="guardianName"
+              value={userDataObj.guardianName}
+              status={isEditing}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiUser />}
+            />
+            <CustomInput
+              label="Parent Email"
+              name="guardianEmail"
+              value={userDataObj.guardianEmail}
+              status={isEditing}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiMail />}
+            />
+            <CustomInput
+              label="Parent Phone"
+              name="guardianPhoneNumber"
+              value={userDataObj.guardianPhoneNumber}
+              status={isEditing}
+              valuesObj={userDataObj}
+              setValuesObj={setUserDataObj}
+              icon={<FiPhone />}
+            />
+          </div>
+        </div>
+
+        {/* ── Action Footer ── */}
+        {isEditing && (
+          <div className="flex-shrink-0 px-6 sm:px-7 py-5 bg-slate-50/80 border-t border-slate-100 flex gap-3">
+            <button
+              onClick={handleCancel}
+              className="flex-1 py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveDetails}
+              disabled={loading}
+              className={`flex-1 py-3.5 text-white rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-2 transition-all ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}`}
+              style={{
+                background:
+                  "linear-gradient(135deg, #0B1053 0%, #149B9A 100%)",
+                boxShadow: "0 6px 20px rgba(20,155,154,0.3)",
+              }}
+            >
+              {loading ? (
+                <Loader color="white" />
+              ) : (
+                <>
+                  <FiSave size={16} /> Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

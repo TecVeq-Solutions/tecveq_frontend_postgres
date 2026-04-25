@@ -13,7 +13,7 @@ const StudentLayout = ({ children }) => {
       <div className="fixed top-0 left-0 h-full z-20 flex-shrink-0">
         <Sidebar />
       </div>
-      <div className="flex-1 h-full overflow-y-auto custom-scrollbar relative">
+      <div className="flex-1 h-full overflow-x-hidden overflow-y-auto custom-scrollbar relative">
         {children}
       </div>
     </div>

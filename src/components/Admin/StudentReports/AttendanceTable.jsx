@@ -3,10 +3,10 @@ import React from 'react'
 
 const AttendanceTable = ({ data }) => {
     return (
-        <div className="flex flex-1">
-            <div className="flex flex-col flex-1 gap-2">
-                <div className="flex flex-1">
-                    <table className="flex flex-col flex-1 bg-white rounded-lg table-fixed">
+        <div className="flex flex-1 w-full overflow-hidden">
+            <div className="flex flex-col flex-1 gap-2 w-full overflow-x-auto">
+                <div className="flex flex-1 min-w-[500px]">
+                    <table className="flex flex-col flex-1 bg-white rounded-lg table-fixed w-full">
                         <thead className="flex gap-5 px-2 py-3 rounded-tl-lg rounded-tr-lg border-t-[#0B1053] bg-[#dbddf8]">
                             <tr className="flex flex-1">
                                 <td className="flex-[1] flex justify-center md:text-[15px] text-[13px]">Sr No.</td>

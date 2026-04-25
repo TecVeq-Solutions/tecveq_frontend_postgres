@@ -26,7 +26,7 @@ const ManageUsers = () => {
   const [requestsModal, setRequestsModal] = useState(false);
   const [isAddUserModal, setIsAddUserModal] = useState(false);
   const [isEditUserModal, setIsEditUserModal] = useState(false);
-  const { adminUsersDataPending, adminUsersData, adminUsersRefecth } = useAdmin();
+  const { adminUsersDataPending, adminUsersData, adminUsersRefecth, allLevels } = useAdmin();
 
 
   const toggleRequestModal = () => {
@@ -106,7 +106,8 @@ const ManageUsers = () => {
       <>
         <div className="w-full bg-[#F9F9F9] font-poppins">
           <div className="flex flex-1">
-            <div className={`w-full min-h-full lg:px-10 sm:px-6 px-3 flex-grow lg:ml-72`}>
+            {/* min-h-full */}
+            <div className={`w-full h-[100vh] lg:px-10 sm:px-6 px-3 flex-grow lg:ml-80`}>
               <div className="min-h-full">
                 <Navbar heading={"Manage Users"} />
                 <div className={`${isBlurred ? "blur" : ""}`}>
@@ -117,27 +118,37 @@ const ManageUsers = () => {
                     {/* Right group: search + select + buttons */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:flex-wrap gap-3 w-full sm:w-auto">
 
-                      {/* Search input — full width on mobile */}
-                      <div className="flex items-center gap-2 border bg-white border-[#00000020] px-4 py-2 rounded-3xl w-full sm:w-auto">
-                        <IoSearch className="shrink-0" />
+                      {/* Search input */}
+                      <div className="group flex items-center gap-2 px-4 py-2.5 rounded-2xl w-full sm:w-auto
+      bg-white/70 backdrop-blur-md border border-white/60
+      shadow-[0_2px_12px_rgba(106,0,255,0.08)]
+      hover:shadow-[0_4px_20px_rgba(106,0,255,0.14)]
+      hover:border-[#6A00FF]/30
+      transition-all duration-300 ease-out">
+                        <IoSearch className="shrink-0 text-[#6A00FF] opacity-60 group-hover:opacity-100 transition-opacity duration-200 text-base" />
                         <input
                           type="text"
-                          className="bg-transparent outline-none w-full sm:w-auto"
-                          placeholder="Search Users"
+                          className="bg-transparent outline-none w-full sm:w-44 text-[#0B1053] placeholder:text-[#0B1053]/35 text-sm font-medium"
+                          placeholder="Search users..."
                           value={searchText}
                           onChange={(e) => setSearchText(e.target.value)}
                         />
                       </div>
 
-                      {/* Select dropdown — full width on mobile */}
-                      <div className="flex items-center border bg-white border-[#00000020] px-4 py-2 rounded-xl w-full sm:w-auto">
+                      {/* Select dropdown */}
+                      <div className="group flex items-center px-4 py-2.5 rounded-2xl w-full sm:w-auto
+      bg-white/70 backdrop-blur-md border border-white/60
+      shadow-[0_2px_12px_rgba(106,0,255,0.08)]
+      hover:shadow-[0_4px_20px_rgba(106,0,255,0.14)]
+      hover:border-[#6A00FF]/30
+      transition-all duration-300 ease-out">
                         <select
-                          className="px-2 w-full bg-transparent outline-none"
+                          className="w-full sm:w-32 bg-transparent outline-none text-sm font-medium text-[#0B1053] cursor-pointer"
                           onChange={(e) => setSelectText(e.target.value)}
                         >
-                          <option value="student" className="px-2 py-1">Student</option>
-                          <option value="teacher" className="px-2 py-1">Teacher</option>
-                          <option value="parent" className="px-2 py-1">Parent</option>
+                          <option value="student">Student</option>
+                          <option value="teacher">Teacher</option>
+                          <option value="parent">Parent</option>
                         </select>
                       </div>
 
@@ -152,30 +163,54 @@ const ManageUsers = () => {
                         )}
                       </div>
 
-                      {/* Action buttons — side by side, full width row on mobile */}
-                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2.5 w-full sm:w-auto">
+
+                        {/* Requests button */}
                         <button
                           onClick={toggleRequestModal}
-                          className="flex-1 sm:flex-none cursor-pointer flex py-2 px-4 rounded-3xl bg-[#cccffa] text-[#0B1053] text-sm items-center justify-center gap-2"
+                          className="group flex-1 sm:flex-none cursor-pointer flex py-2.5 px-5 rounded-2xl
+          bg-gradient-to-br from-[#dde0ff] to-[#c8ccff]
+          text-[#0B1053] text-sm font-semibold items-center justify-center gap-2
+          border border-[#b0b5f5]/60
+          shadow-[0_2px_8px_rgba(106,0,255,0.12)]
+          hover:shadow-[0_6px_20px_rgba(106,0,255,0.22)]
+          hover:from-[#cfd3ff] hover:to-[#b8beff]
+          active:scale-95
+          transition-all duration-200 ease-out"
                         >
-                          Requests{" "}
-                          <span className="text-xs px-2 py-1 bg-[#a5aaf3] text-[#0B1053] rounded-3xl">
+                          <span>Requests</span>
+                          <span className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5
+          bg-[#6A00FF] text-white text-xs font-bold rounded-full
+          shadow-[0_2px_6px_rgba(106,0,255,0.35)]
+          group-hover:shadow-[0_3px_10px_rgba(106,0,255,0.5)]
+          transition-shadow duration-200">
                             {requestCount}
                           </span>
                         </button>
+
+                        {/* Add User button */}
                         <button
                           onClick={toggleAddUserModal}
-                          className="flex-1 sm:flex-none cursor-pointer flex py-2 px-4 rounded-3xl bg-[#6A00FF] text-white text-sm items-center justify-center"
+                          className="flex-1 sm:flex-none cursor-pointer flex py-2.5 px-5 rounded-2xl
+          bg-gradient-to-br from-[#7B1FFF] to-[#5500CC]
+          text-white text-sm font-semibold items-center justify-center gap-2
+          shadow-[0_4px_14px_rgba(106,0,255,0.4)]
+          hover:shadow-[0_6px_22px_rgba(106,0,255,0.55)]
+          hover:from-[#8A2FFF] hover:to-[#6600EE]
+          active:scale-95
+          transition-all duration-200 ease-out"
                         >
-                          Add User
+                          <span className="text-lg leading-none -mt-px">+</span>
+                          <span>Add User</span>
                         </button>
-                      </div>
 
+                      </div>
                     </div>
                   </div>
                   {/* ─── End Toolbar ─── */}
 
-                  <div className="my-2 min-h-[400px] overflow-x-auto">
+                  <div className="my-2 min-h-[400px] overflow-x-auto px-1">
                     <DataRows
                       header={true}
                       role={"Role"}
@@ -184,49 +219,63 @@ const ManageUsers = () => {
                       userName={"Name"}
                       userclass={"Class"}
                       contact={"Contact"}
-                      bgColor={"#F9F9F9"}
                     />
 
-                    {adminUsersData?.allUsers
-                      ?.filter((usr) => {
-                        const matchesName =
-                          searchText && usr.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase());
-                        const matchesRollNo =
-                          searchText && usr.rollNo && usr.rollNo.includes(searchText);
-                        const matchesUserType =
-                          selectText && usr.userType === selectText.toLocaleLowerCase();
+                    {(() => {
+                      const filteredUsers = adminUsersData?.allUsers?.filter((usr) => {
+                        const searchLower = searchText.toLowerCase();
+                        const matchesSearch = !searchText ||
+                          usr.name?.toLowerCase().includes(searchLower) ||
+                          (usr.rollNo && usr.rollNo.includes(searchText));
 
-                        if (!searchText && selectText) return matchesUserType;
-                        if (searchText && !selectText) return matchesName || matchesRollNo;
-                        if (searchText && selectText) return matchesUserType && (matchesName || matchesRollNo);
-                        return true;
-                      })
-                      .map((usr, index) => (
+                        const matchesUserType = !selectText || usr.userType === selectText.toLowerCase();
+
+                        return matchesSearch && matchesUserType;
+                      });
+
+                      if (filteredUsers?.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100 mt-4">
+                            <div className="text-gray-300 mb-2">
+                              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                            </div>
+                            <p className="text-lg font-medium text-gray-500">No users found matching your criteria</p>
+                          </div>
+                        );
+                      }
+
+                      return filteredUsers.map((usr, index) => (
                         <DataRows
                           data={usr}
                           key={usr.id}
                           header={false}
                           index={index + 1}
-                          bgColor={"#FFFFFF"}
                           userName={usr.name}
                           role={usr.userType}
-                          userclass={usr?.class}
+                                                    userclass={
+                            usr.userType === "student"
+                              ? (usr.level?.name || allLevels.find(l => l.id === usr.levelID)?.name || "—")
+                              : usr.userType === "teacher"
+                                ? (Array.from(new Set(usr.classroomTeachers?.map(ct => ct.classroom?.name).filter(Boolean))).join(", ") || "—")
+                                : usr.userType === "parent"
+                                  ? (Array.from(new Set(usr.students?.map(s => s.level?.name || allLevels.find(l => l.id === s.levelID)?.name).filter(Boolean))).join(", ") || "—")
+                                  : "—"
+                          }
                           contact={usr.phoneNumber}
                           userId={
                             usr?.userType === "teacher"
-                              ? `${usr.referenceNo}`
+                              ? `${usr.referenceNo || usr.id.slice(0, 6).toUpperCase()}`
                               : usr?.userType === "parent"
-                                ? usr?.id.slice(0, 5)
-                                : usr?.rollNo || "not assign"
+                                ? usr?.id.slice(0, 5).toUpperCase()
+                                : usr?.rollNo || "Not Assigned"
                           }
                           toggleClassMenu={(e) => toggleMenu(e)}
                           onClickFunction={handleFunctionClick(usr)}
                         />
-                      ))}
-
-                    {adminUsersData.allUsers.length == 0 && (
-                      <div className="text-center py-4 text-3xl font-medium">No users to display!</div>
-                    )}
+                      ));
+                    })()}
                   </div>
                 </div>
               </div>

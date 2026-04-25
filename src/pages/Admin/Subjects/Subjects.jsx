@@ -61,7 +61,7 @@ const Subjects = () => {
                 <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
                     <div className="flex flex-1">
                         <div
-                            className={`w-full min-h-full lg:px-10 sm:px-6 px-3 flex-grow lg:ml-72`}
+                            className={`w-full h-[100vh] lg:px-10 sm:px-6 px-3 flex-grow lg:ml-80`}
                         >
                             <div className="min-h-full pb-10">
                                 <Navbar heading={"Subject"} />

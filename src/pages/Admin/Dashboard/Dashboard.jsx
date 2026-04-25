@@ -84,26 +84,71 @@ const Dashboard = () => {
   return (
     adminUsersDataPending ? <div className="flex flex-1"> <Loader /> </div> :
       <>
-        <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
-          <div className="flex flex-1 gap-4">
-            <div className={`flex flex-col flex-1 px-5 lg:ml-72 min-h-full`}>
-              <div className="flex min-h-20 md:px-14 lg:px-0">
+        <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins overflow-x-hidden w-full">
+          <div className="flex flex-1 gap-4 w-full">
+            <div className={`flex flex-col flex-1 px-3 sm:px-5 ml-0 lg:ml-80 min-h-full min-w-0`}>
+              <div className="flex min-h-20 md:px-14 lg:pt-3 lg:px-0">
                 <Navbar heading={"Admin Dashboard"} />
               </div>
               <div
-                className={`flex flex-col md:px-10 lg:px-0 lg:mt-0 mt-16 sm:mt-1 md:mt-1 lg:flex-row flex-1 gap-5 my-2  ${isBlurred ? "blur" : ""
+                className={`flex flex-col  md:px-10  sm:py-3 lg:px-0 lg:mt-0 sm:mt-16 sm:mt-1 md:mt-1 lg:flex-row flex-1 gap-5 my-2  ${isBlurred ? "blur" : ""
                   } ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}
               >
-                <div className="flex flex-[5] flex-col gap-3 ">
+
+
+                {/* grap................................................................ */}
+                <div className="flex flex-[5] flex-col gap-3 min-w-0">
                   <p className="text-xl font-semibold">System Overview</p>
                   <SystemOverview />
                 </div>
-                <div className="flex flex-[2] flex-col gap-2">
-                  <p className="text-xl font-semibold">Students</p>
-                  <StudentsCard title={"Total Enrolled"} value={students?.allEnrolled?.length} />
-                  <StudentsCard title={"Total Pending"} value={students?.allPending?.length} />
-                  <StudentsCard title={"Total Inactive"} value={students?.allInactive?.length} />
+
+                {/* total user */}
+                <div className="flex flex-[2] flex-col gap-4 min-w-0">
+                  <div className="flex flex-col gap-1 px-1">
+                    <p className="text-xl font-semibold text-slate-800 tracking-tight">Students Statistics</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Enrollment Metrics</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+
+                    {/* Total Enrolled - Green Theme */}
+                    <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden translate-z-0">
+                      {/* Left Accent Strip */}
+                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500 z-20" />
+                      <div className="p-1"> {/* Padding to prevent content touching the strip */}
+                        <StudentsCard
+                          title={"Total Enrolled"}
+                          value={students?.allEnrolled?.length}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Total Pending - Amber Theme */}
+                    <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden translate-z-0">
+                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500 z-20" />
+                      <div className="p-1">
+                        <StudentsCard
+                          title={"Total Pending"}
+                          value={students?.allPending?.length}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Total Inactive - Rose Theme */}
+                    <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden translate-z-0">
+                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-500 z-20" />
+                      <div className="p-1">
+                        <StudentsCard
+                          title={"Total Inactive"}
+                          value={students?.allInactive?.length}
+                        />
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
+
+                {/* ...... */}
               </div>
               <div
                 className={`flex flex-col md:px-10 lg:px-0 lg:flex-row flex-1 gap-5 py-6 ${isBlurred ? "blur" : ""

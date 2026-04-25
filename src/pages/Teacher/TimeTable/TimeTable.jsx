@@ -27,7 +27,7 @@ const TimeTable = () => {
   return (
     <div className="flex flex-1 min-h-screen bg-[#f9f9f9]/50 font-poppins">
       <div className="flex flex-1 gap-4">
-        <div className={`flex flex-col flex-1 lg:pl-1 lg:pr-4 lg:ml-72`}>
+        <div className={`flex flex-col flex-1 lg:pl-1 lg:pr-4 lg:ml-80`}>
           <div className="flex h-20 md:px-14 lg:px-0">
             <Navbar heading={"Time Table"} />
           </div>
@@ -36,11 +36,12 @@ const TimeTable = () => {
               }`}
           >
             <div className={`flex  flex-col  gap-y-6 gap-1 bg-white w-full relative ${isSidebarOpen ? "-z-10" : "z-auto"}`}>
-              <div className={` border px-4  py-3 border-grey/30 rounded-md shadow-lg w-full `}>
+              <div className={` border px-4  py-3 border-grey/30 rounded-md shadow-lg w-full min-h-[550px]`}>
                 <MyCalendar
                   data={data}
                   isPending={isPending}
                   refetch={refetch}
+                  isRefetching={isRefetching}
                 />
               </div>
             </div>

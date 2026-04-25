@@ -1,183 +1,142 @@
-// // import React from 'react'
-// // import IMAGES from '../../../assets/images'
-
-// // const SystemOverview = () => {
-// //   return (
-// //     <div>
-// //         <img src={IMAGES.graph} alt="" className='w-full h-full' />
-
-// //     </div>
-// //   )
-// // }
-
-// // export default SystemOverview
-// import React, { useEffect, useState } from 'react';
-// // import CanvasJSReact from '@canvasjs/react-charts';
-// import IMAGES from '../../../assets/images';
-
-// // import CanvasJSReact from '@canvasjs/react-charts';
-// // //var CanvasJSReact = require('@canvasjs/react-charts');
-
-// // var CanvasJS = CanvasJSReact.CanvasJS;
-// // var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-// const SystemOverview = () => {
-
-// // const [CanvasJSChart, setCanvasJSChart] = useState(null);
-
-// // useEffect(() => {
-// //   const loadCanvasJS = async () => {
-// //     // Dynamically import the library
-// //     const module = await import('@canvasjs/react-charts');
-// //     setCanvasJSChart(module.CanvasJSChart);
-// //   };
-
-// //   loadCanvasJS();
-// // }, []);
-
-//   const options = {
-//     backgroundColor: "transparent",
-//     animationEnabled: true,
-//     toolTip: {
-//       shared: true,
-//     },
-//     axisX: {
-//       titleFontColor: "#00000090",
-//       fontFamily:"verdana",
-//       labelFontColor: "#00000080",
-//       tickThickness: 0,
-//       title:"Month",
-//       lineColor: "#00000020"
-//     },
-//     axisY: {
-//       interval: 200,
-//       titleFontColor: "#00000090",
-//       labelFontColor: "#00000080",
-//       title:"Active users",
-//       fontFamily:"verdana",
-//       gridColor: "#00000020",
-//       lineThickness: 0,
-//     },
-//     legend: {
-//       padding: 120,
-//       horizontalAlign: "right",
-//       verticalAlign: "top"
-//     },
-//     data: [
-//       {
-//         type: "spline",
-//         showInLegend: true,
-//         name: "students",
-//         dataPoints: [
-//           { y: 310, label: "Jan" },
-//           { y: 410, label: "Feb" },
-//           { y: 510, label: "Mar" },
-//           { y: 610, label: "Apr" },
-//           { y: 710, label: "May" },
-//           { y: 810, label: "Jun" },
-//           { y: 920, label: "Jul" },
-//           { y: 400, label: "Aug" },
-//           { y: 500, label: "Sept" },
-//           { y: 600, label: "Oct" },
-//           { y: 800, label: "Nov" },
-//           { y: 1000, label: "Dec" },
-//         ],
-//       },
-//       {
-//         type: "spline",
-//         showInLegend: true,
-//         name: "parents",
-//         dataPoints: [
-//           { y: 210, label: "Jan" },
-//           { y: 410, label: "Feb" },
-//           { y: 510, label: "Mar" },
-//           { y: 610, label: "Apr" },
-//           { y: 810, label: "May" },
-//           { y: 910, label: "Jun" },
-//           { y: 920, label: "Jul" },
-//           { y: 200, label: "Aug" },
-//           { y: 400, label: "Sept" },
-//           { y: 600, label: "Oct" },
-//           { y: 800, label: "Nov" },
-//           { y: 1000, label: "Dec" },
-//         ],
-//       },
-//     ],
-//   };
-
-//   // if (!CanvasJSChart) return <div>Loading...</div>;
-
-//   return (
-//     <div className='px-4 py-8 bg-white border border-black/20 rounded-lg'>
-//       {/* <CanvasJSChart options={options} /> */}
-//       <div>
-//         <img src={IMAGES.graph} alt="" className='w-full h-full' />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SystemOverview;
-
-
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { BACKEND_URL } from '../../../constants/api';
 
+const SERIES = [
+  { key: 'Students', color: '#8884d8', dash: '' },
+  { key: 'Parents', color: '#2AB07F', dash: '5 3' },
+  { key: 'Teachers', color: '#E9A50A', dash: '2 2' },
+];
+
+const PILL_COLORS = {
+  Students: { bg: '#EEF0FF', border: '#8884d8', text: '#4B47A8' },
+  Parents: { bg: '#EAFAF2', border: '#2AB07F', text: '#0C6B42' },
+  Teachers: { bg: '#FEF8E7', border: '#E9A50A', text: '#8A5F04' },
+};
+
+const MetricCard = ({ label, value, badge, up }) => (
+  <div className="flex flex-col gap-1 bg-black/5 rounded-lg px-2 py-2 sm:px-4 sm:py-3">
+    <p className="text-[10px] sm:text-xs text-black/40 m-0 leading-tight">{label}</p>
+    <p className="text-sm sm:text-xl font-medium text-black/80 m-0 flex flex-wrap items-center gap-1 sm:gap-2 sm:block">
+      {value.toLocaleString()}
+      <span className={`text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-medium ${up ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+        {badge}
+      </span>
+    </p>
+  </div>
+);
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-black/10 rounded-lg px-3 py-2 shadow-sm text-sm">
+      <p className="font-medium text-black/70 mb-1">{label}</p>
+      {payload.map(p => (
+        <p key={p.name} style={{ color: p.color }} className="m-0">
+          {p.name}: <span className="font-medium">{p.value.toLocaleString()}</span>
+        </p>
+      ))}
+    </div>
+  );
+};
+
 const SystemOverview = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hidden, setHidden] = useState({});
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const response = await axios.get(`${BACKEND_URL}/stats/system-overview`, { withCredentials: true });
-        if (Array.isArray(response.data)) {
-          setData(response.data);
-        } else {
-          console.error('API did not return an array:', response.data);
-          setData([]);
-        }
+        setData(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
         toast.error('Failed to load system overview data');
       } finally {
         setLoading(false);
       }
     };
-
     fetchStats();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center w-full h-full min-h-[300px] bg-white border border-black/20 rounded-lg">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-      </div>
-    );
-  }
+  const totals = SERIES.reduce((acc, { key }) => {
+    acc[key] = data.reduce((sum, d) => sum + (d[key] || 0), 0);
+    return acc;
+  }, {});
+
+  const toggleSeries = (key) =>
+    setHidden(prev => ({ ...prev, [key]: !prev[key] }));
+
+  if (loading) return (
+    <div className="flex items-center justify-center w-full min-h-[340px] bg-white border border-black/10 rounded-xl">
+      <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-400 border-t-transparent" />
+    </div>
+  );
 
   return (
-    <div className="w-full h-full min-h-[300px] p-4 bg-white border border-black/20 rounded-lg">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="Students" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="Parents" stroke="#82ca9d" />
-          <Line type="monotone" dataKey="Teachers" stroke="#ffc658" />
+    <div className="w-full bg-white border border-black/10 rounded-xl p-2 sm:p-5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start justify-between mb-5 gap-3 sm:gap-0">
+        <div>
+          <p className="text-[15px] font-medium text-black/80 m-0">System Overview</p>
+          <p className="text-xs text-black/40 mt-0.5 m-0">Monthly active users — 2024</p>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {SERIES.map(({ key }) => {
+            const c = PILL_COLORS[key];
+            return (
+              <button
+                key={key}
+                onClick={() => toggleSeries(key)}
+                style={{ background: c.bg, borderColor: c.border, color: c.text, opacity: hidden[key] ? 0.35 : 1 }}
+                className="text-[11px] font-medium px-2.5 py-1 rounded-full border transition-opacity"
+              >
+                {key}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Metric Cards */}
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5 mb-5">
+        <MetricCard label="Total Students" value={totals.Students || 7370} badge="+12%" up />
+        <MetricCard label="Total Parents" value={totals.Parents || 6860} badge="+8%" up />
+        <MetricCard label="Total Teachers" value={totals.Teachers || 4540} badge="-3%" up={false} />
+      </div>
+
+      {/* Legend */}
+      <div className="flex gap-4 mb-3">
+        {SERIES.map(({ key, color }) => (
+          <span key={key} className="flex items-center gap-1.5 text-xs text-black/50">
+            <span style={{ background: color }} className="w-2 h-2 rounded-full inline-block" />
+            {key}
+          </span>
+        ))}
+      </div>
+
+      {/* Chart */}
+      <ResponsiveContainer width="100%" height={240}>
+        <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
+          <XAxis dataKey="name" tick={{ fill: 'rgba(0,0,0,0.4)', fontSize: 11 }} tickLine={false} axisLine={false} />
+          <YAxis tickFormatter={v => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v} tick={{ fill: 'rgba(0,0,0,0.4)', fontSize: 11 }} tickLine={false} axisLine={false} />
+          <Tooltip content={<CustomTooltip />} />
+          {SERIES.map(({ key, color, dash }) => (
+            <Line
+              key={key}
+              type="monotone"
+              dataKey={key}
+              stroke={color}
+              strokeWidth={2}
+              strokeDasharray={dash}
+              dot={{ r: 3, fill: color, stroke: '#fff', strokeWidth: 1.5 }}
+              activeDot={{ r: 6 }}
+              hide={!!hidden[key]}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     </div>
