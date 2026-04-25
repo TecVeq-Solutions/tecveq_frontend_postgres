@@ -107,7 +107,7 @@ const Login = () => {
                 @keyframes rotateRingRev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
                 @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
                 @keyframes dotPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.6); } 50% { box-shadow: 0 0 0 8px rgba(0,212,255,0); } }
-                @keyframes dotPulseViolet { 0%,100% { box-shadow: 0 0 0 0 rgba(168,85,247,0.6); } 50% { box-shadow: 0 0 0 8px rgba(168,85,247,0); } }
+                @keyframes dotPulseBlue { 0%,100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.6); } 50% { box-shadow: 0 0 0 8px rgba(37,99,235,0); } }
                 @keyframes meshMove1 { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(40px,-30px) scale(1.08); } 66% { transform: translate(-20px,25px) scale(0.94); } }
                 @keyframes meshMove2 { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(-35px,-20px) rotate(15deg); } }
                 @keyframes meshMove3 { 0%,100% { transform: translate(0,0) scale(1); } 40% { transform: translate(20px,35px) scale(1.12); } 80% { transform: translate(-30px,-10px) scale(0.9); } }
@@ -208,18 +208,18 @@ const Login = () => {
 
                 <div className="flex-1 min-w-0 relative flex items-center justify-center bg-[#080710] overflow-hidden p-[32px_40px] cursor-crosshair max-[900px]:w-full max-[900px]:p-[32px_24px_48px] max-[640px]:p-[24px_16px_40px] max-[420px]:p-[20px_12px_36px] max-[360px]:p-[16px_10px_32px]" ref={rightPanelRef} onClick={handleRightClick}>
 
-                    <div className="absolute pointer-events-none w-[520px] h-[520px] -top-[180px] -right-[160px] rounded-full bg-[radial-gradient(circle_at_40%_40%,rgba(168,85,247,0.20)_0%,rgba(120,50,200,0.11)_35%,transparent_65%)] blur-[30px] animate-[meshMove1_20s_ease-in-out_infinite] max-[360px]:hidden" />
-                    <div className="absolute pointer-events-none w-[420px] h-[420px] -bottom-[140px] -left-[100px] rounded-full bg-[radial-gradient(circle_at_60%_60%,rgba(232,121,249,0.18)_0%,rgba(180,60,200,0.09)_40%,transparent_65%)] blur-[25px] animate-[meshMove2_25s_ease-in-out_infinite] max-[360px]:hidden" />
-                    <div className="absolute pointer-events-none w-[360px] h-[360px] top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(100,40,160,0.13)_0%,transparent_65%)] blur-[20px] animate-[meshMove3_16s_ease-in-out_infinite] max-[360px]:hidden" />
+                    <div className="absolute pointer-events-none w-[520px] h-[520px] -top-[180px] -right-[160px] rounded-full bg-[radial-gradient(circle_at_40%_40%,rgba(37,99,235,0.20)_0%,rgba(30,64,175,0.11)_35%,transparent_65%)] blur-[30px] animate-[meshMove1_20s_ease-in-out_infinite] max-[360px]:hidden" />
+                    <div className="absolute pointer-events-none w-[420px] h-[420px] -bottom-[140px] -left-[100px] rounded-full bg-[radial-gradient(circle_at_60%_60%,rgba(6,182,212,0.18)_0%,rgba(8,145,178,0.09)_40%,transparent_65%)] blur-[25px] animate-[meshMove2_25s_ease-in-out_infinite] max-[360px]:hidden" />
+                    <div className="absolute pointer-events-none w-[360px] h-[360px] top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(30,58,138,0.13)_0%,transparent_65%)] blur-[20px] animate-[meshMove3_16s_ease-in-out_infinite] max-[360px]:hidden" />
 
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden after:content-[''] after:absolute after:-inset-[60px] after:bg-[linear-gradient(rgba(168,85,247,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.05)_1px,transparent_1px)] after:bg-[length:48px_48px] after:animate-[gridGlow_6s_ease-in-out_infinite]" />
-                    <div className="absolute top-0 bottom-0 w-[1px] left-[25%] bg-[linear-gradient(180deg,transparent,rgba(168,85,247,0.20),transparent)] animate-[lineTrail_7s_linear_infinite] pointer-events-none" />
-                    <div className="absolute top-0 bottom-0 w-[1px] left-[72%] bg-[linear-gradient(180deg,transparent,rgba(232,121,249,0.14),transparent)] animate-[lineTrail_10s_3.5s_linear_infinite] pointer-events-none" />
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden after:content-[''] after:absolute after:-inset-[60px] after:bg-[linear-gradient(rgba(37,99,235,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.05)_1px,transparent_1px)] after:bg-[length:48px_48px] after:animate-[gridGlow_6s_ease-in-out_infinite]" />
+                    <div className="absolute top-0 bottom-0 w-[1px] left-[25%] bg-[linear-gradient(180deg,transparent,rgba(37,99,235,0.20),transparent)] animate-[lineTrail_7s_linear_infinite] pointer-events-none" />
+                    <div className="absolute top-0 bottom-0 w-[1px] left-[72%] bg-[linear-gradient(180deg,transparent,rgba(37,99,235,0.14),transparent)] animate-[lineTrail_10s_3.5s_linear_infinite] pointer-events-none" />
 
-                    <div className="absolute pointer-events-none w-[90px] h-[90px] rounded-full top-[12%] left-[8%] bg-[radial-gradient(circle,rgba(168,85,247,0.28)_0%,rgba(168,85,247,0.06)_60%,transparent_80%)] blur-[4px] animate-[orbFloat_9s_ease-in-out_infinite] max-[900px]:hidden" />
-                    <div className="absolute pointer-events-none w-[60px] h-[60px] rounded-full bottom-[16%] right-[9%] bg-[radial-gradient(circle,rgba(232,121,249,0.30)_0%,rgba(200,80,220,0.08)_60%,transparent_80%)] blur-[3px] animate-[orbFloat2_12s_ease-in-out_infinite] max-[360px]:hidden" />
-                    <div className="absolute pointer-events-none w-[45px] h-[45px] rounded-full top-[68%] left-[5%] bg-[radial-gradient(circle,rgba(168,85,247,0.22)_0%,transparent_70%)] blur-[2px] animate-[orbFloat_7s_2s_ease-in-out_infinite] max-[360px]:hidden" />
-                    <div className="absolute pointer-events-none w-[35px] h-[35px] rounded-full top-[20%] right-[6%] bg-[radial-gradient(circle,rgba(120,220,180,0.18)_0%,transparent_70%)] blur-[2px] animate-[orbFloat2_8s_1s_ease-in-out_infinite] max-[900px]:hidden" />
+                    <div className="absolute pointer-events-none w-[90px] h-[90px] rounded-full top-[12%] left-[8%] bg-[radial-gradient(circle,rgba(37,99,235,0.28)_0%,rgba(37,99,235,0.06)_60%,transparent_80%)] blur-[4px] animate-[orbFloat_9s_ease-in-out_infinite] max-[900px]:hidden" />
+                    <div className="absolute pointer-events-none w-[60px] h-[60px] rounded-full bottom-[16%] right-[9%] bg-[radial-gradient(circle,rgba(37,99,235,0.22)_0%,rgba(37,99,235,0.04)_60%,transparent_80%)] blur-[3px] animate-[orbFloat2_12s_ease-in-out_infinite] max-[360px]:hidden" />
+                    <div className="absolute pointer-events-none w-[45px] h-[45px] rounded-full top-[68%] left-[5%] bg-[radial-gradient(circle,rgba(37,99,235,0.20)_0%,transparent_70%)] blur-[2px] animate-[orbFloat_7s_2s_ease-in-out_infinite] max-[360px]:hidden" />
+                    <div className="absolute pointer-events-none w-[35px] h-[35px] rounded-full top-[20%] right-[6%] bg-[radial-gradient(circle,rgba(37,99,235,0.18)_0%,transparent_70%)] blur-[2px] animate-[orbFloat2_8s_1s_ease-in-out_infinite] max-[900px]:hidden" />
 
                     {[
                         { top: '8%', left: '15%', s: 4, d: '0s', du: '7s' },
@@ -229,50 +229,50 @@ const Login = () => {
                         { top: '90%', left: '60%', s: 4, d: '0.4s', du: '10s' },
                         { top: '35%', left: '4%', s: 3, d: '1.2s', du: '7s' },
                     ].map((p, i) => (
-                        <div key={i} className="absolute rounded-full pointer-events-none bg-[#a855f7]" style={{
+                        <div key={i} className="absolute rounded-full pointer-events-none bg-[#3b82f6]" style={{
                             top: p.top, left: p.left, width: p.s, height: p.s,
-                            boxShadow: `0 0 ${p.s * 3}px rgba(168,85,247,0.75)`,
+                            boxShadow: `0 0 ${p.s * 3}px rgba(37,99,235,0.75)`,
                             animation: `cyanPulse ${p.du} ease-in-out infinite`,
                             animationDelay: p.d,
                         }} />
                     ))}
 
-                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] top-5 left-5 border-t-2 border-l-2 border-[rgba(168,85,247,0.55)] rounded-[3px_0_0_0] max-[420px]:w-10 max-[420px]:h-10 max-[420px]:top-3 max-[420px]:left-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:top-2.5 max-[360px]:left-2.5" />
-                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] top-5 right-5 border-t-2 border-r-2 border-[rgba(232,121,249,0.38)] rounded-[0_3px_0_0] delay-1000 max-[420px]:w-10 max-[420px]:h-10 max-[420px]:top-3 max-[420px]:right-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:top-2.5 max-[360px]:right-2.5" />
-                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] bottom-5 left-5 border-b-2 border-l-2 border-[rgba(232,121,249,0.38)] rounded-[0_0_0_3px] delay-500 max-[420px]:w-10 max-[420px]:h-10 max-[420px]:bottom-3 max-[420px]:left-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:bottom-2.5 max-[360px]:left-2.5" />
-                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] bottom-5 right-5 border-b-2 border-r-2 border-[rgba(168,85,247,0.55)] rounded-[0_0_3px_0] delay-1500 max-[420px]:w-10 max-[420px]:h-10 max-[420px]:bottom-3 max-[420px]:right-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:bottom-2.5 max-[360px]:right-2.5" />
+                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] top-5 left-5 border-t-2 border-l-2 border-[rgba(37,99,235,0.55)] rounded-[3px_0_0_0] max-[420px]:w-10 max-[420px]:h-10 max-[420px]:top-3 max-[420px]:left-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:top-2.5 max-[360px]:left-2.5" />
+                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] top-5 right-5 border-t-2 border-r-2 border-[rgba(37,99,235,0.38)] rounded-[0_3px_0_0] delay-1000 max-[420px]:w-10 max-[420px]:h-10 max-[420px]:top-3 max-[420px]:right-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:top-2.5 max-[360px]:right-2.5" />
+                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] bottom-5 left-5 border-b-2 border-l-2 border-[rgba(37,99,235,0.38)] rounded-[0_0_0_3px] delay-500 max-[420px]:w-10 max-[420px]:h-10 max-[420px]:bottom-3 max-[420px]:left-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:bottom-2.5 max-[360px]:left-2.5" />
+                    <div className="absolute w-14 h-14 pointer-events-none animate-[cornerPulse_3s_ease-in-out_infinite] bottom-5 right-5 border-b-2 border-r-2 border-[rgba(37,99,235,0.55)] rounded-[0_0_3px_0] delay-1500 max-[420px]:w-10 max-[420px]:h-10 max-[420px]:bottom-3 max-[420px]:right-3 max-[360px]:w-8 max-[360px]:h-8 max-[360px]:bottom-2.5 max-[360px]:right-2.5" />
 
                     {ripples.map(r => (
-                        <div key={r.id} className="absolute w-20 h-20 rounded-full bg-[rgba(168,85,247,0.18)] scale-0 pointer-events-none animate-[rippleOut_2s_ease-out_forwards] -ml-10 -mt-10" style={{
+                        <div key={r.id} className="absolute w-20 h-20 rounded-full bg-[rgba(37,99,235,0.18)] scale-0 pointer-events-none animate-[rippleOut_2s_ease-out_forwards] -ml-10 -mt-10" style={{
                             left: `${r.x}%`, top: `${r.y}%`,
                         }} />
                     ))}
 
-                    <div className="relative z-10 bg-[rgba(10,8,22,0.80)] backdrop-blur-[24px] rounded-3xl p-[44px_40px_40px] w-full max-w-[420px] border border-[rgba(168,85,247,0.25)] shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_8px_40px_rgba(0,0,0,0.55),0_0_80px_rgba(168,85,247,0.07),inset_0_1px_0_rgba(255,255,255,0.05)] animate-[cardReveal_0.75s_cubic-bezier(0.22,1,0.36,1)_forwards] before:content-[''] before:absolute before:top-0 before:left-10 before:right-10 before:h-[2px] before:bg-[linear-gradient(90deg,transparent,#a855f7,#e879f9,#a855f7,transparent)] before:bg-[length:200%_100%] before:rounded-[0_0_2px_2px] before:animate-[shimmerViolet_4s_linear_infinite] after:content-[''] after:absolute after:bottom-[-1px] after:left-[20%] after:right-[20%] after:h-[1px] after:bg-[linear-gradient(90deg,transparent,rgba(168,85,247,0.45),transparent)] after:rounded-full max-[640px]:p-[32px_24px_28px] max-[640px]:rounded-[20px] max-[420px]:p-[28px_18px_24px] max-[420px]:rounded-[18px] max-[360px]:p-[24px_14px_20px] max-[360px]:rounded-[16px]">
+                    <div className="relative z-10 bg-[rgba(10,8,22,0.80)] backdrop-blur-[24px] rounded-3xl p-[44px_40px_40px] w-full max-w-[420px] border border-[rgba(37,99,235,0.25)] shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_8px_40px_rgba(0,0,0,0.55),0_0_80px_rgba(37,99,235,0.07),inset_0_1px_0_rgba(255,255,255,0.05)] animate-[cardReveal_0.75s_cubic-bezier(0.22,1,0.36,1)_forwards] before:content-[''] before:absolute before:top-0 before:left-10 before:right-10 before:h-[2px] before:bg-[linear-gradient(90deg,transparent,#3b82f6,#06b6d4,#3b82f6,transparent)] before:bg-[length:200%_100%] before:rounded-[0_0_2px_2px] before:animate-[shimmerViolet_4s_linear_infinite] after:content-[''] after:absolute after:bottom-[-1px] after:left-[20%] after:right-[20%] after:h-[1px] after:bg-[linear-gradient(90deg,transparent,rgba(37,99,235,0.45),transparent)] after:rounded-full max-[640px]:p-[32px_24px_28px] max-[640px]:rounded-[20px] max-[420px]:p-[28px_18px_24px] max-[420px]:rounded-[18px] max-[360px]:p-[24px_14px_20px] max-[360px]:rounded-[16px]">
 
-                        <div className="inline-flex items-center gap-1.5 bg-[rgba(168,85,247,0.12)] border border-[rgba(168,85,247,0.35)] rounded-[100px] p-[5px_13px] mb-[22px] animate-[floatBadge_4s_ease-in-out_infinite] max-[360px]:p-[4px_10px]">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#a855f7] animate-[dotPulseViolet_2s_ease-in-out_infinite]" />
-                            <span className="text-[11px] text-[#c084fc] tracking-[0.14em] font-semibold max-[360px]:text-[10px]">Secure Login</span>
+                        <div className="inline-flex items-center gap-1.5 bg-[rgba(37,99,235,0.12)] border border-[rgba(37,99,235,0.35)] rounded-[100px] p-[5px_13px] mb-[22px] animate-[floatBadge_4s_ease-in-out_infinite] max-[360px]:p-[4px_10px]">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-[dotPulseBlue_2s_ease-in-out_infinite]" />
+                            <span className="text-[11px] text-[#60a5fa] tracking-[0.14em] font-semibold max-[360px]:text-[10px]">Secure Login</span>
                         </div>
 
                         <div className="font-['Cormorant_Garamond',serif] text-[36px] font-bold text-[#f3eeff] tracking-[-0.3px] leading-[1.1] mb-1.5 max-[640px]:text-[30px] max-[420px]:text-[26px] max-[360px]:text-[23px]">
-                            Welcome <em className="not-italic bg-[linear-gradient(135deg,#a855f7,#e879f9,#7c3aed)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmerViolet_4s_linear_infinite]">Back</em>
+                            Welcome <em className="not-italic bg-[linear-gradient(135deg,#3b82f6,#06b6d4,#1d4ed8)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmerViolet_4s_linear_infinite]">Back</em>
                         </div>
-                        <div className="text-[13px] text-[rgba(240,235,255,0.35)] mb-8 leading-[1.6] max-[420px]:text-xs max-[420px]:mb-6 max-[360px]:text-[11.5px] max-[360px]:mb-5">
+                        <div className="text-[13px] text-[rgba(235,245,255,0.4)] mb-8 leading-[1.6] max-[420px]:text-xs max-[420px]:mb-6 max-[360px]:text-[11.5px] max-[360px]:mb-5">
                             Sign in to access your dashboard
                         </div>
 
                         <form onSubmit={handleSubmit}>
                             <div className="mb-[18px] max-[360px]:mb-[14px]">
-                                <label className={`block text-[10.5px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#c084fc]' : 'text-[rgba(240,235,255,0.35)]'}`}>Email Address</label>
+                                <label className={`block text-[10.5px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
                                 <div className="relative">
-                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'email' ? 'text-[#c084fc]' : 'text-[rgba(255,255,255,0.22)]'}`}>
+                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,0.22)]'}`}>
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                                         </svg>
                                     </div>
                                     <input
-                                        className="w-full p-[13px_16px_13px_42px] bg-[rgba(255,255,255,0.05)] border border-[rgba(168,85,247,0.18)] rounded-xl text-sm font-['Syne',sans-serif] text-[#f3eeff] outline-none transition-all duration-300 cubic-bezier(0.4,0,0.2,1) caret-[#a855f7] placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(168,85,247,0.75)] focus:bg-[rgba(168,85,247,0.06)] focus:shadow-[0_0_0_4px_rgba(168,85,247,0.14),inset_0_1px_0_rgba(255,255,255,0.04)] max-[420px]:text-[13px] max-[420px]:p-[12px_14px_12px_40px] max-[360px]:text-[12.5px] max-[360px]:p-[11px_12px_11px_38px] max-[360px]:rounded-[10px]" required type="email"
+                                        className="w-full p-[13px_16px_13px_42px] bg-[rgba(255,255,255,0.05)] border border-[rgba(37,99,235,0.18)] rounded-xl text-sm font-['Syne',sans-serif] text-[#f3eeff] outline-none transition-all duration-300 cubic-bezier(0.4,0,0.2,1) caret-[#3b82f6] placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(37,99,235,0.75)] focus:bg-[rgba(37,99,235,0.06)] focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14),inset_0_1px_0_rgba(255,255,255,0.04)] max-[420px]:text-[13px] max-[420px]:p-[12px_14px_12px_40px] max-[360px]:text-[12.5px] max-[360px]:p-[11px_12px_11px_38px] max-[360px]:rounded-[10px]" required type="email"
                                         placeholder="you@example.com"
                                         onFocus={() => setActiveField('email')}
                                         onBlur={() => setActiveField(null)}
@@ -281,21 +281,21 @@ const Login = () => {
                             </div>
 
                             <div className="mb-[18px] max-[360px]:mb-[14px]">
-                                <label className={`block text-[10.5px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#c084fc]' : 'text-[rgba(240,235,255,0.35)]'}`}>Password</label>
+                                <label className={`block text-[10.5px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
                                 <div className="relative">
-                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'password' ? 'text-[#c084fc]' : 'text-[rgba(255,255,255,0.22)]'}`}>
+                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,0.22)]'}`}>
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                                         </svg>
                                     </div>
                                     <input
-                                        className="w-full p-[13px_16px_13px_42px] pr-[46px] bg-[rgba(255,255,255,0.05)] border border-[rgba(168,85,247,0.18)] rounded-xl text-sm font-['Syne',sans-serif] text-[#f3eeff] outline-none transition-all duration-300 cubic-bezier(0.4,0,0.2,1) caret-[#a855f7] placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(168,85,247,0.75)] focus:bg-[rgba(168,85,247,0.06)] focus:shadow-[0_0_0_4px_rgba(168,85,247,0.14),inset_0_1px_0_rgba(255,255,255,0.04)] max-[420px]:text-[13px] max-[420px]:p-[12px_14px_12px_40px] max-[420px]:pr-[42px] max-[360px]:text-[12.5px] max-[360px]:p-[11px_12px_11px_38px] max-[360px]:pr-[38px] max-[360px]:rounded-[10px]" required
+                                        className="w-full p-[13px_16px_13px_42px] pr-[46px] bg-[rgba(255,255,255,0.05)] border border-[rgba(37,99,235,0.18)] rounded-xl text-sm font-['Syne',sans-serif] text-[#f3eeff] outline-none transition-all duration-300 cubic-bezier(0.4,0,0.2,1) caret-[#3b82f6] placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(37,99,235,0.75)] focus:bg-[rgba(37,99,235,0.06)] focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14),inset_0_1px_0_rgba(255,255,255,0.04)] max-[420px]:text-[13px] max-[420px]:p-[12px_14px_12px_40px] max-[420px]:pr-[42px] max-[360px]:text-[12.5px] max-[360px]:p-[11px_12px_11px_38px] max-[360px]:pr-[38px] max-[360px]:rounded-[10px]" required
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Enter your password"
                                         onFocus={() => setActiveField('password')}
                                         onBlur={() => setActiveField(null)}
                                     />
-                                    <button type="button" className="absolute right-[14px] top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-[rgba(255,255,255,0.26)] flex items-center transition-colors duration-200 hover:text-[#c084fc] max-[360px]:right-[11px]" onClick={() => setShowPassword(!showPassword)}>
+                                    <button type="button" className="absolute right-[14px] top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-[rgba(255,255,255,0.26)] flex items-center transition-colors duration-200 hover:text-[#60a5fa] max-[360px]:right-[11px]" onClick={() => setShowPassword(!showPassword)}>
                                         {showPassword ? (
                                             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
@@ -312,31 +312,31 @@ const Login = () => {
 
                             <div className="flex justify-between items-center mb-[26px] max-[420px]:flex-wrap max-[420px]:gap-2 max-[360px]:mb-[18px]">
                                 <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" className="w-[15px] h-[15px] cursor-pointer accent-[#a855f7] rounded" />
-                                    <span className="text-[12.5px] text-[rgba(240,235,255,0.36)] select-none max-[360px]:text-[11px]">Remember me</span>
+                                    <input type="checkbox" className="w-[15px] h-[15px] cursor-pointer accent-[#3b82f6] rounded" />
+                                    <span className="text-[12.5px] text-[rgba(235,245,255,0.4)] select-none max-[360px]:text-[11px]">Remember me</span>
                                 </label>
-                                <button type="button" className="bg-none border-none font-['Syne',sans-serif] text-[12.5px] text-[rgba(240,235,255,0.3)] cursor-pointer transition-colors duration-200 hover:text-[#c084fc] max-[360px]:text-[11px]">Forgot password?</button>
+                                <button type="button" className="bg-none border-none font-['Syne',sans-serif] text-[12.5px] text-[rgba(235,245,255,0.4)] cursor-pointer transition-colors duration-200 hover:text-[#60a5fa] max-[360px]:text-[11px]">Forgot password?</button>
                             </div>
 
                             <div className="mb-5">
                                 {loading ? (
                                     <div className="flex justify-center p-[8px_0]"><Loader /></div>
                                 ) : (
-                                    <button type="submit" className="w-full p-[15px] bg-[linear-gradient(135deg,#7c3aed_0%,#a855f7_40%,#e879f9_80%,#c026d3_100%)] bg-[length:200%_100%] border-none rounded-xl text-white text-sm font-bold tracking-[0.08em] cursor-pointer font-['Syne',sans-serif] relative overflow-hidden transition-all duration-300 cubic-bezier(0.4,0,0.2,1) shadow-[0_4px_20px_rgba(168,85,247,0.38)] hover:bg-right hover:-translate-y-[2px] hover:shadow-[0_8px_32px_rgba(168,85,247,0.55)] active:translate-y-0 active:shadow-[0_4px_16px_rgba(168,85,247,0.38)] before:content-[''] before:absolute before:top-0 before:-left-full before:w-3/5 before:h-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] before:skew-x-[-20deg] before:animate-[btnShine_4s_ease-in-out_infinite_1s] max-[420px]:text-[13px] max-[360px]:p-[13px] max-[360px]:text-[12.5px] max-[360px]:rounded-[10px]">
+                                    <button type="submit" className="w-full p-[15px] bg-[linear-gradient(135deg,#1e40af_0%,#3b82f6_40%,#38bdf8_80%,#0284c7_100%)] bg-[length:200%_100%] border-none rounded-xl text-white text-sm font-bold tracking-[0.08em] cursor-pointer font-['Syne',sans-serif] relative overflow-hidden transition-all duration-300 cubic-bezier(0.4,0,0.2,1) shadow-[0_4px_20px_rgba(37,99,235,0.38)] hover:bg-right hover:-translate-y-[2px] hover:shadow-[0_8px_32px_rgba(37,99,235,0.55)] active:translate-y-0 active:shadow-[0_4px_16px_rgba(37,99,235,0.38)] before:content-[''] before:absolute before:top-0 before:-left-full before:w-3/5 before:h-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] before:skew-x-[-20deg] before:animate-[btnShine_4s_ease-in-out_infinite_1s] max-[420px]:text-[13px] max-[360px]:p-[13px] max-[360px]:text-[12.5px] max-[360px]:rounded-[10px]">
                                         Sign In &nbsp;→
                                     </button>
                                 )}
                             </div>
 
                             <div className="flex items-center gap-3.5 mt-6 mb-5 max-[360px]:mt-[18px] max-[360px]:mb-4">
-                                <div className="flex-1 h-[1px] bg-[rgba(168,85,247,0.14)]" />
-                                <span className="text-[10px] text-[rgba(168,85,247,0.45)] tracking-[0.2em] font-semibold">New Here?</span>
-                                <div className="flex-1 h-[1px] bg-[rgba(168,85,247,0.14)]" />
+                                <div className="flex-1 h-[1px] bg-[rgba(37,99,235,0.14)]" />
+                                <span className="text-[10px] text-[rgba(37,99,235,0.45)] tracking-[0.2em] font-semibold">New Here?</span>
+                                <div className="flex-1 h-[1px] bg-[rgba(37,99,235,0.14)]" />
                             </div>
 
-                            <p className="text-center text-[13px] text-[rgba(240,235,255,0.32)] max-[360px]:text-xs">
+                            <p className="text-center text-[13px] text-[rgba(235,245,255,0.4)] max-[360px]:text-xs">
                                 Don't have an account?{' '}
-                                <span className="text-[#c084fc] font-semibold cursor-pointer transition-colors duration-200 hover:text-[#e879f9] hover:shadow-[0_0_12px_rgba(168,85,247,0.5)]" onClick={handleGoToSignUp}>Create one now</span>
+                                <span className="text-[#60a5fa] font-semibold cursor-pointer transition-colors duration-200 hover:text-[#06b6d4] hover:shadow-[0_0_12px_rgba(37,99,235,0.5)]" onClick={handleGoToSignUp}>Create one now</span>
                             </p>
                         </form>
                     </div>
