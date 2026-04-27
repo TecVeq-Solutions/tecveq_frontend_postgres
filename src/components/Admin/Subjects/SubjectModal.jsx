@@ -14,11 +14,7 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
 
   console.log("subject data is : ", subjectData);
 
-  const [subjectValue, setSubjectValue] = useState(((isEditTrue && subjectData) && subjectData.subjectName) || "");
-  // const [levelValue, setLevelValue] = useState(
-  //   isEditTrue && subjectData ? subjectData.levelName : ""
-  // );
-
+  const [subjectValue, setSubjectValue] = useState("");
   const [levelValue, setLevelValue] = useState("");
   const [errormsg, setErrormsg] = useState(false);
 
@@ -53,8 +49,8 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
       let result;
       console.log(" sending obj is : ", { name: subjectValue, levelID: levelValue })
       if (isEditTrue) {
-        result = await editSubject({ name: subjectValue, levelID: levelValue }, subjectData?.data.id);
-        console.log("subject updatd ", result);
+        result = await editSubject({ name: subjectValue, levelID: levelValue }, subjectData?.id);
+        console.log("subject updated ", result);
       } else {
         result = await createSubject({ name: subjectValue, levelID: levelValue });
       }
@@ -75,11 +71,15 @@ const SubjectModal = ({ open, setopen, refetch, isEditTrue, subjectData, allLeve
 
   useEffect(() => {
     if (isEditTrue && subjectData) {
+      setSubjectValue(subjectData.name || "");
       // Find the matching level ID
       const matchingLevel = allLevels?.find(item => item.name === subjectData.levelName);
       setLevelValue(matchingLevel?.id || "");
+    } else {
+      setSubjectValue("");
+      setLevelValue("");
     }
-  }, [isEditTrue, subjectData, allLevels]);
+  }, [isEditTrue, subjectData, allLevels, open]);
   console.log("hahhahahaha", levelValue);
 
   return (
