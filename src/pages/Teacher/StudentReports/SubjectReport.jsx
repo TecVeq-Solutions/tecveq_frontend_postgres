@@ -13,25 +13,26 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getStudentReport } from "../../../api/Teacher/StudentReport";
 import moment from "moment";
 import { useBlur } from "../../../context/BlurContext";
-import { BookOpen, CheckSquare } from "lucide-react";
+import { BookOpen, CheckSquare, ChevronDown } from "lucide-react";
 
 const SubjectReport = () => {
   const location = useLocation();
   const { isBlurred } = useBlur();
+  const [selectedSubject, setSelectedSubject] = React.useState(location.state?.subject || null);
 
   const { data, isPending, isSuccess, isError, refetch, isRefetching } = useQuery({
     queryKey: [
       "studentReports",
       location.state?.id,
-      location.state?.classroom?.id,
-      location.state?.subject?.id,
+      selectedSubject?.id || location.state?.subject?.id,
+      selectedSubject?.classroomId || location.state?.classroom?.id,
     ],
     queryFn: async () => {
       if (!location.state?.id) return null;
       return await getStudentReport(
         location.state.id,
-        location.state.classroom.id,
-        location.state.subject.id
+        selectedSubject?.classroomId || location.state.classroom.id,
+        selectedSubject?.id || location.state.subject.id
       );
     },
     enabled: !!location.state?.id,
@@ -126,17 +127,36 @@ const SubjectReport = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Subject Selector */}
+                  <div className="mt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <p className="text-xl font-bold text-gray-900">Performance Overview</p>
+                      <p className="text-sm text-gray-500 mt-0.5">Select a subject to view detailed stats</p>
+                    </div>
+
+                    <div className="relative w-full sm:w-60">
+                      <select
+                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0B1053]/30 focus:border-[#0B1053] transition cursor-pointer"
+                        value={selectedSubject ? JSON.stringify(selectedSubject) : ""}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setSelectedSubject(JSON.parse(e.target.value));
+                          }
+                        }}
+                      >
+                        {data?.subjects?.map((sub, index) => (
+                          <option key={sub.id || index} value={JSON.stringify(sub)}>
+                            {sub?.name} {sub?.classroomName ? `(${sub.classroomName})` : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
                 </div>
 
-                {/* ── Performance Overview heading ── */}
-                <div className="mt-6 sm:mt-8">
-                  <p className="text-xl font-bold text-gray-900">
-                    Performance Overview
-                  </p>
-                  <p className="text-sm text-gray-500 mt-0.5">
-                    Summary of student's academic standing
-                  </p>
-                </div>
+
 
                 {/* ── Overview Cards ── */}
                 <div className="mt-4 sm:mt-5">
@@ -188,7 +208,10 @@ const SubjectReport = () => {
                       <p className="font-semibold text-gray-800">Assignments</p>
                     </div>
                     <div className="p-3 sm:p-4 overflow-x-auto">
-                      <QuizAssignmentsTable data={data?.assignments || []} type={"a"} />
+                      <QuizAssignmentsTable 
+                        data={(Array.isArray(data?.assignments) ? data?.assignments : data?.assignments?.data) || []} 
+                        type={"a"} 
+                      />
                     </div>
                   </div>
 
@@ -201,7 +224,10 @@ const SubjectReport = () => {
                       <p className="font-semibold text-gray-800">Quizzes</p>
                     </div>
                     <div className="p-3 sm:p-4 overflow-x-auto">
-                      <QuizAssignmentsTable data={data?.quizes || []} type={"q"} />
+                      <QuizAssignmentsTable 
+                        data={(Array.isArray(data?.quizzes || data?.quizes) ? (data?.quizzes || data?.quizes) : (data?.quizzes?.data || data?.quizes?.data)) || []} 
+                        type={"q"} 
+                      />
                     </div>
                   </div>
 

@@ -9,6 +9,7 @@ import { useAdmin } from '../../../context/AdminContext';
 import { useTeacher } from '../../../context/TeacherContext';
 import { BACKEND_URL_SOCKET } from '../../../constants/api';
 import { io } from 'socket.io-client';
+import { PiGraduationCap, PiChartLineUp, PiShieldCheck, PiArrowRight } from 'react-icons/pi';
 
 const Login = () => {
     const [mounted, setMounted] = useState(false);
@@ -174,22 +175,22 @@ const Login = () => {
                                 <em className="not-italic bg-[linear-gradient(135deg,#00d4ff_0%,#00ffcc_40%,#0099cc_80%)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmerCyan_4s_linear_infinite]">Learning</em><br />
                                 Journey
                             </h1>
-                            <p className="text-sm text-[rgba(220,248,255,0.38)] leading-[1.75] max-w-[340px] font-normal max-[640px]:text-[13px] max-[640px]:max-w-full">
+                            <p className="text-sm sm:text-md text-[rgba(220,248,255,0.38)] leading-[1.75] max-w-[340px] font-normal max-[640px]:text-[13px] max-[640px]:max-w-full">
                                 A world-class platform crafted for students,<br />teachers, and administrators.
                             </p>
                         </div>
 
                         <div className="mb-10 flex flex-col gap-2.5 max-[640px]:hidden">
                             {[
-                                { icon: '🎓', title: 'Smart Learning', desc: 'AI-powered personalized study plans', delay: '0.2s' },
-                                { icon: '📊', title: 'Live Analytics', desc: 'Track progress with real-time dashboards', delay: '0.3s' },
-                                { icon: '🔐', title: 'Secure & Private', desc: 'Enterprise-grade data protection', delay: '0.4s' },
+                                { icon: <PiGraduationCap size={22} />, title: 'Smart Learning', desc: 'AI-powered personalized study plans', delay: '0.2s' },
+                                { icon: <PiChartLineUp size={22} />, title: 'Live Analytics', desc: 'Track progress with real-time dashboards', delay: '0.3s' },
+                                { icon: <PiShieldCheck size={22} />, title: 'Secure & Private', desc: 'Enterprise-grade data protection', delay: '0.4s' },
                             ].map(f => (
                                 <div key={f.title} className="flex items-center gap-3.5 p-[14px_18px] bg-[rgba(0,212,255,0.04)] border border-[rgba(0,212,255,0.12)] rounded-xl cursor-default transition-all duration-[0.35s] cubic-bezier(0.4,0,0.2,1) hover:bg-[rgba(0,212,255,0.09)] hover:border-[rgba(0,212,255,0.32)] hover:translate-x-[6px] animate-[leftReveal_0.8s_ease_forwards]" style={{ animationDelay: f.delay, opacity: 0 }}>
-                                    <div className="w-[38px] h-[38px] shrink-0 rounded-lg bg-[rgba(0,212,255,0.12)] border border-[rgba(0,212,255,0.22)] flex items-center justify-center text-[17px]">{f.icon}</div>
+                                    <div className="w-[38px] h-[38px] shrink-0 rounded-lg bg-[rgba(0,212,255,0.12)] border border-[rgba(0,212,255,0.22)] flex items-center justify-center text-[17px] text-[#00d4ff]">{f.icon}</div>
                                     <div>
-                                        <div className="text-[13px] font-semibold text-[rgba(220,248,255,0.92)] mb-[2px]">{f.title}</div>
-                                        <div className="text-[11.5px] text-[rgba(220,248,255,0.32)] leading-[1.5]">{f.desc}</div>
+                                        <div className="text-[13px] sm:text-[16px] font-semibold text-[rgba(220,248,255,0.92)] mb-[2px]">{f.title}</div>
+                                        <div className="text-[11.5px] sm:text-[14px] text-[rgba(220,248,255,0.32)] leading-[1.5]">{f.desc}</div>
                                     </div>
                                 </div>
                             ))}
@@ -199,7 +200,7 @@ const Login = () => {
                             {[['12K+', 'Students'], ['600+', 'Teachers'], ['98%', 'Satisfaction']].map(([n, l]) => (
                                 <div key={l} className="p-[16px_12px] rounded-xl bg-[rgba(0,212,255,0.05)] border border-[rgba(0,212,255,0.13)] text-center cursor-default transition-all duration-300 hover:bg-[rgba(0,212,255,0.11)] hover:border-[rgba(0,212,255,0.32)] hover:-translate-y-1 max-[420px]:p-[10px_6px] max-[420px]:rounded-lg max-[360px]:p-[8px_4px] max-[360px]:rounded-lg">
                                     <div className="font-['Cormorant_Garamond',serif] text-[26px] font-bold bg-[linear-gradient(135deg,#00d4ff,#00ffcc)] bg-clip-text text-transparent mb-1 max-[420px]:text-[19px] max-[360px]:text-base">{n}</div>
-                                    <div className="text-[10px] text-[rgba(220,248,255,0.32)] tracking-[0.15em] uppercase max-[420px]:text-[8.5px] max-[360px]:text-[7.5px] max-[360px]:tracking-[0.08em]">{l}</div>
+                                    <div className="text-[10px] sm:text-[14px] text-[rgba(220,248,255,0.32)] tracking-[0.15em] uppercase max-[420px]:text-[8.5px] max-[360px]:text-[7.5px] max-[360px]:tracking-[0.08em]">{l}</div>
                                 </div>
                             ))}
                         </div>
@@ -252,21 +253,23 @@ const Login = () => {
 
                         <div className="inline-flex items-center gap-1.5 bg-[rgba(37,99,235,0.12)] border border-[rgba(37,99,235,0.35)] rounded-[100px] p-[5px_13px] mb-[22px] animate-[floatBadge_4s_ease-in-out_infinite] max-[360px]:p-[4px_10px]">
                             <div className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] animate-[dotPulseBlue_2s_ease-in-out_infinite]" />
-                            <span className="text-[11px] text-[#60a5fa] tracking-[0.14em] font-semibold max-[360px]:text-[10px]">Secure Login</span>
+                            <span className="text-[11px] sm:text-[13px] text-[#60a5fa] tracking-[0.14em] font-semibold max-[360px]:text-[10px]">Secure Login</span>
                         </div>
 
                         <div className="font-['Cormorant_Garamond',serif] text-[36px] font-bold text-[#f3eeff] tracking-[-0.3px] leading-[1.1] mb-1.5 max-[640px]:text-[30px] max-[420px]:text-[26px] max-[360px]:text-[23px]">
                             Welcome <em className="not-italic bg-[linear-gradient(135deg,#3b82f6,#06b6d4,#1d4ed8)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmerViolet_4s_linear_infinite]">Back</em>
                         </div>
-                        <div className="text-[13px] text-[rgba(235,245,255,0.4)] mb-8 leading-[1.6] max-[420px]:text-xs max-[420px]:mb-6 max-[360px]:text-[11.5px] max-[360px]:mb-5">
+                        <div className="text-[13px] sm:text-[16px] text-[rgba(235,245,255,0.4)] mb-8 leading-[1.6] max-[420px]:text-xs max-[420px]:mb-6 max-[360px]:text-[11.5px] max-[360px]:mb-5">
                             Sign in to access your dashboard
                         </div>
 
                         <form onSubmit={handleSubmit}>
                             <div className="mb-[18px] max-[360px]:mb-[14px]">
-                                <label className={`block text-[10.5px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
+                                <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
                                 <div className="relative">
-                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,0.22)]'}`}>
+                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
+    ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-black'}`}>
+
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                                         </svg>
@@ -281,9 +284,11 @@ const Login = () => {
                             </div>
 
                             <div className="mb-[18px] max-[360px]:mb-[14px]">
-                                <label className={`block text-[10.5px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
+                                <label className={`block text-[10.5px] sm:text-[14px]  font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
                                 <div className="relative">
-                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,0.22)]'}`}>
+                                    <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
+    ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-black'}`}>
+
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                                         </svg>
@@ -322,15 +327,15 @@ const Login = () => {
                                 {loading ? (
                                     <div className="flex justify-center p-[8px_0]"><Loader /></div>
                                 ) : (
-                                    <button type="submit" className="w-full p-[15px] bg-[linear-gradient(135deg,#1e40af_0%,#3b82f6_40%,#38bdf8_80%,#0284c7_100%)] bg-[length:200%_100%] border-none rounded-xl text-white text-sm font-bold tracking-[0.08em] cursor-pointer font-['Syne',sans-serif] relative overflow-hidden transition-all duration-300 cubic-bezier(0.4,0,0.2,1) shadow-[0_4px_20px_rgba(37,99,235,0.38)] hover:bg-right hover:-translate-y-[2px] hover:shadow-[0_8px_32px_rgba(37,99,235,0.55)] active:translate-y-0 active:shadow-[0_4px_16px_rgba(37,99,235,0.38)] before:content-[''] before:absolute before:top-0 before:-left-full before:w-3/5 before:h-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] before:skew-x-[-20deg] before:animate-[btnShine_4s_ease-in-out_infinite_1s] max-[420px]:text-[13px] max-[360px]:p-[13px] max-[360px]:text-[12.5px] max-[360px]:rounded-[10px]">
-                                        Sign In &nbsp;→
+                                    <button type="submit" className="w-full p-[15px] bg-[linear-gradient(135deg,#1e40af_0%,#3b82f6_40%,#38bdf8_80%,#0284c7_100%)] bg-[length:200%_100%] border-none rounded-xl text-white text-sm font-bold tracking-[0.08em] cursor-pointer font-['Syne',sans-serif] relative overflow-hidden transition-all duration-300 cubic-bezier(0.4,0,0.2,1) shadow-[0_4px_20px_rgba(37,99,235,0.38)] hover:bg-right hover:-translate-y-[2px] hover:shadow-[0_8px_32px_rgba(37,99,235,0.55)] active:translate-y-0 active:shadow-[0_4px_16px_rgba(37,99,235,0.38)] before:content-[''] before:absolute before:top-0 before:-left-full before:w-3/5 before:h-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] before:skew-x-[-20deg] before:animate-[btnShine_4s_ease-in-out_infinite_1s] max-[420px]:text-[13px] max-[360px]:p-[13px] max-[360px]:text-[12.5px] max-[360px]:rounded-[10px] flex items-center justify-center gap-2">
+                                        Sign In <PiArrowRight weight="bold" size={18} />
                                     </button>
                                 )}
                             </div>
 
                             <div className="flex items-center gap-3.5 mt-6 mb-5 max-[360px]:mt-[18px] max-[360px]:mb-4">
                                 <div className="flex-1 h-[1px] bg-[rgba(37,99,235,0.14)]" />
-                                <span className="text-[10px] text-[rgba(37,99,235,0.45)] tracking-[0.2em] font-semibold">New Here?</span>
+                                <span className="text-[10px] sm:text-[12px] text-[rgba(37,99,235,0.45)] tracking-[0.2em] font-semibold">New Here?</span>
                                 <div className="flex-1 h-[1px] bg-[rgba(37,99,235,0.14)]" />
                             </div>
 
