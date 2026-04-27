@@ -36,9 +36,8 @@ const setupAxios = () => {
 
       // Handle 401 specifically if needed (e.g., redirect to login)
       if (error?.response?.status === 401) {
-        // Optional: Redirect or clear user state
-        // localStorage.removeItem("tcauser");
-        // window.location.href = "/login";
+        localStorage.removeItem("tcauser");
+        window.location.href = "/login";
       }
 
       return Promise.reject(error);
