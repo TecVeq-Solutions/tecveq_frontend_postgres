@@ -9,6 +9,7 @@ import { useStudent } from '../../../context/StudentContext';
 import { useParent } from '../../../context/ParentContext';
 import { io } from 'socket.io-client';
 import { BACKEND_URL, BACKEND_URL_SOCKET } from '../../../constants/api';
+import { PiGraduationCap, PiUsersThree, PiArrowRight } from 'react-icons/pi';
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -131,11 +132,11 @@ const Login = () => {
                         background: `radial-gradient(700px circle at ${mousePos.x}% ${mousePos.y}%, rgba(0,212,255,0.07) 0%, transparent 55%)`,
                         transition: 'background 0.1s',
                     }} />
-                    
+
                     <div className="absolute rounded-full pointer-events-none w-[560px] h-[560px] -top-[120px] -left-[140px] bg-[radial-gradient(circle_at_40%_40%,rgba(0,80,140,.85)_0%,rgba(0,40,80,.55)_45%,transparent_70%)] animate-[auroraDrift_18s_ease-in-out_infinite] blur-[1px]" />
                     <div className="absolute rounded-full pointer-events-none w-[480px] h-[480px] -bottom-[80px] -right-[100px] bg-[radial-gradient(circle_at_60%_60%,rgba(0,100,100,.65)_0%,rgba(0,60,70,.35)_50%,transparent_70%)] animate-[auroraDrift2_22s_ease-in-out_infinite] blur-[2px]" />
                     <div className="absolute rounded-full pointer-events-none w-[300px] h-[300px] top-[45%] left-[55%] bg-[radial-gradient(circle,rgba(0,60,90,.3) 0%,transparent_65%)] animate-[auroraDrift_14s_ease-in-out_infinite_reverse]" />
-                    
+
                     <div className="absolute inset-0 pointer-events-none overflow-hidden after:content-[''] after:absolute after:-inset-[100px] after:bg-[length:56px_56px] after:bg-[linear-gradient(rgba(0,212,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.045)_1px,transparent_1px)]">
                         <div className="absolute left-0 right-0 h-[1px] bg-[linear-gradient(90deg,transparent,rgba(0,212,255,0.28),transparent)] animate-[scanLine_8s_linear_infinite] pointer-events-none" />
                     </div>
@@ -177,19 +178,19 @@ const Login = () => {
                             <h1 className="font-['Cormorant_Garamond',serif] text-[52px] font-bold leading-[1.08] text-[#e0f7ff] tracking-[-0.5px] mb-3.5 max-[900px]:text-[42px] max-[640px]:text-[36px] max-[420px]:text-[30px] max-[360px]:text-[26px]">
                                 Your Portal<br />To <em className="not-italic bg-[linear-gradient(135deg,#00d4ff_0%,#00ffcc_40%,#0099cc_80%)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[shimmerCyan_4s_linear_infinite]">Excellence</em>
                             </h1>
-                            <p className="text-sm text-[rgba(220,248,255,.38)] leading-[1.75] max-w-[340px] font-normal max-[640px]:text-[13px] max-[640px]:max-w-full">Students and parents can access their personalized dashboard, track progress, and stay connected.</p>
+                            <p className="text-sm sm:text-md text-[rgba(220,248,255,.38)] leading-[1.75] max-w-[340px] font-normal max-[640px]:text-[13px] max-[640px]:max-w-full">Students and parents can access their personalized dashboard, track progress, and stay connected.</p>
                         </div>
                         <div className="mb-9 max-[640px]:hidden">
                             <div className="text-[10px] tracking-[0.2em] uppercase text-[rgba(0,212,255,.5)] font-semibold mb-3.5">Who can login</div>
                             <div className="flex gap-3">
                                 {[
-                                    { icon: '🎓', title: 'Student', desc: 'Access lessons, assignments & progress reports', delay: '0.2s' },
-                                    { icon: '👨‍👩‍👧', title: 'Parent', desc: "Monitor your child's academic journey", delay: '0.32s' },
+                                    { icon: <PiGraduationCap size={28} />, title: 'Student', desc: 'Access lessons, assignments & progress reports', delay: '0.2s' },
+                                    { icon: <PiUsersThree size={28} />, title: 'Parent', desc: "Monitor your child's academic journey", delay: '0.32s' },
                                 ].map(r => (
                                     <div key={r.title} className="flex-1 p-[16px_14px] bg-[rgba(0,212,255,.04)] border border-[rgba(0,212,255,.12)] rounded-[14px] cursor-default transition-all duration-[0.35s] cubic-bezier(.4,0,.2,1) hover:bg-[rgba(0,212,255,.09)] hover:border-[rgba(0,212,255,.32)] hover:-translate-y-1 animate-[leftReveal_0.8s_ease_forwards] opacity-0" style={{ animationDelay: r.delay }}>
-                                        <div className="text-[22px] mb-2">{r.icon}</div>
-                                        <div className="text-[13px] font-semibold text-[rgba(220,248,255,.92)] mb-[3px]">{r.title}</div>
-                                        <div className="text-[11px] text-[rgba(220,248,255,.32)] leading-[1.5]">{r.desc}</div>
+                                        <div className="text-[22px] mb-2 text-[#00d4ff]">{r.icon}</div>
+                                        <div className="text-[13px] sm:text-[16px] font-semibold text-[rgba(220,248,255,.92)] mb-[3px]">{r.title}</div>
+                                        <div className="text-[11px] sm:text-[14px] text-[rgba(220,248,255,.32)] leading-[1.5]">{r.desc}</div>
                                     </div>
                                 ))}
                             </div>
@@ -198,7 +199,7 @@ const Login = () => {
                             {[['12K+', 'Students'], ['600+', 'Teachers'], ['98%', 'Satisfaction']].map(([n, l]) => (
                                 <div key={l} className="p-[14px_10px] rounded-[14px] bg-[rgba(0,212,255,0.05)] border border-[rgba(0,212,255,0.13)] text-center cursor-default transition-all duration-300 hover:bg-[rgba(0,212,255,0.11)] hover:border-[rgba(0,212,255,0.32)] hover:-translate-y-1 max-[640px]:p-[12px_8px] max-[420px]:p-[10px_6px] max-[420px]:rounded-[10px] max-[360px]:p-[8px_4px] max-[360px]:rounded-[8px]">
                                     <div className="font-['Cormorant_Garamond',serif] text-2xl font-bold bg-[linear-gradient(135deg,#00d4ff,#00ffcc)] bg-clip-text text-transparent mb-[3px] max-[640px]:text-xl max-[420px]:text-[18px] max-[360px]:text-base">{n}</div>
-                                    <div className="text-[10px] text-[rgba(220,248,255,0.32)] tracking-[0.15em] uppercase max-[420px]:text-[8.5px] max-[360px]:text-[7.5px] max-[360px]:tracking-[0.08em]">{l}</div>
+                                    <div className="text-[10px] sm:text-[14px] text-[rgba(220,248,255,0.32)] tracking-[0.15em] uppercase max-[420px]:text-[8.5px] max-[360px]:text-[7.5px] max-[360px]:tracking-[0.08em]">{l}</div>
                                 </div>
                             ))}
                         </div>
@@ -212,7 +213,7 @@ const Login = () => {
                     <div className="absolute pointer-events-none w-[360px] h-[360px] top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(30,58,138,.13)_0%,transparent_65%)] filter blur-[20px] animate-[meshMove3_16s_ease-in-out_infinite] max-[360px]:hidden" />
 
                     <div className="absolute inset-0 pointer-events-none overflow-hidden after:content-[''] after:absolute after:-inset-[60px] after:bg-[linear-gradient(rgba(37,99,235,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.05)_1px,transparent_1px)] after:bg-[length:48px_48px] after:animate-[gridGlow_6s_ease-in-out_infinite]" />
-                    
+
                     <div className="absolute top-0 bottom-0 w-[1px] left-1/4 bg-[linear-gradient(180deg,transparent,rgba(37,99,235,0.20),transparent)] animate-[lineTrail_7s_linear_infinite] pointer-events-none" />
                     <div className="absolute top-0 bottom-0 w-[1px] left-[72%] bg-[linear-gradient(180deg,transparent,rgba(6,182,212,0.14),transparent)] animate-[lineTrail_10s_3.5s_linear_infinite] pointer-events-none" />
 
@@ -255,13 +256,13 @@ const Login = () => {
                         </div>
 
                         <div className="font-['Cormorant_Garamond',serif] text-[34px] font-bold text-[#f3eeff] tracking-[-.3px] leading-[1.1] mb-1.5 max-[640px]:text-[28px] max-[420px]:text-[24px] max-[360px]:text-[22px]">Welcome Back</div>
-                        <div className="text-[13px] text-[rgba(240,235,255,.35)] mb-7 leading-[1.5] max-[420px]:text-xs max-[420px]:mb-5 max-[360px]:text-[11.5px] max-[360px]:mb-[18px]">Please enter your details to sign in</div>
+                        <div className="text-[13px] sm:text-[16px] text-[rgba(240,235,255,.35)] mb-7 leading-[1.5] max-[420px]:text-xs max-[420px]:mb-5 max-[360px]:text-[11.5px] max-[360px]:mb-[18px]">Please enter your details to sign in</div>
 
                         <form onSubmit={handleSubmit}>
 
                             {/* Role Selector */}
                             <div className="mb-4 max-[360px]:mb-3">
-                                <label className={`block text-[10.5px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'role' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Login As</label>
+                                <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'role' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Login As</label>
                                 <div className="relative">
                                     <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'role' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -286,9 +287,11 @@ const Login = () => {
 
                             {/* Email */}
                             <div className="mb-4 max-[360px]:mb-3">
-                                <label className={`block text-[10.5px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
+                                <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
                                 <div className="relative">
-                                    <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
+                                    <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
+    ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-black'}`}>
+
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                                         </svg>
@@ -304,9 +307,11 @@ const Login = () => {
 
                             {/* Password */}
                             <div className="mb-4 max-[360px]:mb-3">
-                                <label className={`block text-[10.5px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
+                                <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
                                 <div className="relative">
-                                    <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
+                                    <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
+    ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-black'}`}>
+
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                                         </svg>
@@ -347,14 +352,14 @@ const Login = () => {
                                 {loading ? (
                                     <div className="flex justify-center py-2"><Loader /></div>
                                 ) : (
-                                    <button type="submit" className="w-full p-[15px] bg-[linear-gradient(135deg,#1e40af_0%,#3b82f6_40%,#38bdf8_80%,#0284c7_100%)] bg-[length:200%_100%] border-none rounded-xl text-white text-sm font-bold tracking-[.08em] cursor-pointer font-['Syne',sans-serif] relative overflow-hidden transition-all duration-300 cubic-bezier(.4,0,.2,1) shadow-[0_4px_20px_rgba(37,99,235,.38)] hover:bg-right hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(37,99,235,.55)] active:translate-y-0 active:shadow-[0_4px_16px_rgba(37,99,235,.38)] before:content-[''] before:absolute before:top-0 before:-left-full before:w-3/5 before:h-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] before:skew-x-[-20deg] before:animate-[btnShine_4s_ease-in-out_infinite_1s]">Sign In &nbsp;→</button>
+                                    <button type="submit" className="w-full p-[15px] bg-[linear-gradient(135deg,#1e40af_0%,#3b82f6_40%,#38bdf8_80%,#0284c7_100%)] bg-[length:200%_100%] border-none rounded-xl text-white text-sm font-bold tracking-[.08em] cursor-pointer font-['Syne',sans-serif] relative overflow-hidden transition-all duration-300 cubic-bezier(.4,0,.2,1) shadow-[0_4px_20px_rgba(37,99,235,.38)] hover:bg-right hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(37,99,235,.55)] active:translate-y-0 active:shadow-[0_4px_16px_rgba(37,99,235,.38)] before:content-[''] before:absolute before:top-0 before:-left-full before:w-3/5 before:h-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent)] before:skew-x-[-20deg] before:animate-[btnShine_4s_ease-in-out_infinite_1s] flex items-center justify-center gap-2">Sign In <PiArrowRight weight="bold" size={18} /></button>
                                 )}
                             </div>
 
                             {/* Divider */}
                             <div className="flex items-center gap-3.5 mt-[22px] mb-[18px] max-[360px]:mt-4 max-[360px]:mb-3.5">
                                 <div className="flex-1 h-[1px] bg-[rgba(37,99,235,.14)]" />
-                                <span className="text-[10px] text-[rgba(37,99,235,.45)] tracking-[.2em] font-semibold">New Here?</span>
+                                <span className="text-[10px] sm:text-[12px] text-[rgba(37,99,235,.45)] tracking-[.2em] font-semibold">New Here?</span>
                                 <div className="flex-1 h-[1px] bg-[rgba(37,99,235,.14)]" />
                             </div>
 

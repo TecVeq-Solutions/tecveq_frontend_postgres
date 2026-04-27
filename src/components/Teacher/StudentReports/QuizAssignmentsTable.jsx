@@ -36,7 +36,7 @@ const QuizAssignmentsTable = ({ data, type }) => {
 
                                 if (!isSubmitted) {
                                     if (isDueDatePassed) {
-                                        displayMarks = <span className="text-red-500 font-semibold italic">no assignment</span>;
+                                        displayMarks = <span className="text-red-500 font-semibold italic">{type === 'q' ? "no quiz" : "no assignment"}</span>;
                                         displayGrade = "F";
                                     } else {
                                         displayMarks = <span className="text-yellow-600 italic">pending</span>;
