@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 const setupAxios = () => {
   // Global axios configuration
   axios.defaults.withCredentials = true;
+  axios.defaults.timeout = 20000; // 20 seconds timeout to prevent hanging requests
 
   // Response interceptor for global error handling
   axios.interceptors.response.use(
@@ -14,12 +15,18 @@ const setupAxios = () => {
     (error) => {
       // Catch all axios errors (4xx, 5xx, or network errors)
       if (!axios.isCancel(error)) {
-        const errMsg =
+        let errMsg =
           error?.response?.data?.message ||
           error?.response?.data?.error ||
           (typeof error?.response?.data === "string" ? error?.response?.data : null) ||
           error.message ||
           "An unexpected error occurred";
+
+        if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
+          errMsg = "Request timed out. Please check your internet connection or try again later.";
+        } else if (error.message === "Network Error") {
+          errMsg = "Network Error: Could not connect to the server. This may be due to a CORS issue or the server being down.";
+        }
 
         // Skip toast for specific expected "errors" like teacher not being in a classroom yet
         const skipToast = errMsg === "Teacher not found in any classroom." || errMsg === "No subjects found for the given teacher." || errMsg === "Setting not found";

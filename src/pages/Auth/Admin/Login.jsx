@@ -54,12 +54,17 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
+            const emailValue = e.target[0].value.trim().toLowerCase();
+            const passwordValue = e.target[1].value;
+
             const dataBody = {
-                email: e.target[0].value.trim().toLowerCase(),
-                password: e.target[1].value
+                email: emailValue,
+                password: passwordValue
             };
+            
             const response = await studentLogin(dataBody);
-            if (response !== "error") {
+            
+            if (response && response !== "error") {
                 setUserData(response);
                 if (response.userType == "admin") {
                     setAdminLogedIn(true);
@@ -79,13 +84,19 @@ const Login = () => {
                     localStorage.setItem("tcauser", JSON.stringify(response));
                     navigate("/teacher/dashboard");
                 } else {
+                    toast.error("Unauthorized access type");
                     navigate("/admin/login");
                 }
+            } else if (response === "error") {
+                // apiRequest usually throws, but if it returns "error", handle it here
+                console.error("Login failed: API returned 'error'");
             }
         } catch (error) {
-            console.log("error in student login UI screen is : ", error);
+            console.error("error in student login UI screen is : ", error);
+            // toast.error is already handled by setupAxios interceptor
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleGoToSignUp = () => navigate("/signup");

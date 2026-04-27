@@ -52,13 +52,19 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
+            const roleValue = e.target[0].value;
+            const emailValue = e.target[1].value.trim().toLowerCase();
+            const passwordValue = e.target[2].value;
+
             const dataBody = {
-                role: e.target[0].value,
-                email: e.target[1].value,
-                password: e.target[2].value
+                role: roleValue,
+                email: emailValue,
+                password: passwordValue
             };
+            
             const response = await studentLogin(dataBody);
-            if (response !== "error") {
+            
+            if (response && response !== "error") {
                 setUserData(response);
                 if (response.userType == "student") {
                     if (response.isBlocked == true) {
@@ -81,13 +87,18 @@ const Login = () => {
                     navigate("/parent/children");
                     setParentLogedIn(true);
                 } else {
+                    toast.error("Unauthorized access type");
                     navigate("/");
                 }
+            } else if (response === "error") {
+                console.error("Login failed: API returned 'error'");
             }
         } catch (error) {
-            console.log("error in student login UI screen is : ", error);
+            console.error("error in student login UI screen is : ", error);
+            // toast.error is already handled by setupAxios interceptor
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleGoToSignUp = () => navigate("/signup");
