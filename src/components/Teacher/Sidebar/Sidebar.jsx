@@ -99,7 +99,7 @@ const Sidebar = () => {
   ];
 
   const Menubar = ({ isMobile }) => (
-    <div className="admin-sidebar flex flex-col   w-80 h-screen bg-[#0B1053] text-white shadow-xl">
+    <div className="admin-sidebar flex flex-col w-80 lg:w-72  xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
       <div className=" flex items-center justify-between px-[16px] pt-6 pb-5 border-b 
        border-gray-200">

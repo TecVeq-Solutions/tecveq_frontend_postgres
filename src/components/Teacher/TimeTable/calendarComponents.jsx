@@ -64,9 +64,9 @@ export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
           opacity: 0.5,
         }} />
 
-        <div className="flex flex-col justify-start items-start px-2 pt-1 pb-1 gap-[3px]">
+        <div className="flex flex-col justify-start items-start px-1 xl:px-2 pt-1 pb-1 gap-[3px]">
           {/* Label (Using "Schedule" or "Class" instead of Teacher for teacher side) */}
-          <div className="flex items-center gap-1 w-full">
+          <div className="flex flex-col xl:flex-row xl:items-center  gap-1 w-full">
             <span style={{
               fontSize: "8px",
               fontWeight: 600,

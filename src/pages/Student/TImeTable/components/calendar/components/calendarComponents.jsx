@@ -11,7 +11,7 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 export const CustomEvent = ({ event, setevents }) => {
   const [detailsModalOpen, setdetailsModalOpen] = useState(false);
-  
+
   // Calculate event duration in hours for height scaling
   const startTime = new Date(event.startTime);
   const endTime = new Date(event.endTime);
@@ -26,7 +26,7 @@ export const CustomEvent = ({ event, setevents }) => {
         open={detailsModalOpen}
         setopen={setdetailsModalOpen}
       />}
-      
+
       <div
         onClick={() => {
           if (event?.teacher?.name) {
@@ -64,9 +64,9 @@ export const CustomEvent = ({ event, setevents }) => {
           opacity: 0.5,
         }} />
 
-        <div className="flex flex-col justify-start items-start px-2 pt-1 pb-1 gap-[3px]">
+        <div className="flex flex-col justify-start items-start px-1 xl:px-2  pt-1 pb-1 gap-[3px]">
           {/* Teacher */}
-          <div className="flex items-center gap-1 w-full">
+          <div className="flex flex-col xl:flex-row xl:items-center   gap-1 w-full">
             <span style={{
               fontSize: "8px",
               fontWeight: 600,
@@ -280,7 +280,7 @@ export const CustomToolbar = ({
 }) => {
   const goToBack = () => toolbar.onNavigate("PREV");
   const goToNext = () => toolbar.onNavigate("NEXT");
-  
+
   // Current visible date from calendar (updates on navigate)
   const visibleDate = toolbar.date ? moment(toolbar.date) : moment();
 

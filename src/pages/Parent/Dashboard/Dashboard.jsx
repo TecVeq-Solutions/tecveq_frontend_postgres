@@ -24,7 +24,7 @@ const Dashboard = () => {
 
       <div className="flex flex-1 gap-4 relative z-10">
         {/* px-2 on mobile, px-5 on sm+, lg:ml-80 for sidebar offset */}
-        <div className="flex flex-col flex-1 px-2 sm:px-5 lg:ml-80">
+        <div className="flex flex-col flex-1 px-2 sm:px-5 ml-80 lg:ml-72 xl:ml-80">
           <div className="flex h-16 sm:h-20">
             <Navbar />
           </div>
