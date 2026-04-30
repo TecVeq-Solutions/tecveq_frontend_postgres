@@ -30,7 +30,7 @@ const Dashboard = () => {
             <div className="flex-1 xl:flex-[2] min-w-0">
               <Announcements data={allAnnouncements} />
             </div>
-            <div className={`flex-1 xl:flex-[3] min-w-0 ${isSidebarOpen ? "z-0" : "z-auto"}`}>
+            <div className={`hidden lg:block flex-1 xl:flex-[3] min-w-0 ${isSidebarOpen ? "z-0" : "z-auto"}`}>
               <UpcomingClasses />
             </div>
           </div>

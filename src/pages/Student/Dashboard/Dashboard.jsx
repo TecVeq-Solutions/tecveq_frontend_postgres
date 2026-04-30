@@ -40,7 +40,7 @@ const Dashboard = () => {
         <div className="flex w-full min-h-screen bg-[#f9f9f9]/50 font-poppins">
           <div className="flex w-full">
             <div className={`flex flex-col flex-1 w-full lg:w-[calc(100%-20rem)] lg:max-w-[calc(100%-20rem)] px-2 sm:px-5 lg:ml-80`}>
-              <div className="flex h-20 md:px-14 lg:px-0">
+              <div className="flex h-16 md:px-14 lg:px-0">
                 <Navbar />
               </div>
               <div
@@ -56,7 +56,7 @@ const Dashboard = () => {
               <div
                 className="flex flex-col md:px-10 lg:px-0 xl:flex-row flex-1 gap-5 my-2"
               >
-                <div className="flex flex-[3]">
+                <div className="hidden lg:flex flex-[3]">
                   <ScheduledClasses />
                 </div>
                 <div className="flex flex-[2]">
