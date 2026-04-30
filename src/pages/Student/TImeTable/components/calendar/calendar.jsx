@@ -89,7 +89,8 @@ const MyCalendar = () => {
           addModalOpen={addModalOpen}
           setaddModalOpen={setaddModalOpen}
         />}
-      <div className="w-full h-[350vh] overflow-y-auto">
+      {/* overflow-y-auto overflow-x-auto */}
+      <div className="student-calendar w-full h-[800px] overflow-x-auto overflow-y-auto">
         <Calendar
           style={{}}
           formats={{
@@ -104,31 +105,31 @@ const MyCalendar = () => {
           events={events}
           startAccessor="start"
           endAccessor="end"
-          className="w-full"
-        step={60}
-        timeslots={1}
-        components={useMemo(() => ({
-          toolbar: (toolbar) => (
-            <CustomToolbar
-              loading={loading}
-              activeFilteredField={activeFilteredField}
-              setactiveFilteredField={setactiveFilteredField}
-              events={data}
-              setevents={setEvents}
-              addModalOpen={addModalOpen}
-              setaddModalOpen={setaddModalOpen}
-              toolbar={toolbar}
-            />
-          ),
-          event: (e) => {
-            return <CustomEvent setevents={setEvents} event={e.event} />;
-          },
-          timeGutterHeader: SideTimeHeader,
-          timeGutterWrapper: SideTime,
-          header: Header,
-        }), [loading, activeFilteredField, data, addModalOpen])}
-        dayLayoutAlgorithm={"no-overlap"}
-      />
+          className="w-full min-w-[900px] sm:min-w-full h-full"
+          step={60}
+          timeslots={1}
+          components={useMemo(() => ({
+            toolbar: (toolbar) => (
+              <CustomToolbar
+                loading={loading}
+                activeFilteredField={activeFilteredField}
+                setactiveFilteredField={setactiveFilteredField}
+                events={data}
+                setevents={setEvents}
+                addModalOpen={addModalOpen}
+                setaddModalOpen={setaddModalOpen}
+                toolbar={toolbar}
+              />
+            ),
+            event: (e) => {
+              return <CustomEvent setevents={setEvents} event={e.event} />;
+            },
+            timeGutterHeader: SideTimeHeader,
+            timeGutterWrapper: SideTime,
+            header: Header,
+          }), [loading, activeFilteredField, data, addModalOpen])}
+          dayLayoutAlgorithm={"no-overlap"}
+        />
       </div>
     </>
   );

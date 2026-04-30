@@ -80,8 +80,8 @@ export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
               fontWeight: 500,
               overflow: "hidden",
               textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: "70%",
+              whiteSpace: "normal",
+              maxWidth: "100%",
             }}>
               {moment(event.startTime).format("hh:mm a")}
             </span>
@@ -95,7 +95,7 @@ export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
             lineHeight: "1.2",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            whiteSpace: "normal",
             width: "100%",
           }}>
             {event.title ? event.title : "Untitled"}
@@ -117,7 +117,7 @@ export const CustomEvent = ({ event, setevents, refetch, isRefetching }) => {
                 fontWeight: 600,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                whiteSpace: "normal",
               }}>
                 {event?.subject?.name}
               </span>
@@ -134,7 +134,7 @@ export const SideTime = (props) => {
   const times = props.slotMetrics.groups;
 
   return (
-    <div className="flex flex-col" style={{ width: "110px" }}>
+    <div className="flex flex-col w-[90px] sm:w-[110px]">
       {times.map((time, index) => {
         const startTime = moment.utc(time[0]).tz("Asia/Karachi");
         const endTime = index < times.length - 1
@@ -144,15 +144,8 @@ export const SideTime = (props) => {
         return (
           <div
             key={`${time}`}
+            className="w-[90px] sm:w-[110px] h-[100px] min-h-[100px] flex items-center justify-center border-b border-[#EDE9FE] py-2 px-1"
             style={{
-              width: "110px",
-              height: "100px",
-              minHeight: "100px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderBottom: "1px solid #EDE9FE",
-              padding: "8px 4px",
               background: index % 2 === 0 ? "#FAFAFA" : "#FFFFFF",
             }}
           >

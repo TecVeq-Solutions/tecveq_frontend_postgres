@@ -125,7 +125,7 @@ const Announcements = () => {
                     </div>
 
                     {/* ── Cards Grid ── */}
-                    <div className='grid grid-cols-1 gap-3 sm:gap-6 transition-all duration-500'>
+                    <div className='grid grid-cols-1 gap-2 sm:gap-3 transition-all duration-500'>
                         {filteredData.length > 0 ? (
                             filteredData.map((item, index) => (
                                 annouce ? (

@@ -16,7 +16,7 @@ export const CustomEvent = ({ event, setevents }) => {
   const startTime = new Date(event.startTime);
   const endTime = new Date(event.endTime);
   const durationHours = calculateDurationHours(startTime, endTime);
-  const eventHeight = Math.max(100, durationHours * 100); // Minimum 100px, scale by 100px per hour
+  const eventHeight = Math.max(80, durationHours * 80); // Minimum 80px, scale by 80px per hour
 
   return (
     <div className="relative flex flex-1 w-full overflow-visible mb-1">
@@ -80,8 +80,8 @@ export const CustomEvent = ({ event, setevents }) => {
               fontWeight: 500,
               overflow: "hidden",
               textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: "70%",
+              whiteSpace: "normal",
+              maxWidth: "100%",
             }}>
               {event?.teacher?.name ?? "—"}
             </span>
@@ -95,7 +95,7 @@ export const CustomEvent = ({ event, setevents }) => {
             lineHeight: "1.2",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            whiteSpace: "normal",
             width: "100%",
           }}>
             {event?.title || "Untitled"}
@@ -117,7 +117,7 @@ export const CustomEvent = ({ event, setevents }) => {
                 fontWeight: 600,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                whiteSpace: "normal",
               }}>
                 {event?.subject?.name}
               </span>
@@ -133,7 +133,7 @@ export const SideTime = (props) => {
   const times = props.slotMetrics.groups;
 
   return (
-    <div className="flex flex-col" style={{ width: "110px" }}>
+    <div className="flex flex-col w-[90px] sm:w-[110px]">
       {times.map((time, index) => {
         const startTime = moment.utc(time[0]).tz("Asia/Karachi");
         const endTime = index < times.length - 1
@@ -143,15 +143,8 @@ export const SideTime = (props) => {
         return (
           <div
             key={`${time}2`}
+            className="w-[90px] sm:w-[110px] h-[80px] min-h-[80px] flex items-center justify-center border-b border-[#EDE9FE] py-2 px-1"
             style={{
-              width: "110px",
-              height: "100px",
-              minHeight: "100px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderBottom: "1px solid #EDE9FE",
-              padding: "8px 4px",
               background: index % 2 === 0 ? "#FAFAFA" : "#FFFFFF",
             }}
           >
