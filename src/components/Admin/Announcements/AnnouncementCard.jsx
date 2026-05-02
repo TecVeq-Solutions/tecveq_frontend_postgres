@@ -33,7 +33,7 @@ const AnnouncementCard = ({ announcement, deleteAnnouncement, editAnnouncement, 
     const toggleMenu = () => setShowMenu(!showMenu);
 
     return (
-        <div className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-xl hover:shadow-gray-200/50 transition-all  duration-300  sm:mb-4 overflow-visible">
+        <div className="group relative bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-xl hover:shadow-gray-200/50 transition-all  duration-300  sm:mb-2 overflow-visible">
 
             <div className="flex flex-col gap-4">
 

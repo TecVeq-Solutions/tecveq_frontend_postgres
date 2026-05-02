@@ -5,7 +5,7 @@ const AdminLayout = ({ children }) => {
   return (
     <>
       <div className="flex max-w-full">
-        <div className="fixed top-0 left-0 h-screen z-20 flex">
+        <div className="fixed top-0 left-0 h-screen z-[100] flex">
           <Sidebar />
         </div>
         {children}

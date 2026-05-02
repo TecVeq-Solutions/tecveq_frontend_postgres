@@ -128,7 +128,7 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
           startAccessor="start"
           endAccessor="end"
           onNavigate={handleNavigate}
-          className="w-full"
+          className="w-full min-w-[900px] sm:min-w-full h-full"
           dayLayoutAlgorithm="no-overlap"
           step={60}
           timeslots={1}

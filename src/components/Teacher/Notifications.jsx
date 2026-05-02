@@ -103,22 +103,22 @@ const Notifications = ({ onclose, dashboard }) => {
   return (
     <div className={`fixed inset-y-0 right-0 z-[200] flex flex-col bg-[#F8FAFC] border-l border-slate-200 shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] transition-all duration-500 md:w-[400px] w-full ${!dashboard ? "pt-20" : "pt-0"}`}>
       {/* Header */}
-      <div className="relative overflow-hidden bg-white px-6 py-8 border-b border-slate-100">
+      <div className="relative overflow-hidden bg-white px-3 sm:px-6 py-8 border-b border-slate-100">
         <div className="absolute top-[-10%] right-[-10%] w-32 h-32 bg-[#149B9A]/5 rounded-full blur-3xl"></div>
         <div className="relative flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
               Updates <span className="text-[#149B9A]">.</span>
             </h2>
-            <div className="mt-4 flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+            <div className="mt-4 flex bg-slate-50 gap-2 p-1 rounded-xl border border-slate-100">
               <button
-                className={`flex-1 py-2 text-[12px] font-bold rounded-lg transition-all ${activeTab === "notification" ? "bg-white text-[#0B1053] shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
+                className={`flex-1 py-2 px-2 text-[12px] font-bold rounded-lg transition-all ${activeTab === "notification" ? "bg-white text-[#0B1053] shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
                 onClick={() => setActiveTab("notification")}
               >
                 Notifications
               </button>
               <button
-                className={`flex-1 py-2 text-[12px] font-bold rounded-lg transition-all ${activeTab === "announcement" ? "bg-white text-[#0B1053] shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
+                className={`flex-1 py-2 px-2 text-[12px] font-bold rounded-lg transition-all ${activeTab === "announcement" ? "bg-white text-[#0B1053] shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
                 onClick={() => setActiveTab("announcement")}
               >
                 Announcements
@@ -132,7 +132,7 @@ const Notifications = ({ onclose, dashboard }) => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 no-scrollbar custom-scroll">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 no-scrollbar custom-scroll">
         {activeTab === "notification" ? (
           notificationsLoading ? (
             <div className="flex flex-col gap-4">

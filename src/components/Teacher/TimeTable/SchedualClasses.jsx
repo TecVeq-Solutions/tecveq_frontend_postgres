@@ -86,7 +86,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
 
   return (
     <div className="fixed inset-0 z-[999] flex justify-end items-start bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in duration-300">
-      <div className="mr-6 mt-6 w-[440px] bg-white rounded-[24px] shadow-[0_20px_50px_rgba(8,_112,_184,_0.2)] flex flex-col max-h-[92vh] animate-in slide-in-from-right duration-500 overflow-hidden border border-blue-50">
+      <div className="mr-0 sm:mr-6 mt-6  w-[440px] bg-white rounded-0 sm:rounded-[24px] shadow-[0_20px_50px_rgba(8,_112,_184,_0.2)] flex flex-col max-h-[100vh] sm:max-h-[92vh] animate-in slide-in-from-right duration-500 overflow-hidden border  border-blue-50">
 
         {/* Header - Royal Blue Gradient (Same as Admin) */}
         <div className="relative px-8 py-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
@@ -114,7 +114,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
         </div>
 
         {/* Body */}
-        <div className="flex flex-col gap-6 px-8 py-6 overflow-y-auto custom-scrollbar bg-white">
+        <div className="flex flex-col gap-6 px-3 sm:px-8 py-6 overflow-y-auto custom-scrollbar bg-white">
 
           {/* Section: Academic Info */}
           <div className="space-y-4">

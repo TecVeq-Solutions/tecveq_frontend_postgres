@@ -168,7 +168,7 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
             events={events}
             startAccessor="start"
             endAccessor="end"
-            className="w-full"
+            className="w-full min-w-[900px] sm:min-w-full h-full"
             step={60}
             timeslots={1}
             components={{

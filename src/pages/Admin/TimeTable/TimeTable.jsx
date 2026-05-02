@@ -10,6 +10,9 @@ import { useBlur } from "../../../context/BlurContext";
 import { getAllClasses } from "../../../api/ForAllAPIs";
 import { useTeacher } from "../../../utils/TeacherProvider";
 import { useSidebar } from "../../../context/SidebarContext";
+import { IoTime } from "react-icons/io5";
+import AdminTimeTableMobile from "../../../components/Admin/TimeTable/AdminTimeTableMobile";
+
 
 const TimeTable = () => {
 
@@ -29,20 +32,12 @@ const TimeTable = () => {
   const { data, isPending, refetch, isRefetching } = useQuery({
     queryKey: ["timetable", teacherID],
     queryFn: () => getAllClasses(teacherID),
-    enabled: !!teacherID, // Ensure query is only enabled if teacherID exists
   });
 
   if (!isPending) {
     console.log("classea in admin are : ", data);
   }
 
-
-  useEffect(() => {
-    if (!teacherID) {
-      // If teacherID is null, fetch all classes
-      refetch();
-    }
-  }, [teacherID, refetch]);
 
   const [isChatOpen, setIsChatOpen] = useState(false); // new state for chat
 
@@ -58,21 +53,30 @@ const TimeTable = () => {
         <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
           <div className="flex flex-1 gap-4">
             {/* <div className={`flex flex-col flex-1 px-2 sm:px-5 lg:ml-72 h-screen max-h-screen overflow-hidden`}> */}
-            <div className={`flex flex-col flex-1 px-2 sm:px-5 lg:ml-80 min-h-full pb-10`}>
-              <div className="flex h-16 sm:h-20 md:px-14 lg:px-0">
+            <div className={`flex flex-col flex-1 px-2 sm:px-5 lg:ml-72 xl:ml-80 min-h-full pb-10`}>
+              <header className="sticky top-0 z-40 bg-[#f9f9f9]/90 backdrop-blur-sm flex h-16 sm:h-20 md:px-14 lg:px-0">
                 <Navbar heading={"Time Table"} />
-              </div>
+              </header>
               <div
                 className={`flex flex-col   md:px-10 lg:px-0 w-full gap-3 sm:gap-5 pt-6 pb-2 flex-1 ${isBlurred ? "blur" : ""
                   }`}
               >
-                <div className={`flex flex-1 gap-2 sm:gap-4 bg-white w-full relative ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}>
-                  <div className="border p-2 sm:p-3 lg:px-2 lg:py-5  border-grey/30 rounded-md shadow-lg w-full min-h-[500px]">
-                    <MyCalendar data={data} isPending={isPending} refetch={refetch} isRefetching={isRefetching} />
+                <div className="hidden lg:block w-full">
+                  <div className={`flex flex-1 gap-2 sm:gap-4 bg-white w-full relative ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}>
+                    <div className="border p-2 sm:p-3 lg:px-2 lg:py-5  border-grey/30 rounded-md shadow-lg w-full min-h-[550px]">
+                      <MyCalendar data={data} isPending={isPending} refetch={refetch} isRefetching={isRefetching} />
+                    </div>
                   </div>
-                  {/* <div className="flex-1 p-5 border rounded-md shadow-lg border-grey/30">
-                    <SchedualClasses refetch={refetch} data={data} isPending={isPending} />
-                  </div> */}
+                </div>
+
+                {/* Mobile/Tablet view */}
+                <div className="lg:hidden w-full">
+                  <AdminTimeTableMobile 
+                    data={data} 
+                    isPending={isPending} 
+                    refetch={refetch} 
+                    isRefetching={isRefetching} 
+                  />
                 </div>
               </div>
 

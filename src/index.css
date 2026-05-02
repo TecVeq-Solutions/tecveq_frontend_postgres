@@ -119,7 +119,7 @@
 .rbc-time-view {
   height: 100% !important;
   width: 100% !important;
-  overflow: hidden !important;
+  overflow-x: visible !important;
 }
 
 .rbc-time-content {
@@ -133,8 +133,15 @@
 
 .rbc-time-gutter {
   display: block !important;
-  width: 110px !important;
-  min-width: 110px !important;
+  width: 90px !important;
+  min-width: 90px !important;
+}
+
+@media (min-width: 640px) {
+  .rbc-time-gutter {
+    width: 110px !important;
+    min-width: 110px !important;
+  }
 }
 
 .rbc-time-header-cell {
@@ -158,7 +165,13 @@
 
 /*for width of the first cell containing GTM+5*/
 .rbc-time-header-gutter {
-  width: 110px !important;
+  width: 90px !important;
+}
+
+@media (min-width: 640px) {
+  .rbc-time-header-gutter {
+    width: 110px !important;
+  }
 }
 
 /* Removed duplicate rule - see below for the proper one */
@@ -178,6 +191,10 @@
 .rbc-timeslot-group {
   min-height: 100px !important;
   /* Increased to 100px for better spacing */
+}
+
+.student-calendar .rbc-timeslot-group {
+  min-height: 80px !important;
 }
 
 /* Remove any constraints on the day column */

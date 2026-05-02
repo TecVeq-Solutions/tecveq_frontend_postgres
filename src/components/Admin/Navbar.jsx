@@ -8,11 +8,14 @@ import { useBlur } from "../../context/BlurContext";
 import { useQuery } from "@tanstack/react-query";
 import { getAllNotifications } from "../../api/Admin/NotificationApi";
 
+import { useSidebar } from "../../context/SidebarContext";
+
 const Navbar = ({ heading }) => {
   const [mail, setMail] = useState(false);
   const [bell, setBell] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const { isBlurred, toggleBlur } = useBlur();
+  const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
 
   const mailRef = useRef(null);
   const bellRef = useRef(null);
@@ -86,6 +89,21 @@ const Navbar = ({ heading }) => {
 
   return (
     <nav className=" admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+      {/* Mobile Hamburger Trigger */}
+      <div
+        className="absolute left-3 top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
+        onClick={() => {
+          setIsopen(!isopen);
+          setIsSidebarOpen(!isSidebarOpen);
+        }}
+      >
+        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5 shadow-sm active:scale-95 transition-transform">
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-3.5 bg-white h-0.5 rounded-full block" />
+        </div>
+      </div>
+
       {/* Background layer that blurs */}
       <div
         className="flex items-center justify-between w-full"

@@ -233,7 +233,7 @@ const ScheduledClasses = () => {
 
   return (
     <div className="flex flex-1">
-      <div className="flex flex-col flex-1 gap-2">
+      <div className="hidden lg:flex flex-col flex-1 gap-2">
         <div className="flex">
           <p className="flex text-lg font-medium">Sheduled Classes</p>
         </div>
@@ -243,12 +243,21 @@ const ScheduledClasses = () => {
           </div>
 
           <div className="flex flex-col flex-1 gap-1">
-            {filteredclasses.length > 0 ? "":"No Scheduled classes right now"}
+            {filteredclasses.length > 0 ? "" : "No Scheduled classes right now"}
             {filteredclasses.map((item) => (
               <EventComponet item={item} key={item} />
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Desktop Only Message */}
+      <div className="lg:hidden flex flex-col items-center justify-center p-8 w-full bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center mb-4 text-blue-600">
+          <IoCalendar size={28} />
+        </div>
+        <h3 className="text-lg font-bold text-gray-900">Desktop Only</h3>
+        <p className="text-gray-500 text-xs text-center mt-2">Scheduled classes view is optimized for desktop screens (1024px+).</p>
       </div>
     </div>
   );

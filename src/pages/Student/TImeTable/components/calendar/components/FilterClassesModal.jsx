@@ -279,7 +279,7 @@ const FilterClassesModal = ({ addModalOpen, setaddModalOpen }) => {
   return (
     <div
       ref={ref}
-      className="absolute z-50 flex flex-col bg-white pb-6  rounded-2xl shadow-xl border border-gray-100 w-80 sm:w-96 right-0  overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300"
+      className="absolute z-50 flex flex-col bg-white pb-6 mt-[-20px]  rounded-2xl shadow-xl border border-gray-100 w-80 sm:w-96 right-0  overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300"
       style={{ maxHeight: "88vh" }}
     >
       {/* Header — always visible, never scrolls */}

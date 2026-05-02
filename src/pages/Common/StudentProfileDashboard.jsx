@@ -641,31 +641,40 @@ const StudentProfileDashboard = () => {
                 <div className="lg:col-span-3 space-y-6">
 
                     {/* ── Navigation Tabs ── */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 4 }} className="no-scrollbar">
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", paddingBottom: 4 }} className="no-scrollbar">
                         {tabs.map((tab, i) => (
                             <motion.button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 whileTap={{ scale: 0.95 }}
+                                className={tab.id === "timetable" ? "hidden lg:flex" : "flex"}
                                 style={{
-                                    display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px',
-                                    borderRadius: 14, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
-                                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                                    transition: 'all 0.2s ease',
-                                    ...(activeTab === tab.id ? {
-                                        background: 'linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)',
-                                        color: 'white',
-                                        border: '1px solid rgba(99,102,241,0.3)',
-                                        boxShadow: '0 8px 24px -4px rgba(67,56,202,0.4)'
-                                    } : {
-                                        background: 'white',
-                                        color: '#64748b',
-                                        border: '1px solid rgba(226,232,240,0.8)',
-                                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
-                                    })
+                                    alignItems: "center",
+                                    gap: 7,
+                                    padding: "10px 18px",
+                                    borderRadius: 14,
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    whiteSpace: "nowrap",
+                                    cursor: "pointer",
+                                    fontFamily: "'DM Sans', sans-serif",
+                                    transition: "all 0.2s ease",
+                                    ...(activeTab === tab.id
+                                        ? {
+                                            background: "linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)",
+                                            color: "white",
+                                            border: "1px solid rgba(99,102,241,0.3)",
+                                            boxShadow: "0 8px 24px -4px rgba(67,56,202,0.4)",
+                                        }
+                                        : {
+                                            background: "white",
+                                            color: "#64748b",
+                                            border: "1px solid rgba(226,232,240,0.8)",
+                                            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                                        }),
                                 }}
                             >
-                                <span style={{ color: activeTab === tab.id ? 'rgba(165,180,252,0.9)' : '#94a3b8' }}>
+                                <span style={{ color: activeTab === tab.id ? "rgba(165,180,252,0.9)" : "#94a3b8" }}>
                                     {tab.icon}
                                 </span>
                                 {tab.label}
@@ -1148,7 +1157,8 @@ const StudentProfileDashboard = () => {
                             {activeTab === "timetable" && (
                                 <PremiumCard className="p-5">
                                     <SectionHeader icon={<IoTime size={13} />} title="Weekly Schedule" gradient="from-violet-500 to-indigo-500" />
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    
+                                    <div className="hidden lg:flex flex-col gap-8">
                                         {classes.length > 0 ? classes.map((cls, i) => (
                                             <motion.div
                                                 key={i}
@@ -1187,6 +1197,17 @@ const StudentProfileDashboard = () => {
                                                 <p style={{ color: '#94a3b8', fontSize: 13, fontWeight: 500 }}>No classes scheduled.</p>
                                             </div>
                                         )}
+                                    </div>
+
+                                    {/* Mobile/Tablet Fallback */}
+                                    <div className="lg:hidden flex flex-col items-center justify-center p-10 py-16 text-center">
+                                        <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+                                            <IoTime className="text-3xl text-indigo-500" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Desktop View Required</h3>
+                                        <p className="text-gray-500 text-sm max-w-[240px] mx-auto leading-relaxed">
+                                            The weekly schedule is currently available only on desktop screens (1024px+).
+                                        </p>
                                     </div>
                                 </PremiumCard>
                             )}
