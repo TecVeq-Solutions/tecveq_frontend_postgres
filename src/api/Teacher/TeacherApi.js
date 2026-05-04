@@ -10,3 +10,15 @@ export const updateTeacher = apiRequest(async (data) =>{
     const response = await axios.put(url, data);
     return response;
 })
+
+export const getMyStudentsForReport = apiRequest(async () => {
+    const url = `${BACKEND_URL}/user/teacher/my-students-for-report`
+    const response = await axios.get(url);
+    return response;
+})
+
+export const getMyTeacherStudentSubjects = apiRequest(async (studentId) => {
+    const url = `${BACKEND_URL}/user/teacher/my-student-subjects/${studentId}`
+    const response = await axios.get(url);
+    return response;
+})

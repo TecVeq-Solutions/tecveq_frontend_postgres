@@ -89,7 +89,7 @@ const SubjectReport = () => {
       <>
         <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
           <div className="flex flex-1">
-            <div className="flex-grow w-full px-2 lg:px-20 sm:px-10 lg:ml-72">
+            <div className="flex-grow w-full px-2 lg:px-20 sm:px-10 ml-0 lg:ml-72">
               <div className=" pt-2 ">
                 <StudentNavbar heading={subject + " Report"} />
                 <div className=" report flex flex-row items-center justify-between flex-grow mt-2">

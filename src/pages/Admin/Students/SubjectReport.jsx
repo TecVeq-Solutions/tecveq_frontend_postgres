@@ -205,12 +205,14 @@ const SubjectReport = () => {
                   onChange={(e) => setSelectedSubject(e.target.value)}
                 >
                   <option value="">— Select Subject —</option>
-                  {isSuccess &&
-                    subjects?.subjects?.map((sub, index) => (
-                      <option key={sub.id || index} value={JSON.stringify(sub)}>
-                        {sub?.name}
-                      </option>
-                    ))}
+                  {studentSubjectWithLevel?.subjects?.map((sub, index) => (
+                    <option
+                      key={sub.id || index}
+                      value={JSON.stringify({ id: sub.id, name: sub.subjectName })}
+                    >
+                      {sub?.subjectName}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>

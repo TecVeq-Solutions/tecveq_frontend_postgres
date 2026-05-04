@@ -22,12 +22,13 @@ export const deleteClassroom = apiRequest(async (id) => await axios.delete(`${BA
 
 export const fetchStudentAttendanceReport = async (params) => {
     try {
-        const { classroomId, subjectId, startDate, endDate } = params;
+        const { classroomId, subjectId, studentId, startDate, endDate } = params;
 
         // Build query parameters
         const queryParams = new URLSearchParams({
             classroomId,
             ...(subjectId && { subjectId }),
+            ...(studentId && { studentId }),
             ...(startDate && { startDate }),
             ...(endDate && { endDate })
         });

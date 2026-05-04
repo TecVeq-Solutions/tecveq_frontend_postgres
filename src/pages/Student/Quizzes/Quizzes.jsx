@@ -19,7 +19,7 @@ const Quizzes = () => {
     return (
         <div className="flex flex-1 min-h-screen font-poppins" style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f9f9f9 100%)" }}>
             <div className="flex flex-1">
-                <div className="w-full lg:px-20 sm:px-10 px-3 flex-grow lg:ml-72">
+                <div className="w-full lg:px-20 sm:px-10 px-3 flex-grow ml-0 lg:ml-72">
                     <div className="pt-1">
                         <Navbar heading={"Quizzes"} />
 

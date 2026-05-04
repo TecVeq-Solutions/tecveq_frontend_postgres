@@ -60,7 +60,7 @@ const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
 
   /* ── Event Card ── */
   const EventCard = ({ item }) => (
-    <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
+    <div className="flex items-center gap-3 px-2 sm:px-4 py-3 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
       <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 overflow-hidden">
         <img
           src={IMAGES.MathIcon}

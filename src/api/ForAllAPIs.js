@@ -19,7 +19,7 @@ export const userLogout = apiRequest(async () => {
 
 
 export const getAllClasses = apiRequest(async (params) => {
-    const { teacherID, startDate: customStartDate, endDate: customEndDate } = params || {};
+    const { teacherID, studentID, startDate: customStartDate, endDate: customEndDate } = params || {};
 
     let startDate = customStartDate ? new Date(customStartDate) : new Date(Date.now());
     if (!customStartDate) startDate.setDate(startDate.getDate() - 15);
@@ -32,7 +32,10 @@ export const getAllClasses = apiRequest(async (params) => {
     if (typeof id === 'object') id = id?.id;
     if (!id && typeof params !== 'object') id = params;
 
-    const url = `${BACKEND_URL}/class?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}${id ? `&teacherID=${id}` : ''}`;
+    let url = `${BACKEND_URL}/class?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+    if (id) url += `&teacherID=${id}`;
+    if (studentID) url += `&studentID=${studentID}`;
+
     const response = await axios.get(url);
     return response;
 })

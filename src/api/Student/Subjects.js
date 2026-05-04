@@ -4,8 +4,8 @@ import apiRequest from "../../utils/ApiRequest";
 
 axios.defaults.withCredentials = true;
 
-export const getAllSubjects = apiRequest(async (id) => {
-    const url = `${BACKEND_URL}/user/student-subjects/${id}`;
+export const getAllSubjects = apiRequest(async (id, all = false) => {
+    const url = `${BACKEND_URL}/user/student-subjects/${id}?all=${all}`;
     const response = await axios.get(url);
     return response;
 })

@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
-import IMAGES from "../../../assets/images";
-
 import { FiClock } from "react-icons/fi";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
@@ -61,12 +59,8 @@ const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
   /* ── Event Card ── */
   const EventCard = ({ item }) => (
     <div className="flex items-center gap-3 px-2 sm:px-4 py-3 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
-      <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 overflow-hidden">
-        <img
-          src={IMAGES.MathIcon}
-          alt=""
-          className="w-8 h-8 object-cover rounded-lg"
-        />
+      <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 overflow-hidden text-indigo-600 font-bold text-xs">
+        {item.subject?.name?.charAt(0) || "S"}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
@@ -220,7 +214,7 @@ const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
   return (
     <div
       ref={ref}
-      className="flex flex-col bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-[380px] overflow-hidden mx-auto"
+      className="flex flex-col bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-sm overflow-hidden"
       style={{ maxHeight: "90vh" }}
     >
       {/* Header — always visible, never scrolls */}

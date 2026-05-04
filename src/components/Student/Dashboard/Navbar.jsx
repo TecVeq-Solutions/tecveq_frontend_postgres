@@ -12,6 +12,7 @@ import { logout } from "../../../api/User/UserApi";
 import { useBlur } from "../../../context/BlurContext";
 import { useUser } from "../../../context/UserContext";
 import { getAllNotifications } from "../../../api/ForAllAPIs";
+import { useSidebar } from "../../../context/SidebarContext";
 
 const Navbar = ({ heading }) => {
   const [mail, setMail] = useState(false);
@@ -22,6 +23,7 @@ const Navbar = ({ heading }) => {
   const navigate = useNavigate();
   const { isBlurred, toggleBlur } = useBlur();
   const { userData } = useUser();
+  const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
 
   const toggleMail = () => {
     setMail(!mail);
@@ -60,14 +62,30 @@ const Navbar = ({ heading }) => {
 
   return (
     <nav className="student-navbar w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+      {/* Mobile Hamburger Trigger */}
+      <div
+        className="absolute left-3 top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
+        onClick={() => {
+          setIsopen(!isopen);
+          setIsSidebarOpen(!isSidebarOpen);
+        }}
+      >
+        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5 shadow-sm active:scale-95 transition-transform">
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-3.5 bg-white h-0.5 rounded-full block" />
+        </div>
+      </div>
+
       <div className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}>
         {/* Left: Heading */}
         {/* Left: Heading/Greeting */}
         <div className="flex-shrink-0 flex flex-col items-start justify-center pl-2 sm:pl-0">
-          <h1 className="text-lg md:text-2xl pl-10 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate max-w-[130px] sm:max-w-none">
-            {heading || "Teacher Dashboard"}
+          <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate max-w-[150px] sm:max-w-none">
+            {heading || "Student Dashboard"}
           </h1>
         </div>
+
 
         {/* Center: Search (Desktop Only) */}
         <div className="hidden lg:block flex-1 max-w-md mx-8">

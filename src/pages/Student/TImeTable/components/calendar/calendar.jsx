@@ -15,7 +15,7 @@ import { useUser } from "../../../../../context/UserContext";
 
 const localizer = momentLocalizer(moment);
 
-const MyCalendar = () => {
+const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
   const { userData } = useUser()
 
 
@@ -51,12 +51,8 @@ const MyCalendar = () => {
     });
   };
 
-  const { data, isPending, isSuccess } = useQuery({ queryKey: ["classe"], queryFn: getAllClasses });
-  if (!isPending) {
-    //console.log("classes in studnets are : ", data)
-  }
   useEffect(() => {
-    if (!isPending) {
+    if (!isPending && data) {
 
       let allclassfilter = data?.map((item) => {
         // let newdate = moment.utc(item.startTime);
@@ -72,10 +68,12 @@ const MyCalendar = () => {
 
 
 
+
+
       //console.log("all class filter is : ", allclassfilter);
       setEvents(allclassfilter);
     }
-  }, [currentWeek, isSuccess, isPending, data]);
+  }, [currentWeek, isPending, data]);
 
 
 
@@ -111,7 +109,7 @@ const MyCalendar = () => {
           components={useMemo(() => ({
             toolbar: (toolbar) => (
               <CustomToolbar
-                loading={loading}
+                loading={isPending}
                 activeFilteredField={activeFilteredField}
                 setactiveFilteredField={setactiveFilteredField}
                 events={data}
@@ -127,12 +125,13 @@ const MyCalendar = () => {
             timeGutterHeader: SideTimeHeader,
             timeGutterWrapper: SideTime,
             header: Header,
-          }), [loading, activeFilteredField, data, addModalOpen])}
+          }), [isPending, activeFilteredField, data, addModalOpen])}
           dayLayoutAlgorithm={"no-overlap"}
         />
       </div>
     </>
   );
 };
+
 
 export default MyCalendar;

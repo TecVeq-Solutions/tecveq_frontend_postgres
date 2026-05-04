@@ -42,7 +42,7 @@ const DataRow = (props) => {
             </p>
           </div>
           <div className="flex ml-3 mr-2 lg:mr-5 cursor-pointer">
-            <p
+            <div
               onClick={() => {
                 toggleMenu();
               }}
@@ -56,7 +56,7 @@ const DataRow = (props) => {
                 setIsOpen={setMenu}
               />}
               <BsThreeDotsVertical />
-            </p>
+            </div>
           </div>
         </div>
       </div>
