@@ -7,10 +7,14 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { useStudent } from "../../../context/StudentContext";
 import moment from "moment";
 import { useSidebar } from "../../../context/SidebarContext";
+import { useParent } from "../../../context/ParentContext";
 import { CalendarDays } from 'lucide-react'; // Ya GraduationCap use karein
 
-const ScheduledClasses = () => {
-  const { allClasses } = useStudent();
+const ScheduledClasses = ({ hideHeader }) => {
+  const studentContext = useStudent();
+  const parentContext = useParent();
+  const allClasses = parentContext?.parentLogedIn ? parentContext.allClasses : studentContext?.allClasses || [];
+
   const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [filteredClasses, setFilteredClasses] = useState([]);
   const { isSidebarOpen } = useSidebar();
@@ -252,25 +256,25 @@ const ScheduledClasses = () => {
     <div className="flex flex-1">
       <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
-        <div className="flex items-center gap-3">
-
-
+        {!hideHeader && (
           <div className="flex items-center gap-3">
-            {/* Icon Container - Background ke sath thoda zayada attractive lagta hai */}
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <CalendarDays className="w-6 h-6 text-blue-600" />
-            </div>
+            <div className="flex items-center gap-3">
+              {/* Icon Container - Background ke sath thoda zayada attractive lagta hai */}
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <CalendarDays className="w-6 h-6 text-blue-600" />
+              </div>
 
-            <div>
-              <p className="text-xl font-semibold text-gray-800 tracking-tight">
-                Scheduled Classes
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Your upcoming learning sessions
-              </p>
+              <div>
+                <p className="text-xl font-semibold text-gray-800 tracking-tight">
+                  Scheduled Classes
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Your upcoming learning sessions
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Main card */}
         <div

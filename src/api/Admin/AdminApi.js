@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 axios.defaults.withCredentials = true;
 
 export const getAllStudents = apiRequest(async () => await axios.get(`${BACKEND_URL}/user/students`));
+export const getSubjectsByLevel = apiRequest(async (levelId) => await axios.get(`${BACKEND_URL}/subject/${levelId}`));
 
 
 export const getAllUsers = apiRequest(async () => {
@@ -45,6 +46,18 @@ export const useGetAllStudentsWithLevel = (levelId) => {
 
 export const getAllTeachers = apiRequest(async () => {
     const url = `${BACKEND_URL}/user/admin/teachers`
+    const response = await axios.get(url);
+    return response;
+})
+
+export const getStudentsByTeacher = apiRequest(async (teacherId) => {
+    const url = `${BACKEND_URL}/user/admin/students-by-teacher/${teacherId}`
+    const response = await axios.get(url);
+    return response;
+})
+
+export const getTeacherStudentSubjects = apiRequest(async (teacherId, studentId) => {
+    const url = `${BACKEND_URL}/user/admin/teacher-student-subjects/${teacherId}/${studentId}`
     const response = await axios.get(url);
     return response;
 })

@@ -527,7 +527,7 @@ const AdminTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
             </AnimatePresence>
 
             {addModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#0f0a28]/45 backdrop-blur-xl">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-4 bg-[#0f0a28]/45 backdrop-blur-xl">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.92, y: 12 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}

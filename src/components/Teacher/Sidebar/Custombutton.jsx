@@ -11,6 +11,7 @@ const iconMap = {
   book: LuBookOpen,
   quiz: LuCalendar,
   attendence: LuUsers,
+  "attendence-report": VscGraph,
   classroom: LuLayoutDashboard,
 };
 

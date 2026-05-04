@@ -10,6 +10,7 @@ import { formatDate } from '../../../constants/formattedDate';
 import { submitAssignment } from '../../../api/Student/Assignments';
 import { useUser } from '../../../context/UserContext';
 import { useSidebar } from '../../../context/SidebarContext';
+import { useParent } from '../../../context/ParentContext';
 import { FiEdit } from 'react-icons/fi';
 import ConfirmModal from './ConfirmModal';
 import {
@@ -29,6 +30,10 @@ const QuizAssignmentRow = (props) => {
     const [textExpanded, setTextExpanded] = useState(false);
     const { isSidebarOpen } = useSidebar();
     const { userData } = useUser();
+    const parentContext = useParent();
+
+    const isParent = userData?.userType === 'parent';
+    const targetStudentId = isParent ? parentContext?.selectedChild?.id : userData?.id;
 
     const quizAssignmentMutation = useMutation({
         mutationKey: ['quizAssignment'],
@@ -49,6 +54,7 @@ const QuizAssignmentRow = (props) => {
     });
 
     const handleFileChange = (event) => {
+        if (isParent) return; // Parents cannot upload
         const file = event.target.files[0];
         if (!file) return;
         setSelectedFile(file);
@@ -86,9 +92,13 @@ const QuizAssignmentRow = (props) => {
     };
 
     useEffect(() => {
-        props?.alldata?.submissions?.forEach((item) => {
-            if (item?.studentID === userData?.id) setIsUploadded(true);
-        });
+        if (isParent) {
+            if (props.alldata?.isSubmitted) setIsUploadded(true);
+        } else {
+            props?.alldata?.submissions?.forEach((item) => {
+                if (item?.studentID === targetStudentId || item?.studentID?.id === targetStudentId) setIsUploadded(true);
+            });
+        }
 
         if (!props.deadline || props.header) return;
 
@@ -100,7 +110,7 @@ const QuizAssignmentRow = (props) => {
         compareDateAndTime(formattedDateTimeString);
         const intervalId = setInterval(() => compareDateAndTime(formattedDateTimeString), 1000);
         return () => clearInterval(intervalId);
-    }, [props.deadline]);
+    }, [props.deadline, targetStudentId]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(props.text);
@@ -206,23 +216,31 @@ const QuizAssignmentRow = (props) => {
                             {isLoading ? (
                                 <div className="scale-75"><Loader /></div>
                             ) : !isUploaded ? (
-                                <label htmlFor={`upload-${props.id}`}
-                                    className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer transition-all hover:opacity-90 hover:shadow-lg active:scale-95"
-                                    style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}>
-                                    <Upload size={13} />
-                                    Upload
-                                    <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
-                                </label>
+                                isParent ? (
+                                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full">
+                                        Pending
+                                    </span>
+                                ) : (
+                                    <label htmlFor={`upload-${props.id}`}
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer transition-all hover:opacity-90 hover:shadow-lg active:scale-95"
+                                        style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}>
+                                        <Upload size={13} />
+                                        Upload
+                                        <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
+                                    </label>
+                                )
                             ) : (
                                 <div className="flex items-center gap-2">
                                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
                                         <CheckCircle2 size={12} />
                                         Submitted
                                     </span>
-                                    <label htmlFor={`upload-${props.id}`} className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer text-purple-500 hover:bg-purple-50 transition-colors">
-                                        <FiEdit size={14} />
-                                        <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
-                                    </label>
+                                    {!isParent && (
+                                        <label htmlFor={`upload-${props.id}`} className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer text-purple-500 hover:bg-purple-50 transition-colors">
+                                            <FiEdit size={14} />
+                                            <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
+                                        </label>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -278,17 +296,25 @@ const QuizAssignmentRow = (props) => {
                             {isLoading ? (
                                 <div className="scale-75"><Loader /></div>
                             ) : !isUploaded ? (
-                                <label htmlFor={`upload-mobile-${props.id}`}
-                                    className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer"
-                                    style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}>
-                                    <Upload size={13} /> Upload
-                                    <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
-                                </label>
+                                isParent ? (
+                                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full">
+                                        Pending
+                                    </span>
+                                ) : (
+                                    <label htmlFor={`upload-mobile-${props.id}`}
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer"
+                                        style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}>
+                                        <Upload size={13} /> Upload
+                                        <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
+                                    </label>
+                                )
                             ) : (
-                                <label htmlFor={`upload-mobile-${props.id}`} className="flex items-center gap-1.5 text-xs font-medium text-purple-600 hover:bg-purple-50 px-2 py-1.5 rounded-lg cursor-pointer transition-colors">
-                                    <FiEdit size={13} /> Re-submit
-                                    <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
-                                </label>
+                                !isParent && (
+                                    <label htmlFor={`upload-mobile-${props.id}`} className="flex items-center gap-1.5 text-xs font-medium text-purple-600 hover:bg-purple-50 px-2 py-1.5 rounded-lg cursor-pointer transition-colors">
+                                        <FiEdit size={13} /> Re-submit
+                                        <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
+                                    </label>
+                                )
                             )}
                         </div>
                     </div>

@@ -33,7 +33,7 @@ const Reports = () => {
   return (
     <div className="flex flex-1 bg-[#F4F6FB] font-poppins">
       <div className="flex flex-1">
-        <div className="w-full min-h-screen px-4 sm:px-10 lg:px-20 lg:ml-72 sm:py-6">
+        <div className="w-full min-h-screen px-4 sm:px-10 lg:px-20 ml-0 lg:ml-72 sm:py-6">
 
           {/* Navbar */}
           <div className="flex items-center justify-between mb-3">

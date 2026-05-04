@@ -15,21 +15,21 @@ const Reports = () => {
   const [enableQuery, setEnableQuery] = useState(false);
 
   const subjectQuery = useQuery({
-    queryKey: ["subjects"],
+    queryKey: ["subjects", selectedChild?.id],
     queryFn: async () => {
       const results = await getAllSubjects(selectedChild.id);
       setAllSubjects(results);
       return results;
     },
     staleTime: 300000,
-    enabled: enableQuery
+    enabled: enableQuery && !!selectedChild?.id
   });
 
   useEffect(() => {
-    if (allSubjects.length == 0) {
+    if (allSubjects?.subjects?.length === 0 && selectedChild?.id) {
       setEnableQuery(true);
     }
-  }, []);
+  }, [allSubjects, selectedChild]);
 
   const handleFunctionClick = (report) => {
     navigate(`/parent/reports/${report?.subject?.name}`, { state: report });
@@ -59,7 +59,7 @@ const Reports = () => {
             {/* Stats cards — always 3 columns, smaller on mobile */}
             {allSubjects?.subjects?.length > 0 && (() => {
               const subjects = allSubjects.subjects;
-              const avg = Math.round(subjects.reduce((s, r) => s + r.avgAttendancePer, 0) / subjects.length);
+              const avg = Math.round(subjects.reduce((s, r) => s + Number(r.avgAttendancePer || 0), 0) / subjects.length);
               const atRisk = subjects.filter(r => r.avgAttendancePer < 60).length;
               return (
                 <div className="grid grid-cols-3 gap-1 sm:gap-3 mb-6">

@@ -1,193 +1,83 @@
-import React, { useEffect, useState } from "react";
-import IMAGES from "../../../assets/images";
-import QuizAssignmentRow from "../../../components/Parent/QuizAssignment/QuizAssignmentRow";
-import { useBlur } from "../../../context/BlurContext";
-import ProfileMenu from "../../../components/Parent/Dashboard/ProfileMenu";
-import ProfileDetails from "../../../components/Parent/Dashboard/ProfileDetails";
-import Notifications from "../../../components/Parent/Dashboard/Notifications";
-import { useNavigate } from "react-router-dom";
-import DataRows from "../../../components/Parent/Reports/DataRows";
-import { useParent } from "../../../context/ParentContext";
-import { useQuery } from "@tanstack/react-query";
-import { getAllSubjects } from "../../../api/Parent/ParentApi";
+import React from "react";
 import Navbar from "../../../components/Parent/Dashboard/Navbar";
+import QuizAssignmentRow from "../../../components/Student/QuizAssignment/QuizAssignmentRow";
+import { useBlur } from "../../../context/BlurContext";
+import { useParent } from "../../../context/ParentContext";
+import { useSidebar } from "../../../context/SidebarContext";
+import { ClipboardList } from "lucide-react";
 
 const Assignments = () => {
-  const [mail, setmail] = useState(false);
-  const [bell, setBell] = useState(false);
-  const [isProfileMenu, setIsProfileMenu] = useState(false);
-  const [isProfileDetails, setIsProfileDetails] = useState(false);
+  const { isSidebarOpen } = useSidebar();
+  const { isBlurred } = useBlur();
+  const { allAssignments } = useParent();
 
-  const { isBlurred, toggleBlur } = useBlur();
-
-  const navigate = useNavigate();
-  const onLineClick = () => {
-    navigate(`/parent/assignments/reports`)
-  }
-
-
-  const toggleProfielMenu = () => {
-    setIsProfileMenu(!isProfileMenu);
-    setmail(false);
-    setBell(false);
-  };
-
-  const toggleMail = () => {
-    setmail(!mail);
-    setIsProfileMenu(false);
-    setBell(false);
-  };
-
-  const togglebell = () => {
-    setBell(!bell);
-    setmail(false);
-    setIsProfileMenu(false);
-  };
-
-  const toggleProfileDetails = () => {
-    toggleBlur();
-    setIsProfileDetails(!isProfileDetails);
-  };
-
-  const onProfileClick = () => {
-    toggleProfielMenu();
-    toggleProfileDetails();
-  };
-
-  const onSettingsClick = () => { };
-  const onLogoutClick = () => { };
-
-  const assignments = [
-    {
-      subject: "Mathematics",
-      title: "Assignment 1",
-      deadline: "22nd Jan, 2022 8:30PM",
-      total_marks: 20,
-      download: "Download",
-      upload: true,
-    },
-    {
-      subject: "Science",
-      title: "Assignment 2",
-      deadline: "22nd Jan, 2023 12:30PM",
-      total_marks: 10,
-      download: "Download",
-      upload: false,
-    },
-    {
-      subject: "Mathematics",
-      title: "Assignment 1",
-      deadline: "22nd Jan, 2022 8:30PM",
-      total_marks: 20,
-      download: "Download",
-      upload: true,
-    },
-    {
-      subject: "Mathematics",
-      title: "Assignment 1",
-      deadline: "22nd Jan, 2022 8:30PM",
-      total_marks: 20,
-      download: "Download",
-      upload: true,
-    },
-  ];
-
-
-
-
-  const reports = [
-    {
-      subject: "Mathematics",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-    {
-      subject: "English",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-    {
-      subject: "Urdu",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-    {
-      subject: "Chemistry",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-    {
-      subject: "Biology",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-    {
-      subject: "Islamiyat",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-    {
-      subject: "History",
-      instructor: "John Smith",
-      attendance: "70%",
-    },
-  ];
-
-  const handleFunctionClick = (report) => {
-    navigate(`/parent/assignments/reports`, { state: report });
-  };
-
-  const [enableQuery, setEnableQuery] = useState(false);
-
-  const { allSubjects, setAllSubjects, selectedChild } = useParent();
-
-  const subjectQuery = useQuery({
-    queryKey: ["subjects"], queryFn: async () => {
-      const results = await getAllSubjects(selectedChild.id);
-      setAllSubjects(results);
-      return results
-    }, staleTime: 300000, enabled: enableQuery
-  });
-
-  useEffect(() => {
-    if (allSubjects.length == 0) {
-      setEnableQuery(true);
-    }
-  }, []);
-
+  const studentAssignments = allAssignments || [];
 
   return (
-    <div className="flex flex-1 bg-[#F9F9F9] font-poppins">
+    <div className="flex flex-1 min-h-screen font-poppins" style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f9f9f9 100%)" }}>
       <div className="flex flex-1">
-        <div
-          className={`w-full  h-screen lg:px-14 sm:px-10 px-3 flex-grow lg:ml-72`}
-        >
-          <div className="h-screen ">
+        <div className="w-full lg:px-20 sm:px-10 px-3 flex-grow ml-0 lg:ml-72 xl:ml-80">
+          <div className="pt-1">
             <Navbar heading={"Assignments"} />
-            <div className={`mt-8 h-[80%] ${isBlurred ? "blur" : ""
-              } overflow-auto`}>
-              <DataRows index={"Sr. No"} subject={"Subject"} instructor={"Instructor"} attendance={"Attendance"} bgColor={"#F9F9F9"} header={true} />
-              {
-                allSubjects?.subjects && allSubjects?.subjects.length > 0 ? (
-                  allSubjects.subjects.map((report, index) => (
-                    <DataRows
-                      key={index}
-                      index={index + 1}
-                      subject={report?.subject?.name}
-                      instructor={report?.teacher?.name}
-                      attendance={report?.avgAttendancePer}
-                      bgColor={"#FFFFFF"}
-                      header={false}
-                      onClickFunction={() => handleFunctionClick(report)}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center font-semibold text-2xl text-gray-500 py-4">
-                    No Assignments Found
-                  </div>
-                )
-              }
 
+            <div className={`${isBlurred ? "blur" : ""} relative ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}>
+              {/* Header Banner */}
+              <div className="mt-6 mb-6 rounded-2xl px-6 py-5 flex items-center gap-4"
+                style={{ background: "linear-gradient(135deg, #6A00FF 0%, #9B4DFF 60%, #C084FC 100%)" }}>
+                <div className="bg-white/20 rounded-xl p-3">
+                  <ClipboardList className="text-white" size={28} />
+                </div>
+                <div>
+                  <h2 className="text-white font-bold text-xl leading-tight">Assignments</h2>
+                  <p className="text-purple-200 text-sm mt-0.5">
+                    {studentAssignments.length} assignment{studentAssignments.length !== 1 ? "s" : ""} assigned
+                  </p>
+                </div>
+              </div>
+
+              {/* Table Header */}
+              <div className="hidden md:grid grid-cols-12 gap-2 px-5 py-3 mb-2 rounded-xl text-xs font-semibold text-purple-700 tracking-wide uppercase"
+                style={{ background: "rgba(106,0,255,0.07)", border: "1px solid rgba(106,0,255,0.12)" }}>
+                <div className="col-span-1 text-center">#</div>
+                <div className="col-span-2 text-center">Subject</div>
+                <div className="col-span-3 text-center">Title</div>
+                <div className="col-span-2 text-center">Deadline</div>
+                <div className="col-span-1 text-center">Marks</div>
+                <div className="col-span-1 text-center">File</div>
+                <div className="col-span-2 text-center">Status</div>
+              </div>
+
+              {/* Assignment Cards */}
+              <div className="space-y-3">
+                {studentAssignments.map((assignment, index) => (
+                  <QuizAssignmentRow
+                    alldata={assignment}
+                    isQuiz={false}
+                    index={index + 1}
+                    id={assignment.id}
+                    key={assignment.id}
+                    subject={assignment?.subject?.name || assignment?.subjectID?.name}
+                    title={assignment?.title}
+                    deadline={assignment?.dueDate}
+                    header={false}
+                    total_marks={assignment?.totalMarks}
+                    download={assignment?.files?.[0]?.url}
+                    upload={true}
+                    text={assignment?.text}
+                  />
+                ))}
+              </div>
+
+              {/* Empty State */}
+              {studentAssignments.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                  <div className="bg-purple-100 rounded-full p-6">
+                    <ClipboardList size={48} className="text-purple-400" />
+                  </div>
+                  <p className="font-semibold text-xl text-gray-500">No assignments yet</p>
+                  <p className="text-gray-400 text-sm">No assignments have been posted.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

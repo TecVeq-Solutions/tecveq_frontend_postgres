@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllSubjects } from "../../../api/Parent/ParentApi";
 import Loader from "../../../utils/Loader";
 
-const SubjectsEnrolled = () => {
+const SubjectsEnrolled = ({ hideHeader }) => {
   const [popup, setPopup] = useState(false);
   const [clickedItem, setClickedItem] = useState(null);
   const [enableQuery, setEnableQuery] = useState(false);
@@ -135,17 +135,19 @@ const SubjectsEnrolled = () => {
       <div className="flex flex-col flex-1 gap-3">
 
         {/* Section Header */}
-        <div className="flex items-center gap-3 pt-6">
-          <div className="w-1 h-6 rounded-full"
-            style={{ background: "linear-gradient(180deg, #007EEA, #0B1053)" }} />
-          <p className="text-lg font-semibold text-[#0B1053] tracking-tight">Subjects Enrolled</p>
-          {subjects?.length > 0 && (
-            <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold text-white"
-              style={{ background: "linear-gradient(135deg, #007EEA, #0B1053)" }}>
-              {subjects.length}
-            </span>
-          )}
-        </div>
+        {!hideHeader && (
+          <div className="flex items-center gap-3 pt-6">
+            <div className="w-1 h-6 rounded-full"
+              style={{ background: "linear-gradient(180deg, #007EEA, #0B1053)" }} />
+            <p className="text-lg font-semibold text-[#0B1053] tracking-tight">Subjects Enrolled</p>
+            {subjects?.length > 0 && (
+              <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold text-white"
+                style={{ background: "linear-gradient(135deg, #007EEA, #0B1053)" }}>
+                {subjects.length}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* ── MOBILE VIEW (< sm) ── */}
         <div className="flex flex-col gap-3 sm:hidden">

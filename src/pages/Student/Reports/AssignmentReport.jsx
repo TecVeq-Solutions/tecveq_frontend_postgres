@@ -20,7 +20,7 @@ const AssignmentReport = () => {
         {/* <div className="fixed flex">
           <Sidebar currentScreen={"reports"} />
         </div> */}
-        <div className="flex-grow w-full lg:px-20 sm:px-10 px-7 lg:ml-72 ">
+        <div className="flex-grow w-full lg:px-20 sm:px-10 px-7 ml-0 lg:ml-72 ">
           <div className="pt-2 ">
             <StudentNavbar heading={title} />
             <div className="flex flex-row items-center justify-between flex-grow mt-2">

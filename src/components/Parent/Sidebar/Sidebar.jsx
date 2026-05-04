@@ -74,6 +74,7 @@ const Sidebar = () => {
       label: "Main",
       items: [
         { key: "dashboard", title: "Dashboard", icon: "home", route: "/parent/dashboard" },
+        { key: "timetable", title: "Time Table", icon: "time", route: "/parent/timetable" },
         { key: "reports", title: "Reports", icon: "graph", route: "/parent/reports" },
       ]
     },
@@ -82,6 +83,7 @@ const Sidebar = () => {
       items: [
         { key: "assignments", title: "Assignments", icon: "book", route: "/parent/assignments" },
         { key: "quizzes", title: "Quizzes", icon: "quiz", route: "/parent/quizzes" },
+        { key: "attendence-report", title: "Attendance Report", icon: "graph", route: "/parent/attendence-report" },
       ]
     },
     {

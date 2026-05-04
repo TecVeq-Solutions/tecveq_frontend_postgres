@@ -89,7 +89,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
       <div className="mr-0 sm:mr-6 mt-6  w-[440px] bg-white rounded-0 sm:rounded-[24px] shadow-[0_20px_50px_rgba(8,_112,_184,_0.2)] flex flex-col max-h-[100vh] sm:max-h-[92vh] animate-in slide-in-from-right duration-500 overflow-hidden border  border-blue-50">
 
         {/* Header - Royal Blue Gradient (Same as Admin) */}
-        <div className="relative px-8 py-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
+        <div className="relative px-3 sm:px-8 py-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <IoRocketOutline size={100} className="text-white rotate-12" />
           </div>
@@ -192,7 +192,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
                   type="date"
                   value={classObj.startEventDate}
                   onChange={(e) => setClassObj((prev) => ({ ...prev, startEventDate: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 sm:px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -201,7 +201,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
                   type="date"
                   value={classObj.endEventDate}
                   onChange={(e) => setClassObj((prev) => ({ ...prev, endEventDate: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 sm:px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -236,7 +236,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
                   type="time"
                   value={classObj.startTime}
                   onChange={(e) => setClassObj((prev) => ({ ...prev, startTime: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 sm:px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -245,7 +245,7 @@ const SchedualClasses = ({ refetch, addScheduleModalOpen, setAddScheduleModalOpe
                   type="time"
                   value={classObj.endTime}
                   onChange={(e) => setClassObj((prev) => ({ ...prev, endTime: e.target.value }))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 sm:px-4 py-2.5 text-sm text-slate-700 focus:border-blue-500 transition-all shadow-sm"
                 />
               </div>
             </div>

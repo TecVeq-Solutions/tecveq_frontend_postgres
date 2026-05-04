@@ -76,6 +76,9 @@ import { TeacherProvider } from "./utils/TeacherProvider";
 import ChangePassword from "./commonComponents/ChangePassword";
 import AddCSVFile from "./pages/Admin/AddCSVFile/AddCSVFile";
 import AttendenceReport from "./pages/Admin/AttendenceReport/AttendenceReport";
+import TAttendenceReport from "./pages/Teacher/Attendence/AttendenceReport";
+import StudentAttendenceReport from "./pages/Student/Attendence/AttendenceReport";
+import ParentAttendenceReport from "./pages/Parent/Attendence/AttendenceReport";
 import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import ProtectedSuperAdmin from "./utils/ProtectedSuperAdmin";
 import SAPlatformFees from "./pages/SuperAdmin/PlatformFees/PlatformFees";
@@ -346,6 +349,14 @@ function App() {
             }
           />
           <Route
+            path="/student/attendence-report"
+            element={
+              <StudentLayout>
+                <StudentAttendenceReport />
+              </StudentLayout>
+            }
+          />
+          <Route
             path="/student-profile/:studentId"
             element={
               <StudentLayout>
@@ -453,6 +464,14 @@ function App() {
               </TeacherLayout>
             }
           />
+          <Route
+            path="/teacher/attendence-report"
+            element={
+              <TeacherLayout>
+                <TAttendenceReport />
+              </TeacherLayout>
+            }
+          />
 
           <Route
             path="/teacher/classroom/head-attendence"
@@ -493,6 +512,22 @@ function App() {
             element={
               <ParentLayout>
                 <PDashboard />
+              </ParentLayout>
+            }
+          />
+          <Route
+            path="/parent/timetable"
+            element={
+              <ParentLayout>
+                <TimeTable />
+              </ParentLayout>
+            }
+          />
+          <Route
+            path="/parent/attendence-report"
+            element={
+              <ParentLayout>
+                <ParentAttendenceReport />
               </ParentLayout>
             }
           />

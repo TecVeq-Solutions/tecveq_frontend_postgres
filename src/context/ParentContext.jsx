@@ -47,12 +47,26 @@ export const ParentProvider = ({ children }) => {
         }, staleTime: 300000, enabled: parentLogedIn
     });
 
+    const classesQuery = useQuery({
+        queryKey: ["classe", selectedChild?.id], queryFn: async () => {
+            const results = await getAllClasses({ studentID: selectedChild?.id });
+            setAllClasses(results);
+            return results;
+        }, staleTime: 300000, enabled: parentLogedIn && !!selectedChild?.id
+    });
+
     useEffect(() => {
         if (assignmentQuery.isSuccess) {
             if (assignmentQuery.data?.assignments) setAllAssignments(assignmentQuery.data.assignments);
             if (assignmentQuery.data?.quizzes) setAllQuizes(assignmentQuery.data.quizzes);
         }
     }, [assignmentQuery.isSuccess, assignmentQuery.data]);
+
+    useEffect(() => {
+        if (classesQuery.isSuccess) {
+            setAllClasses(classesQuery.data);
+        }
+    }, [classesQuery.isSuccess, classesQuery.data]);
 
     // useEffect(() => {
     //     if (quizQuery.isSuccess) {
@@ -94,6 +108,11 @@ export const ParentProvider = ({ children }) => {
             setAllQuizes,
             assignmentRefetch: assignmentQuery.refetch,
             assignmentIsPending: assignmentQuery.isPending,
+
+            allClasses,
+            setAllClasses,
+            classesRefetch: classesQuery.refetch,
+            classesIsPending: classesQuery.isPending,
 
             selectedChild,
             setSelectedChild
