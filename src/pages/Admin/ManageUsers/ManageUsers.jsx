@@ -23,6 +23,7 @@ const ManageUsers = () => {
   const [requestCount, setReqCount] = useState(0);
   const [searchText, setSearchText] = useState("");
   const [selectText, setSelectText] = useState("student");
+  const [selectedLevel, setSelectedLevel] = useState("");
   const [requestsModal, setRequestsModal] = useState(false);
   const [isAddUserModal, setIsAddUserModal] = useState(false);
   const [isEditUserModal, setIsEditUserModal] = useState(false);
@@ -106,8 +107,8 @@ const ManageUsers = () => {
       <>
         <div className="w-full bg-[#F9F9F9] font-poppins">
           <div className="flex flex-1">
-            {/* min-h-full */}
-            <div className={`w-full h-[100vh] lg:px-10 sm:px-6 px-3 flex-grow lg:ml-80`}>
+            {/* min-h-full h-[100vh] */}
+            <div className={`w-full  lg:px-10 sm:px-6 px-3 flex-grow lg:ml-80`}>
               <div className="min-h-full">
                 <Navbar heading={"Manage Users"} />
                 <div className={`${isBlurred ? "blur" : ""}`}>
@@ -133,6 +134,27 @@ const ManageUsers = () => {
                           value={searchText}
                           onChange={(e) => setSearchText(e.target.value)}
                         />
+                      </div>
+
+                      {/* Class dropdown */}
+                      <div className="group flex items-center px-4 py-2.5 rounded-2xl w-full sm:w-auto
+      bg-white/70 backdrop-blur-md border border-white/60
+      shadow-[0_2px_12px_rgba(106,0,255,0.08)]
+      hover:shadow-[0_4px_20px_rgba(106,0,255,0.14)]
+      hover:border-[#6A00FF]/30
+      transition-all duration-300 ease-out">
+                        <select
+                          className="w-full sm:w-32 bg-transparent outline-none text-sm font-medium text-[#0B1053] cursor-pointer"
+                          value={selectedLevel}
+                          onChange={(e) => setSelectedLevel(e.target.value)}
+                        >
+                          <option value="">All Classes</option>
+                          {allLevels?.map((level) => (
+                            <option key={level.id} value={level.id}>
+                              {level.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
                       {/* Select dropdown */}
@@ -230,7 +252,18 @@ const ManageUsers = () => {
 
                         const matchesUserType = !selectText || usr.userType === selectText.toLowerCase();
 
-                        return matchesSearch && matchesUserType;
+                        let matchesClass = true;
+                        if (selectedLevel) {
+                          if (usr.userType === "student") {
+                            matchesClass = usr.levelID == selectedLevel || usr.level?.id == selectedLevel;
+                          } else if (usr.userType === "teacher") {
+                            matchesClass = usr.classroomTeachers?.some(ct => ct.classroom?.levelID == selectedLevel);
+                          } else if (usr.userType === "parent") {
+                            matchesClass = usr.students?.some(s => s.levelID == selectedLevel || s.level?.id == selectedLevel);
+                          }
+                        }
+
+                        return matchesSearch && matchesUserType && matchesClass;
                       });
 
                       if (filteredUsers?.length === 0) {
@@ -254,7 +287,7 @@ const ManageUsers = () => {
                           index={index + 1}
                           userName={usr.name}
                           role={usr.userType}
-                                                    userclass={
+                          userclass={
                             usr.userType === "student"
                               ? (usr.level?.name || allLevels.find(l => l.id === usr.levelID)?.name || "—")
                               : usr.userType === "teacher"

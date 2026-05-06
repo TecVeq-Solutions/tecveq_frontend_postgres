@@ -17,18 +17,11 @@ import { formatTimeInPKT } from '../../../utils/timeUtils';
 /* ─── Admin timetable same palette/style ─── */
 const CLASS_PALETTES = [
     {
-        grad: 'from-rose-500 to-pink-600',
-        soft: 'bg-rose-50',
-        text: 'text-rose-700',
-        border: 'border-rose-200',
-        shadow: 'shadow-rose-500/20'
-    },
-    {
-        grad: 'from-violet-500 to-purple-600',
-        soft: 'bg-violet-50',
-        text: 'text-violet-700',
-        border: 'border-violet-200',
-        shadow: 'shadow-violet-500/20'
+        grad: 'from-[#0B1053] to-[#1e267e]',
+        soft: 'bg-blue-50',
+        text: 'text-[#0B1053]',
+        border: 'border-blue-200',
+        shadow: 'shadow-blue-500/20'
     },
     {
         grad: 'from-sky-500 to-blue-600',
@@ -36,27 +29,6 @@ const CLASS_PALETTES = [
         text: 'text-sky-700',
         border: 'border-sky-200',
         shadow: 'shadow-sky-500/20'
-    },
-    {
-        grad: 'from-amber-500 to-orange-500',
-        soft: 'bg-amber-50',
-        text: 'text-amber-700',
-        border: 'border-amber-200',
-        shadow: 'shadow-amber-500/20'
-    },
-    {
-        grad: 'from-emerald-500 to-teal-600',
-        soft: 'bg-emerald-50',
-        text: 'text-emerald-700',
-        border: 'border-emerald-200',
-        shadow: 'shadow-emerald-500/20'
-    },
-    {
-        grad: 'from-fuchsia-500 to-pink-600',
-        soft: 'bg-fuchsia-50',
-        text: 'text-fuchsia-700',
-        border: 'border-fuchsia-200',
-        shadow: 'shadow-fuchsia-500/20'
     }
 ];
 
@@ -68,21 +40,21 @@ const IconButton = ({ children, onClick, className = '', label }) => (
         aria-label={label}
         whileTap={{ scale: 0.9 }}
         onClick={onClick}
-        className={`grid place-items-center rounded-2xl bg-white/85 text-slate-500 shadow-sm shadow-violet-100/70 ring-1 ring-violet-100/80 backdrop-blur-xl transition-all duration-200 hover:bg-white hover:text-violet-600 hover:shadow-md ${className}`}
+        className={`grid place-items-center rounded-2xl bg-white/85 text-slate-500 shadow-sm shadow-blue-100/70 ring-1 ring-blue-100/80 backdrop-blur-xl transition-all duration-200 hover:bg-white hover:text-[#0B1053] hover:shadow-md ${className}`}
     >
         {children}
     </motion.button>
 );
 
 const SkeletonCard = () => (
-    <div className="relative flex gap-3 overflow-hidden rounded-[30px] border border-white/70 bg-white/70 p-3 shadow-sm shadow-violet-100/60 backdrop-blur-xl">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-100 via-purple-100 to-indigo-100" />
+    <div className="relative flex gap-3 overflow-hidden rounded-[30px] border border-white/70 bg-white/70 p-3 shadow-sm shadow-blue-100/60 backdrop-blur-xl">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-100 via-sky-100 to-indigo-100" />
         <div className="flex w-14 shrink-0 flex-col items-center gap-2">
-            <div className="h-11 w-11 animate-pulse rounded-2xl bg-violet-50" />
+            <div className="h-11 w-11 animate-pulse rounded-2xl bg-blue-50" />
             <div className="h-9 w-10 animate-pulse rounded-xl bg-slate-50" />
         </div>
         <div className="flex flex-1 flex-col gap-3 py-1">
-            <div className="h-4 w-20 animate-pulse rounded-full bg-violet-50" />
+            <div className="h-4 w-20 animate-pulse rounded-full bg-blue-50" />
             <div className="h-4 w-4/5 animate-pulse rounded-full bg-slate-50" />
             <div className="h-3 w-1/2 animate-pulse rounded-full bg-slate-50" />
         </div>
@@ -140,28 +112,29 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
     }, [currentWeekStart, selectedDate]);
 
     return (
-        <div className="relative flex min-h-screen w-full min-w-[320px] flex-col overflow-x-hidden bg-gradient-to-br from-[#f6f2ff] via-[#eef4ff] to-[#fff3fb] pb-10 font-['DM_Sans','Helvetica_Neue',sans-serif] selection:bg-violet-100">
-            <div className="pointer-events-none fixed -left-28 top-20 h-72 w-72 rounded-full bg-violet-400/25 blur-3xl" />
-            <div className="pointer-events-none fixed -right-32 top-52 h-80 w-80 rounded-full bg-fuchsia-300/25 blur-3xl" />
+        <div className="relative flex min-h-screen w-full min-w-[320px] flex-col overflow-x-hidden bg-gradient-to-br from-[#f0f4ff] via-[#eef4ff] to-[#f0f9ff] pb-10 font-['DM_Sans','Helvetica_Neue',sans-serif] selection:bg-blue-100">
+            <div className="pointer-events-none fixed -left-28 top-20 h-72 w-72 rounded-full bg-blue-400/25 blur-3xl" />
+            <div className="pointer-events-none fixed -right-32 top-52 h-80 w-80 rounded-full bg-sky-300/25 blur-3xl" />
             <div className="pointer-events-none fixed bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-200/30 blur-3xl" />
 
             {/* ══════════════════════════════ HEADER ══════════════════════════════ */}
-            <header className="sticky top-2 sm:top-16 z-10 border-b border-white/70 bg-[#ede9fe]/90 px-2 pt-4 pb-3 shadow-sm shadow-violet-100/60 backdrop-blur-3xl min-[375px]:px-1 sm:top-20 sm:px-5">
-                <div className="relative overflow-hidden rounded-[28px] border border-white/80 bg-gradient-to-r from-violet-500 via-purple-600 to-indigo-700 p-1 shadow-2xl shadow-violet-200/35 ring-1 ring-violet-100/50 backdrop-blur-2xl min-[375px]:rounded-[34px] min-[375px]:p-3 sm:p-2">
-                    <div className="pointer-events-none absolute -right-16 -top-20 h-40 w-40 rounded-full bg-violet-400/20 blur-3xl" />
-                    <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-purple-400/20 blur-3xl" />
-                    <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
+            <header className="sticky top-2 sm:top-16 z-10 border-b border-white/70 bg-slate-50/90 px-2 pt-4 pb-3 shadow-sm shadow-blue-100/60 backdrop-blur-3xl min-[375px]:px-1 sm:top-20 sm:px-5">
+                <div className="relative overflow-hidden rounded-[28px] border border-white/80 bg-[#0B1053] p-1 shadow-2xl shadow-[#0B1053]/35 ring-1 ring-blue-100/50 backdrop-blur-2xl min-[375px]:rounded-[34px] min-[375px]:p-3 sm:p-2">
+                    <div className="pointer-events-none absolute -right-16 -top-20 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl" />
+                    <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
 
-                    <div className="relative mb-3 rounded-[24px] border border-violet-100/80 bg-gradient-to-br from-white/95 via-violet-50/95 to-fuchsia-50/85 p-2.5 shadow-lg shadow-violet-100/60 min-[375px]:mb-4 min-[375px]:rounded-[28px] min-[375px]:p-3">
+                    <div className="relative mb-3 rounded-[24px] border border-blue-100/80 bg-gradient-to-br from-white/95 via-blue-50/95 to-sky-50/85 p-2.5 shadow-lg shadow-blue-100/60 min-[375px]:mb-4 min-[375px]:rounded-[28px] min-[375px]:p-3">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
-                                <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-violet-200/70 bg-white/85 px-2.5 py-1.5 text-[8px] font-black uppercase tracking-[0.18em] text-violet-700 shadow-sm shadow-violet-100/80 min-[375px]:px-3 min-[375px]:text-[9px]">
+                                <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-blue-200/70 bg-[#0B1053] 
+ px-2.5 py-1.5 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-sm shadow-blue-100/80 min-[375px]:px-3 min-[375px]:text-[9px]">
                                     <IoSparklesOutline size={13} />
                                     Student Mobview
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-[16px] bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 text-white shadow-xl shadow-violet-500/30 ring-1 ring-white/40 min-[375px]:h-11 min-[375px]:w-11 min-[375px]:rounded-[18px]">
+                                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-[16px] bg-[#0B1053] text-white shadow-xl shadow-[#0B1053]/30 ring-1 ring-white/40 min-[375px]:h-11 min-[375px]:w-11 min-[375px]:rounded-[18px]">
                                         <IoCalendarOutline size={21} />
                                     </div>
                                     <div className="min-w-0">
@@ -175,8 +148,8 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                                 </div>
                             </div>
 
-                            <div className="shrink-0 rounded-2xl border border-violet-100 bg-white/80 px-2.5 py-2 text-center shadow-sm shadow-violet-100/70 min-[375px]:px-3">
-                                <div className="text-[17px] font-black leading-none tracking-[-0.04em] text-violet-700">
+                            <div className="shrink-0 rounded-2xl border border-blue-100 bg-white/80 px-2.5 py-2 text-center shadow-sm shadow-blue-100/70 min-[375px]:px-3">
+                                <div className="text-[17px] font-black leading-none tracking-[-0.04em]  text-[#0B1053]">
                                     {filteredEvents.length}
                                 </div>
                                 <div className="mt-1 text-[8px] font-black uppercase tracking-[0.15em] text-slate-400">
@@ -190,7 +163,7 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                                 type="button"
                                 whileTap={{ scale: 0.94 }}
                                 onClick={() => setFilterModalOpen(true)}
-                                className="flex h-10 items-center justify-center gap-1 rounded-2xl border border-violet-200 bg-white/90 px-1.5 text-[9px] font-black uppercase tracking-[0.08em] text-violet-700 shadow-sm shadow-violet-100/80 transition-all duration-200 hover:bg-violet-50 min-[375px]:h-11 min-[375px]:gap-1.5 min-[375px]:px-2 min-[375px]:text-[10px]"
+                                className="flex h-10 items-center justify-center gap-1 rounded-2xl border border-blue-200 bg-white/90 px-1.5 text-[9px] font-black uppercase tracking-[0.08em] text-[#0B1053] shadow-sm shadow-blue-100/80 transition-all duration-200 hover:bg-blue-50 min-[375px]:h-11 min-[375px]:gap-1.5 min-[375px]:px-2 min-[375px]:text-[10px]"
                             >
                                 <IoFilterOutline size={16} />
                                 Filter Classes
@@ -198,8 +171,8 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                         </div>
                     </div>
 
-                    <div className="relative mb-3 overflow-hidden rounded-[24px] border border-violet-100/80 bg-white/80 p-1.5 shadow-inner shadow-violet-50 min-[375px]:mb-4 min-[375px]:rounded-[28px] min-[375px]:p-2">
-                        <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-violet-200 to-transparent" />
+                    <div className="relative mb-3 overflow-hidden rounded-[24px] border border-blue-100/80 bg-white/80 p-1.5 shadow-inner shadow-blue-50 min-[375px]:mb-4 min-[375px]:rounded-[28px] min-[375px]:p-2">
+                        <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-blue-200 to-transparent" />
                         <div className="flex items-center justify-between gap-3">
                             <IconButton
                                 label="Previous week"
@@ -210,8 +183,9 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                             </IconButton>
 
                             <div className="min-w-0 flex-1 text-center">
-                                <div className="mx-auto mb-1 inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.16em] text-violet-600 ring-1 ring-violet-100">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
+                                <div className="mx-auto mb-1 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.16em] text-[#0B1053] 
+ ring-1 ring-blue-100">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-[#0B1053] " />
                                     Selected Day
                                 </div>
                                 <h2 className="truncate text-[15px] font-black tracking-[-0.04em] text-slate-950 min-[375px]:text-[17px]">
@@ -233,7 +207,7 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                     </div>
 
                     {/* ─── Date Picker ─── */}
-                    <div className="relative overflow-hidden rounded-[24px] border border-violet-100/70 bg-gradient-to-r from-indigo-50/80 via-white/90 to-fuchsia-50/80 p-1 shadow-sm shadow-violet-100/60 min-[375px]:rounded-[28px] min-[375px]:p-1.5">
+                    <div className="relative overflow-hidden rounded-[24px] border border-blue-100/70 bg-gradient-to-r from-indigo-50/80 via-white/90 to-sky-50/80 p-1 shadow-sm shadow-blue-100/60 min-[375px]:rounded-[28px] min-[375px]:p-1.5">
                         <AnimatePresence mode="wait" custom={direction}>
                             <motion.div
                                 key={currentWeekStart.format('YYYY-WW')}
@@ -260,10 +234,10 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                                             whileTap={{ scale: 0.94 }}
                                             onClick={() => setSelectedDate(date)}
                                             className={`relative flex h-[64px] min-w-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-[17px] outline-none transition-all duration-300 min-[375px]:h-[74px] min-[375px]:rounded-[21px] ${isSelected
-                                                ? 'bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 text-white shadow-xl shadow-violet-500/35 ring-1 ring-white/40'
+                                                ? 'bg-[#0B1053] text-white shadow-xl shadow-[#0B1053]/35 ring-1 ring-white/40'
                                                 : isToday
-                                                    ? 'border border-violet-200 bg-white text-violet-700 shadow-sm shadow-violet-100/80'
-                                                    : 'border border-white/80 bg-white/70 text-slate-500 shadow-sm shadow-violet-50/70 hover:bg-white'
+                                                    ? 'border border-blue-200 bg-white text-[#0B1053] shadow-sm shadow-blue-100/80'
+                                                    : 'border border-white/80 bg-white/70 text-slate-500 shadow-sm shadow-blue-50/70 hover:bg-white'
                                                 }`}
                                         >
                                             {isSelected && (
@@ -278,7 +252,7 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                                             <span className="mt-1 text-[17px] font-black leading-none tracking-[-0.05em] min-[375px]:text-[20px]">
                                                 {date.format('D')}
                                             </span>
-                                            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : isToday ? 'bg-violet-500' : 'bg-transparent'}`} />
+                                            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : isToday ? 'bg-[#0B1053]' : 'bg-transparent'}`} />
                                         </motion.button>
                                     );
                                 })}
@@ -292,8 +266,8 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
             <main className="relative z-10 mt-3 flex-1 px-2 sm:px-3">
                 <div className="mb-3 flex items-center justify-between gap-1.5 px-0.5 min-[375px]:gap-2 min-[375px]:px-1.5">
                     <div className="min-w-0">
-                        <div className="mb-1 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.22em] text-violet-500">
-                            <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
+                        <div className="mb-1 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.22em] text-[#0B1053]">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#0B1053] " />
                             Timeline
                         </div>
                         <h3 className="truncate text-[16px] font-black leading-none tracking-[-0.04em] text-slate-950 min-[375px]:text-[18px] sm:text-[21px]">
@@ -305,7 +279,7 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                         type="button"
                         whileTap={{ scale: 0.94 }}
                         onClick={() => setFilterModalOpen(true)}
-                        className="flex shrink-0 items-center gap-1 rounded-2xl border border-violet-200 bg-white/90 px-2.5 py-2 text-[9.5px] font-black text-violet-700 shadow-sm shadow-violet-100/70 transition-all duration-200 hover:bg-violet-50 hover:shadow-md min-[375px]:gap-1.5 min-[375px]:px-3.5 min-[375px]:py-2.5 min-[375px]:text-[11px]"
+                        className="flex shrink-0 items-center gap-1 rounded-2xl border border-blue-200 bg-white/90 px-2.5 py-2 text-[9.5px] font-black text-[#0B1053] shadow-sm shadow-blue-100/70 transition-all duration-200 hover:bg-blue-50 hover:shadow-md min-[375px]:gap-1.5 min-[375px]:px-3.5 min-[375px]:py-2.5 min-[375px]:text-[11px]"
                     >
                         <IoFilterOutline size={15} />
                         Filter
@@ -334,9 +308,9 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                             className="pb-12"
                         >
-                            <div className="mb-2 mt-8 flex items-center justify-between rounded-[14px] border border-violet-200 bg-gradient-to-r from-violet-50/90 via-white/90 to-fuchsia-50/80 px-2.5 py-2.5 shadow-sm shadow-violet-100/70 sm:rounded-[18px] sm:px-4">
+                            <div className="mb-2 mt-8 flex items-center justify-between rounded-[14px] border border-blue-200 bg-gradient-to-r from-blue-50/90 via-white/90 to-sky-50/80 px-2.5 py-2.5 shadow-sm shadow-blue-100/70 sm:rounded-[18px] sm:px-4">
                                 <div className="flex min-w-0 items-center gap-3">
-                                    <div className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700 ring-1 ring-violet-200/80 min-[375px]:h-[42px] min-[375px]:w-[42px]">
+                                    <div className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-xl bg-blue-100 text-[#0B1053] ring-1 ring-blue-200/80 min-[375px]:h-[42px] min-[375px]:w-[42px]">
                                         <span className="text-[8px] font-black uppercase leading-none tracking-[0.12em]">
                                             {selectedDate.format('ddd')}
                                         </span>
@@ -345,16 +319,16 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                                         </span>
                                     </div>
                                     <div className="min-w-0">
-                                        <h4 className="truncate text-[12px] font-black leading-tight text-violet-900 min-[375px]:text-[13px] sm:text-[15px]">
+                                        <h4 className="truncate text-[12px] font-black leading-tight text-slate-900 min-[375px]:text-[13px] sm:text-[15px]">
                                             {selectedDate.format('dddd')}
                                         </h4>
-                                        <p className="mt-0.5 text-[9px] font-bold text-violet-500 min-[375px]:text-[10px]">
+                                        <p className="mt-0.5 text-[9px] font-bold text-blue-500 min-[375px]:text-[10px]">
                                             {selectedDate.format('MMMM DD, YYYY')}
                                         </p>
                                     </div>
                                 </div>
 
-                                <span className="shrink-0 rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1.5 text-[9px] font-black text-violet-700 shadow-sm shadow-violet-100 min-[375px]:px-3 min-[375px]:text-[10px]">
+                                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-100 px-2.5 py-1.5 text-[9px] font-black text-[#0B1053] shadow-sm shadow-blue-100 min-[375px]:px-3 min-[375px]:text-[10px]">
                                     {filteredEvents.length} {filteredEvents.length === 1 ? 'class' : 'classes'}
                                 </span>
                             </div>
@@ -368,7 +342,7 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                                             key={event.id || `${event.startTime}-${idx}`}
                                             whileTap={{ scale: 0.992 }}
                                             onClick={() => handleEventClick(event)}
-                                            className="group relative flex min-h-[86px] cursor-pointer overflow-hidden rounded-[14px] border border-slate-200/90 bg-white shadow-sm shadow-slate-100 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-md hover:shadow-violet-100/70 sm:min-h-[96px] sm:rounded-[18px]"
+                                            className="group relative flex min-h-[86px] cursor-pointer overflow-hidden rounded-[14px] border border-slate-200/90 bg-white shadow-sm shadow-slate-100 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md hover:shadow-blue-100/70 sm:min-h-[96px] sm:rounded-[18px]"
                                         >
                                             <div className={`w-1.5 shrink-0 bg-gradient-to-b ${palette.grad}`} />
 
@@ -440,17 +414,17 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                         initial={{ opacity: 0, scale: 0.96, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 0.35 }}
-                        className="mx-auto flex max-w-sm flex-col items-center justify-center rounded-[40px] border border-white/80 bg-white/70 px-6 pt-14 pb-12 text-center shadow-xl shadow-violet-100/70 backdrop-blur-xl"
+                        className="mx-auto flex max-w-sm flex-col items-center justify-center rounded-[40px] border border-white/80 bg-white/70 px-6 pt-14 pb-12 text-center shadow-xl shadow-blue-100/70 backdrop-blur-xl"
                     >
                         <div className="relative mb-7">
-                            <div className="grid h-[128px] w-[128px] place-items-center rounded-[42px] bg-gradient-to-br from-violet-100 via-purple-100 to-indigo-100 shadow-xl shadow-violet-500/10 ring-1 ring-white/80">
-                                <IoCalendarOutline size={54} className="text-violet-500/70" />
+                            <div className="grid h-[128px] w-[128px] place-items-center rounded-[42px] bg-gradient-to-br from-blue-100 via-sky-100 to-indigo-100 shadow-xl shadow-[#0B1053]/10 ring-1 ring-white/80">
+                                <IoCalendarOutline size={54} className="text-[#0B1053]/70" />
                             </div>
-                            <div className="absolute -right-3 -top-3 grid h-11 w-11 animate-bounce place-items-center rounded-2xl border border-white bg-white shadow-lg shadow-violet-100">
-                                <IoRocketOutline size={19} className="text-violet-500" />
+                            <div className="absolute -right-3 -top-3 grid h-11 w-11 animate-bounce place-items-center rounded-2xl border border-white bg-white shadow-lg shadow-blue-100">
+                                <IoRocketOutline size={19} className="text-[#0B1053]" />
                             </div>
-                            <div className="absolute -bottom-3 -left-3 grid h-10 w-10 place-items-center rounded-2xl border border-white bg-white shadow-lg shadow-purple-100">
-                                <IoSparklesOutline size={16} className="text-purple-500" />
+                            <div className="absolute -bottom-3 -left-3 grid h-10 w-10 place-items-center rounded-2xl border border-white bg-white shadow-lg shadow-blue-100">
+                                <IoSparklesOutline size={16} className="text-blue-500" />
                             </div>
                         </div>
 
