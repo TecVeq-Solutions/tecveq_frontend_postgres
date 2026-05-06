@@ -220,7 +220,7 @@ const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
   return (
     <div
       ref={ref}
-      className="flex flex-col bg-white rounded-2xl shadow-xl border border-gray-100 w-96 overflow-hidden"
+      className="flex flex-col bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-[380px] overflow-hidden mx-auto"
       // ─── max height on the whole modal so it never overflows the viewport ───
       style={{ maxHeight: "90vh" }}
     >
@@ -243,7 +243,7 @@ const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
       </div>
 
       {/* ── Scrollable body (calendar + filters + buttons + list) ── */}
-      <div className="flex flex-col gap-4 p-5 overflow-y-auto flex-1 custom-scrollbar">
+      <div className="flex flex-col gap-4  p-2 sm:p-5 overflow-y-auto flex-1 custom-scrollbar">
 
         {/* Calendar */}
         <CustomCalendar

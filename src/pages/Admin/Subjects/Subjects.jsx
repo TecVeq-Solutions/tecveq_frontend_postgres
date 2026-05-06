@@ -61,7 +61,7 @@ const SubjectCard = ({ subject, colorPalette, onEdit, onDelete }) => {
                         {subject.name}
                     </p>
                     <span
-                        className="inline-block mt-1 text-[11px] font-semibold px-[9px] py-[2px] rounded-[20px] tracking-[0.2px]"
+                        className="inline-block mt-1 text-[11px] font-semibold px-[9px] py-[2px] rounded-md tracking-[0.2px]"
                         style={{ background: c.light, color: c.text }}
                     >
                         {subject.levelName}

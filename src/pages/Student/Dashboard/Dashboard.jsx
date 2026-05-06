@@ -46,7 +46,7 @@ const Dashboard = () => {
               <div
                 className="  flex-col md:px-10 lg:px-0 flex xl:flex-row flex-1 gap-5 pt-4 sm:pt-8 pb-6"
               >
-                <div className="flex-[3] flex w-full">
+                <div className="flex-[3] flex w-full mt-3">
                   <SubjectsEnrolled />
                 </div>
                 <div className="flex-[2] flex">

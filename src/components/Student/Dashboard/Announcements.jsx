@@ -23,8 +23,8 @@ const Announcements = () => {
         <div className="flex justify-between items-start mb-3 gap-3">
           <div className="flex items-start gap-3">
             {/* Active Icon Style */}
-            <span className="p-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200 shrink-0">
-              <LuBellRing size={16} />
+            <span className="p-2 bg-blue-600  text-white rounded-xl shadow-lg shadow-blue-200 shrink-0">
+              <LuBellRing size={16} className=" " />
             </span>
             <h4 className="text-[16px] font-bold text-slate-800 leading-tight">
               {item.title}

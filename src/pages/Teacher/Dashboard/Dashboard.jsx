@@ -17,14 +17,14 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col flex-1 bg-[#f9f9f9]/50 font-poppins min-h-screen overflow-x-hidden">
       <div className="flex flex-1 flex-col lg:ml-80 transition-all duration-300">
-        {/* Navbar Container */}
-        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 h-20 flex items-center pl-16 lg:pl-0">
+        {/* Navbar Container   z-[500]*/}
+        <div className="sticky top-0  bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center lg:pl-0">
           <Navbar />
         </div>
 
         {/* Content Area */}
-        <div className={`flex flex-col p-3 sm:p-4 lg:p-6 gap-6 ${isBlurred ? "blur-md" : ""}`}>
-          
+        <div className={`flex flex-col p-2 sm:p-4 lg:p-6 gap-6 ${isBlurred ? "blur-md" : ""}`}>
+
           {/* Top Section: Announcements & Upcoming Classes */}
           <div className="flex flex-col xl:flex-row gap-6">
             <div className="flex-1 xl:flex-[2] min-w-0">

@@ -1154,63 +1154,190 @@ const StudentProfileDashboard = () => {
                             )}
 
                             {/* ══ TIMETABLE TAB ═══════════════════════ */}
-                            {activeTab === "timetable" && (
-                                <PremiumCard className="p-5">
-                                    <SectionHeader icon={<IoTime size={13} />} title="Weekly Schedule" gradient="from-violet-500 to-indigo-500" />
-                                    
-                                    <div className="hidden lg:flex flex-col gap-8">
-                                        {classes.length > 0 ? classes.map((cls, i) => (
-                                            <motion.div
-                                                key={i}
-                                                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                                                style={{
-                                                    display: 'flex', gap: 14, padding: '14px 16px', borderRadius: 18,
-                                                    border: '1px solid rgba(226,232,240,0.8)',
-                                                    background: 'rgba(248,250,252,0.6)',
-                                                    transition: 'all 0.2s ease', cursor: 'default'
-                                                }}
-                                                whileHover={{ background: 'white', borderColor: 'rgba(99,102,241,0.2)', boxShadow: '0 4px 16px rgba(99,102,241,0.08)' }}
-                                            >
-                                                <div style={{
-                                                    background: 'linear-gradient(135deg, rgba(238,242,255,1), rgba(224,231,255,1))',
-                                                    border: '1px solid rgba(199,210,254,1)',
-                                                    borderRadius: 14, padding: '10px 12px',
-                                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: 60
-                                                }}>
-                                                    <span style={{ fontSize: 8, fontWeight: 800, textTransform: 'uppercase', color: '#6366f1', letterSpacing: '0.08em' }}>{moment(cls.startTime).format("ddd")}</span>
-                                                    <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 800, color: '#4338ca', lineHeight: 1.1 }}>{moment(cls.startTime).format("DD")}</span>
-                                                </div>
-                                                <div style={{ flexGrow: 1, minWidth: 0 }}>
-                                                    <h4 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, color: '#0f172a', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cls.subject?.name}</h4>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
-                                                        <IoTime size={10} color="#6366f1" />
-                                                        <span style={{ fontSize: 10, color: '#64748b', fontWeight: 500 }}>{moment(cls.startTime).format("hh:mm A")} – {moment(cls.endTime).format("hh:mm A")}</span>
-                                                    </div>
-                                                </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                                                    <span style={{ fontSize: 10, fontWeight: 600, color: '#64748b', background: 'white', border: '1px solid rgba(226,232,240,1)', padding: '5px 10px', borderRadius: 10 }}>{cls.teacher?.name}</span>
-                                                </div>
-                                            </motion.div>
-                                        )) : (
-                                            <div style={{ padding: '64px 0', textAlign: 'center' }}>
-                                                <IoCalendar size={36} color="#e2e8f0" style={{ margin: '0 auto 12px' }} />
-                                                <p style={{ color: '#94a3b8', fontSize: 13, fontWeight: 500 }}>No classes scheduled.</p>
-                                            </div>
-                                        )}
-                                    </div>
+                            {activeTab === "timetable" && (() => {
+                                // Accent palette per weekday
+                                const DAY_ACCENT = {
+                                    'Monday':    { hdr: 'rgba(99,102,241,0.08)',  hdrBorder: 'rgba(99,102,241,0.2)',  dot: '#6366f1', dotBg: 'rgba(99,102,241,0.12)',  txt: '#3730a3' },
+                                    'Tuesday':   { hdr: 'rgba(16,185,129,0.08)', hdrBorder: 'rgba(16,185,129,0.2)', dot: '#10b981', dotBg: 'rgba(16,185,129,0.12)', txt: '#065f46' },
+                                    'Wednesday': { hdr: 'rgba(245,158,11,0.08)', hdrBorder: 'rgba(245,158,11,0.2)', dot: '#f59e0b', dotBg: 'rgba(245,158,11,0.12)', txt: '#92400e' },
+                                    'Thursday':  { hdr: 'rgba(239,68,68,0.08)',  hdrBorder: 'rgba(239,68,68,0.2)',  dot: '#ef4444', dotBg: 'rgba(239,68,68,0.12)',  txt: '#991b1b' },
+                                    'Friday':    { hdr: 'rgba(168,85,247,0.08)', hdrBorder: 'rgba(168,85,247,0.2)', dot: '#a855f7', dotBg: 'rgba(168,85,247,0.12)', txt: '#6b21a8' },
+                                    'Saturday':  { hdr: 'rgba(20,184,166,0.08)', hdrBorder: 'rgba(20,184,166,0.2)', dot: '#14b8a6', dotBg: 'rgba(20,184,166,0.12)', txt: '#134e4a' },
+                                    'Sunday':    { hdr: 'rgba(249,115,22,0.08)', hdrBorder: 'rgba(249,115,22,0.2)', dot: '#f97316', dotBg: 'rgba(249,115,22,0.12)', txt: '#9a3412' },
+                                };
+                                const CLR_CYCLE = ['#6366f1','#10b981','#f59e0b','#a855f7','#ef4444','#14b8a6','#f97316','#3b82f6'];
 
-                                    {/* Mobile/Tablet Fallback */}
-                                    <div className="lg:hidden flex flex-col items-center justify-center p-10 py-16 text-center">
-                                        <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
-                                            <IoTime className="text-3xl text-indigo-500" />
+                                // Group & sort classes by day
+                                const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                                const grouped = classes.reduce((acc, cls) => {
+                                    const d = moment(cls.startTime).format('dddd');
+                                    if (!acc[d]) acc[d] = [];
+                                    acc[d].push(cls);
+                                    return acc;
+                                }, {});
+                                const days = DAY_ORDER.filter(d => grouped[d]);
+
+                                if (classes.length === 0) return (
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoTime size={13} />} title="Weekly Schedule" gradient="from-violet-500 to-indigo-500" />
+                                        <div style={{ padding: '56px 0', textAlign: 'center' }}>
+                                            <IoCalendar size={36} color="#e2e8f0" style={{ margin: '0 auto 12px' }} />
+                                            <p style={{ color: '#94a3b8', fontSize: 13, fontWeight: 500 }}>No classes scheduled this week.</p>
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Desktop View Required</h3>
-                                        <p className="text-gray-500 text-sm max-w-[240px] mx-auto leading-relaxed">
-                                            The weekly schedule is currently available only on desktop screens (1024px+).
-                                        </p>
-                                    </div>
-                                </PremiumCard>
-                            )}
+                                    </PremiumCard>
+                                );
+
+                                let globalClsIdx = 0;
+                                return (
+                                    <PremiumCard className="p-5">
+                                        <SectionHeader icon={<IoTime size={13} />} title="Weekly Schedule" gradient="from-violet-500 to-indigo-500" />
+                                        <style>{`
+                                            .tt-cls-item { transition: box-shadow 0.18s, transform 0.18s; }
+                                            .tt-cls-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+                                            .tt-wrap::-webkit-scrollbar { width: 4px; }
+                                            .tt-wrap::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.25); border-radius: 99px; }
+                                        `}</style>
+                                        <div className="tt-wrap" style={{ maxHeight: 580, overflowY: 'auto', paddingRight: 2, marginTop: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                            {days.map((dayName, di) => {
+                                                const a = DAY_ACCENT[dayName] || DAY_ACCENT['Monday'];
+                                                const dayCls = [...grouped[dayName]].sort((x,y) => new Date(x.startTime) - new Date(y.startTime));
+                                                return (
+                                                    <motion.div key={dayName} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: di * 0.07 }}>
+                                                        {/* ── Day Header ── */}
+                                                        <div style={{
+                                                            display: 'flex', alignItems: 'center', gap: 10,
+                                                            background: a.hdr, border: `1px solid ${a.hdrBorder}`,
+                                                            borderRadius: 14, padding: '10px 14px', marginBottom: 10,
+                                                        }}>
+                                                            {/* Day mini-calendar badge */}
+                                                            <div style={{
+                                                                width: 40, height: 40, borderRadius: 10,
+                                                                background: a.dotBg, display: 'flex', flexDirection: 'column',
+                                                                alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                                            }}>
+                                                                <span style={{ fontSize: 8, fontWeight: 800, textTransform: 'uppercase', color: a.dot, letterSpacing: '0.06em', lineHeight: 1 }}>
+                                                                    {moment(dayCls[0].startTime).format('ddd')}
+                                                                </span>
+                                                                <span style={{ fontSize: 17, fontWeight: 800, color: a.txt, lineHeight: 1.15 }}>
+                                                                    {moment(dayCls[0].startTime).format('DD')}
+                                                                </span>
+                                                            </div>
+                                                            {/* Day name + date */}
+                                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                                <p style={{ fontWeight: 800, fontSize: 13, color: a.txt, lineHeight: 1 }}>{dayName}</p>
+                                                                <p style={{ fontSize: 10, color: a.dot, marginTop: 2, fontWeight: 500 }}>
+                                                                    {moment(dayCls[0].startTime).format('MMMM DD, YYYY')}
+                                                                </p>
+                                                            </div>
+                                                            {/* Class count badge */}
+                                                            <div style={{
+                                                                padding: '4px 11px', borderRadius: 99,
+                                                                background: a.dotBg, border: `1px solid ${a.hdrBorder}`,
+                                                                fontSize: 10, fontWeight: 700, color: a.txt, whiteSpace: 'nowrap',
+                                                            }}>
+                                                                {dayCls.length} {dayCls.length === 1 ? 'class' : 'classes'}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* ── Classes list ── */}
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingLeft: 4 }}>
+                                                            {dayCls.map((cls, ci) => {
+                                                                const accentColor = CLR_CYCLE[(globalClsIdx++) % CLR_CYCLE.length];
+                                                                const initials = cls.teacher?.name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '??';
+                                                                return (
+                                                                    <div
+                                                                        key={ci}
+                                                                        className="tt-cls-item"
+                                                                        style={{
+                                                                            display: 'flex', alignItems: 'center', gap: 0,
+                                                                            borderRadius: 13,
+                                                                            border: '1px solid rgba(226,232,240,0.8)',
+                                                                            background: '#fff',
+                                                                            overflow: 'hidden',
+                                                                            cursor: 'default',
+                                                                        }}
+                                                                    >
+                                                                        {/* Colored left stripe */}
+                                                                        <div style={{ width: 4, alignSelf: 'stretch', background: accentColor, flexShrink: 0 }} />
+
+                                                                        {/* Time block */}
+                                                                        <div style={{
+                                                                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                                                            justifyContent: 'center', padding: '10px 12px',
+                                                                            borderRight: '1px solid rgba(226,232,240,0.7)',
+                                                                            minWidth: 72, flexShrink: 0,
+                                                                            background: `${accentColor}09`,
+                                                                        }}>
+                                                                            <span style={{ fontSize: 11, fontWeight: 700, color: accentColor }}>
+                                                                                {moment(cls.startTime).format('hh:mm')}
+                                                                            </span>
+                                                                            <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 500, lineHeight: 1.2 }}>
+                                                                                {moment(cls.startTime).format('A')}
+                                                                            </span>
+                                                                            <span style={{ fontSize: 9, color: '#cbd5e1', fontWeight: 400, marginTop: 2 }}>↓</span>
+                                                                            <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b' }}>
+                                                                                {moment(cls.endTime).format('hh:mm')}
+                                                                            </span>
+                                                                            <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 500, lineHeight: 1.2 }}>
+                                                                                {moment(cls.endTime).format('A')}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        {/* Subject info */}
+                                                                        <div style={{ flex: 1, minWidth: 0, padding: '10px 14px' }}>
+                                                                            <div style={{
+                                                                                fontWeight: 700, fontSize: 13, color: '#0f172a',
+                                                                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                                                                marginBottom: 4,
+                                                                            }}>
+                                                                                {cls.subject?.name || 'Unnamed Subject'}
+                                                                            </div>
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                                                                                <span style={{
+                                                                                    fontSize: 9, fontWeight: 700,
+                                                                                    padding: '2px 7px', borderRadius: 99,
+                                                                                    background: `${accentColor}15`, color: accentColor,
+                                                                                    border: `1px solid ${accentColor}30`,
+                                                                                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                                                                                }}>
+                                                                                    Live Class
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {/* Teacher pill */}
+                                                                        <div style={{
+                                                                            display: 'flex', alignItems: 'center', gap: 7,
+                                                                            padding: '8px 14px 8px 10px',
+                                                                            borderLeft: '1px solid rgba(226,232,240,0.7)',
+                                                                            flexShrink: 0,
+                                                                        }}>
+                                                                            <div style={{
+                                                                                width: 26, height: 26, borderRadius: '50%',
+                                                                                background: `linear-gradient(135deg, ${accentColor}55, ${accentColor}cc)`,
+                                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                                fontSize: 9, fontWeight: 800, color: '#fff', flexShrink: 0,
+                                                                            }}>
+                                                                                {initials}
+                                                                            </div>
+                                                                            <div>
+                                                                                <p style={{ fontSize: 11, fontWeight: 600, color: '#374151', whiteSpace: 'nowrap' }}>
+                                                                                    {cls.teacher?.name || 'N/A'}
+                                                                                </p>
+                                                                                <p style={{ fontSize: 9, color: '#94a3b8', fontWeight: 400 }}>Teacher</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </div>
+                                    </PremiumCard>
+                                );
+                            })()}
 
                             {/* ══ FEES TAB ════════════════════════════ */}
                             {activeTab === "fees" && (

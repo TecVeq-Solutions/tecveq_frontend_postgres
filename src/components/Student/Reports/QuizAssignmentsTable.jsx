@@ -1,11 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-
 import { VscFeedback } from "react-icons/vsc";
+import { motion, AnimatePresence } from 'framer-motion';
+import { IoClose } from "react-icons/io5";
 
 const QuizAssignmentsTable = ({ data }) => {
     const params = useParams();
     const navigate = useNavigate();
+    const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleFeedbackClick = (e, feedback) => {
+        e.stopPropagation(); // Prevent row click navigation
+        setSelectedFeedback(feedback || "No feedback provided by the teacher yet.");
+        setShowModal(true);
+    };
 
     // Common td classes for header
     const thClass = "flex justify-center items-center text-center md:text-[15px] text-[11px] font-medium min-w-0 break-words";
@@ -87,8 +96,13 @@ const QuizAssignmentsTable = ({ data }) => {
                                             {displayGrade}
                                         </td>
                                         <td className={`flex-[3] ${tdClass}`}>
-                                            {/* {item.feedback || "No Feedback"} */}
-                                            <VscFeedback />
+                                            <button 
+                                                onClick={(e) => handleFeedbackClick(e, item.feedback)}
+                                                className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200 text-indigo-600"
+                                                title="View Feedback"
+                                            >
+                                                <VscFeedback size={20} />
+                                            </button>
                                         </td>
                                     </tr>
                                 );
@@ -97,6 +111,48 @@ const QuizAssignmentsTable = ({ data }) => {
                     </table>
                 </div>
             </div>
+
+            <AnimatePresence>
+                {showModal && (
+                    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+                            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking modal content
+                        >
+                            <div className="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
+                                <h3 className="text-lg font-bold flex items-center gap-2">
+                                    <VscFeedback size={22} />
+                                    Teacher Feedback
+                                </h3>
+                                <button 
+                                    onClick={() => setShowModal(false)}
+                                    className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                                >
+                                    <IoClose size={24} />
+                                </button>
+                            </div>
+                            <div className="p-6">
+                                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 min-h-[120px]">
+                                    <p className="text-gray-700 leading-relaxed italic">
+                                        "{selectedFeedback}"
+                                    </p>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={() => setShowModal(false)}
+                                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

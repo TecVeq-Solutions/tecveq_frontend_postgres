@@ -229,7 +229,9 @@ const StudentReports = () => {
         <div className="w-full max-w-full min-h-screen px-3 sm:px-6 md:px-10 lg:ml-80 py-4 sm:py-6 overflow-x-hidden">
 
           {/* Navbar */}
-          <Navbar heading={"Student Reports"} />
+          <header className="sticky top-0 z-[500] bg-[#F4F6FB] flex h-16 sm:h-20 -mx-3 sm:-mx-6 md:-mx-10 px-3 sm:px-6 md:px-10">
+            <Navbar heading={"Student Reports"} />
+          </header>
 
           {/* Reports count badge */}
           <div className="py-4">

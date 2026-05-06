@@ -31,11 +31,12 @@ const TimeTable = () => {
     <div className="flex flex-1 min-h-screen bg-[#f9f9f9]/50 font-poppins">
       <div className="flex flex-1 gap-4">
         <div className={`flex flex-col flex-1 lg:pl-1 lg:pr-4 ml-0 lg:ml-72 xl:ml-80`}>
-          <header className="sticky top-0 z-40 bg-[#f9f9f9]/90 backdrop-blur-sm flex h-16 md:px-14 lg:px-0">
+          <header className="sticky top-0 z-40 bg-[#f9f9f9]/90 backdrop-blur-sm px-0 flex h-16 sm:h-20 md:px-14 lg:px-0">
+            {/* z-[500] */}
             <Navbar heading={"Time Table"} />
           </header>
           <div
-            className={`flex px-2 sm:px-4  flex-col md:px-10 lg:px-0 w-full   gap-5 py-2 ${isBlurred ? "blur" : ""
+            className={`flex px-0 sm:px-4  flex-col md:px-10 lg:px-0 w-full   gap-5 py-2 ${isBlurred ? "blur" : ""
               }`}
           >
             <div className="hidden lg:block w-full">

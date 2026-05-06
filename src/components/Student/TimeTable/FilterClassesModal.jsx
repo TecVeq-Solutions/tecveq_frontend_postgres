@@ -236,7 +236,7 @@ const FilterClassesModal = ({ setAddModalOpen, classData, isPending }) => {
       </div>
 
       {/* ── Scrollable body (calendar + filters + buttons + list) ── */}
-      <div className="flex flex-col gap-4 p-5 overflow-y-auto flex-1 custom-scrollbar">
+      <div className="flex flex-col gap-4 p-2  sm:p-5 overflow-y-auto flex-1 custom-scrollbar">
 
         {/* Calendar */}
         <CustomCalendar

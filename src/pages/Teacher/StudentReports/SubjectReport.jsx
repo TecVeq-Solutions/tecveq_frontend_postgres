@@ -208,9 +208,9 @@ const SubjectReport = () => {
                       <p className="font-semibold text-gray-800">Assignments</p>
                     </div>
                     <div className="p-3 sm:p-4 overflow-x-auto">
-                      <QuizAssignmentsTable 
-                        data={(Array.isArray(data?.assignments) ? data?.assignments : data?.assignments?.data) || []} 
-                        type={"a"} 
+                      <QuizAssignmentsTable
+                        data={(Array.isArray(data?.assignments) ? data?.assignments : data?.assignments?.data) || []}
+                        type={"a"}
                       />
                     </div>
                   </div>
@@ -224,9 +224,9 @@ const SubjectReport = () => {
                       <p className="font-semibold text-gray-800">Quizzes</p>
                     </div>
                     <div className="p-3 sm:p-4 overflow-x-auto">
-                      <QuizAssignmentsTable 
-                        data={(Array.isArray(data?.quizzes || data?.quizes) ? (data?.quizzes || data?.quizes) : (data?.quizzes?.data || data?.quizes?.data)) || []} 
-                        type={"q"} 
+                      <QuizAssignmentsTable
+                        data={(Array.isArray(data?.quizzes || data?.quizes) ? (data?.quizzes || data?.quizes) : (data?.quizzes?.data || data?.quizes?.data)) || []}
+                        type={"q"}
                       />
                     </div>
                   </div>

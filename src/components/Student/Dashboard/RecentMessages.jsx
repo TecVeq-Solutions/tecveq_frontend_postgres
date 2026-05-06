@@ -567,7 +567,7 @@ const RecentMessages = ({ onclose, dashboard }) => {
   return (
     <div
       ref={ref}
-      className="fixed right-0 inset-y-0 z-[250] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden"
+      className="fixed right-0 top-20 bottom-0 z-[250] flex flex-row-reverse items-start pointer-events-none w-full sm:w-auto overflow-hidden"
     >
       <style>
         {`

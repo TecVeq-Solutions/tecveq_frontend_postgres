@@ -1,33 +1,47 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
-import { Search, Filter, X, Users, BookOpen, Clock } from 'lucide-react';
-import { fetchStudentAttendanceReport, getMyAllClassroom } from '../../../api/Admin/classroomApi';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { Search, Filter, X, Users, BookOpen, Clock, UserCheck, Download } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-
-import { Download } from "lucide-react";
+import { getAllTeachers, getStudentsByTeacher, getTeacherStudentSubjects } from '../../../api/Admin/AdminApi';
+import { fetchStudentAttendanceReport } from '../../../api/Admin/classroomApi';
 import { useSidebar } from '../../../context/SidebarContext';
 
-
 const INITIAL_FILTERS = {
-    classroomId: '',
+    teacherId: '',
+    studentId: '',
     subjectId: '',
+    classroomId: '',
     startDate: '',
     endDate: ''
 };
 
-const AttendanceReportComp = () => {
+const AttendenceReportByTeacherComp = () => {
     const [filters, setFilters] = useState(INITIAL_FILTERS);
     const [isFilterExpanded, setIsFilterExpanded] = useState(true);
     const [attendanceData, setAttendanceData] = useState(null);
     const reportRef = useRef();
-    const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
+    const { isSidebarOpen } = useSidebar();
 
-    // Fetch classrooms
-    const { data: myClassroomData, isPending: isLoadingClassrooms } = useQuery({
-        queryKey: ["classroom"],
-        queryFn: getMyAllClassroom
+    // Fetch all teachers
+    const { data: teachersData, isPending: isLoadingTeachers } = useQuery({
+        queryKey: ["allTeachers"],
+        queryFn: getAllTeachers
     });
 
-    // Fetch attendance report
+    // Fetch students by selected teacher
+    const { data: studentsData, isPending: isLoadingStudents, refetch: refetchStudents } = useQuery({
+        queryKey: ["studentsByTeacher", filters.teacherId],
+        queryFn: () => getStudentsByTeacher(filters.teacherId),
+        enabled: !!filters.teacherId
+    });
+
+    // Fetch subjects by selected student and teacher
+    const { data: subjectsData, isPending: isLoadingSubjects, refetch: refetchSubjects } = useQuery({
+        queryKey: ["subjectsByTeacherStudent", filters.teacherId, filters.studentId],
+        queryFn: () => getTeacherStudentSubjects(filters.teacherId, filters.studentId),
+        enabled: !!filters.teacherId && !!filters.studentId
+    });
+
+    // Fetch attendance report mutation
     const attendanceSearch = useMutation({
         mutationFn: fetchStudentAttendanceReport,
         onSuccess: (data) => {
@@ -38,53 +52,65 @@ const AttendanceReportComp = () => {
         }
     });
 
-    const classrooms = useMemo(() => myClassroomData?.data || [], [myClassroomData]);
+    const teachers = useMemo(() => {
+        if (!teachersData) return [];
+        // Handle both Array format and Object-of-Arrays format from backend
+        const rawData = teachersData?.data || teachersData;
+        if (!Array.isArray(rawData)) {
+            const uniqueTeachersMap = new Map();
+            Object.values(rawData).forEach(classroomList => {
+                if (Array.isArray(classroomList)) {
+                    classroomList.forEach(item => {
+                        if (item.teacher && !uniqueTeachersMap.has(item.teacher.id)) {
+                            uniqueTeachersMap.set(item.teacher.id, item.teacher);
+                        }
+                    });
+                }
+            });
+            return Array.from(uniqueTeachersMap.values());
+        }
+        return rawData;
+    }, [teachersData]);
+
+    const students = useMemo(() => studentsData?.data || [], [studentsData]);
+    const subjects = useMemo(() => subjectsData?.data || [], [subjectsData]);
     const studentReport = attendanceData?.data;
-
-    // Get subjects for selected classroom
-    const availableSubjects = useMemo(() => {
-        if (!filters.classroomId || !classrooms.length) return [];
-
-        const selectedClassroom = classrooms.find(classroom => classroom.id === filters.classroomId);
-        if (!selectedClassroom?.teachers) return [];
-
-        const subjects = selectedClassroom.teachers
-            .map(teacher => teacher.subject)
-            .filter(Boolean);
-
-        return subjects.reduce((acc, current) => {
-            const exists = acc.find(item => item.id === current.id);
-            if (!exists) acc.push(current);
-            return acc;
-        }, []);
-    }, [filters.classroomId, classrooms]);
 
     // Handle filter changes
     const handleFilterChange = useCallback((field, value) => {
         setFilters(prev => {
             const newFilters = { ...prev, [field]: value };
-            // Reset subject when classroom changes
-            if (field === 'classroomId') {
+
+            // Cascading resets
+            if (field === 'teacherId') {
+                newFilters.studentId = '';
                 newFilters.subjectId = '';
+                newFilters.classroomId = '';
+            } else if (field === 'studentId') {
+                newFilters.subjectId = '';
+                newFilters.classroomId = '';
+            } else if (field === 'subjectId') {
+                // Find classroomId for the selected subject
+                const selectedSub = subjects.find(s => s.id === value);
+                newFilters.classroomId = selectedSub?.classroomId || '';
             }
+
             return newFilters;
         });
-    }, []);
+    }, [subjects]);
 
     const handleReset = useCallback(() => {
         setFilters(INITIAL_FILTERS);
         setAttendanceData(null);
     }, []);
 
-    // Calculate active filters
     const activeFiltersCount = useMemo(() =>
         Object.values(filters).filter(Boolean).length, [filters]
     );
 
-    // Handle search
     const handleSearch = useCallback(async () => {
-        if (!filters.classroomId) {
-            alert('Please select a classroom');
+        if (!filters.teacherId || !filters.studentId || !filters.subjectId) {
+            alert('Please select Teacher, Student and Subject');
             return;
         }
 
@@ -95,177 +121,179 @@ const AttendanceReportComp = () => {
 
         const searchPayload = {
             classroomId: filters.classroomId,
-            subjectId: filters.subjectId || null,
+            subjectId: filters.subjectId,
+            studentId: filters.studentId,
             startDate: filters.startDate || null,
             endDate: filters.endDate || null
         };
 
-        console.log(searchPayload, "search")
-
         attendanceSearch.mutate(searchPayload);
     }, [filters, attendanceSearch]);
 
-    // Get display names
-    const selectedClassroomName = useMemo(() => {
-        if (!filters.classroomId) return '';
-        const classroom = classrooms.find(c => c.id === filters.classroomId);
-        return classroom ? `${classroom.name} - ${classroom.level?.name || 'N/A'}` : '';
-    }, [filters.classroomId, classrooms]);
-
-    const selectedSubjectName = useMemo(() => {
-        if (!filters.subjectId) return '';
-        const subject = availableSubjects.find(s => s.id === filters.subjectId);
-        return subject?.name || '';
-    }, [filters.subjectId, availableSubjects]);
+    const getDisplayName = (type, id) => {
+        if (type === 'teacher') return teachers.find(t => t.id === id)?.name || '';
+        if (type === 'student') return students.find(s => s.id === id)?.name || '';
+        if (type === 'subject') return subjects.find(s => s.id === id)?.name || '';
+        return '';
+    };
 
     const formatDate = (dateString) => {
         return dateString ? new Date(dateString).toLocaleDateString() : '';
     };
 
-    if (isLoadingClassrooms) {
-        return (
-            <div className="bg-white  border border-[#e5e7eb] rounded-xl shadow-lg overflow-hidden">
-                <div className="p-6 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563eb] mx-auto"></div>
-                    <p className="mt-2 text-[#6b7280]">Loading classrooms...</p>
-                </div>
-            </div>
-        );
-    }
-
-
     const handlePrint = () => {
         const content = reportRef.current.innerHTML;
-        const win = window.open('', '', 'width=800,height=600');
+        const win = window.open('', '', 'width=1000,height=800');
         win.document.write(`
-    <html>
-      <head>
-        <title>Print Report</title>
-        <style>
-          .export-button { display: none !important; }
-          table { border-collapse: collapse; width: 100%; }
-          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        </style>
-      </head>
-      <body>${content}</body>
-    </html>
-  `);
+            <html>
+                <head>
+                    <title>Attendance Report</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; }
+                        .export-button { display: none !important; }
+                        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                        th { background-color: #f3f4f6; }
+                        .status-present { color: #059669; font-weight: bold; }
+                        .status-absent { color: #dc2626; font-weight: bold; }
+                        .header { margin-bottom: 30px; border-bottom: 2px solid #6A00FF; padding-bottom: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>Attendance Report</h2>
+                        <p>Teacher: ${getDisplayName('teacher', filters.teacherId)}</p>
+                        <p>Student: ${getDisplayName('student', filters.studentId)}</p>
+                        <p>Subject: ${getDisplayName('subject', filters.subjectId)}</p>
+                        <p>Date Range: ${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}</p>
+                    </div>
+                    ${content}
+                </body>
+            </html>
+        `);
         win.document.close();
         win.focus();
-        win.print();
-        win.close();
+        setTimeout(() => {
+            win.print();
+            win.close();
+        }, 500);
     };
 
     return (
-        <div className="bg-white border mt-10 border-[#e5e7eb] rounded-xl shadow-lg overflow-hidden">
-            {/* Header */}
-            <div className="bg-[#6A00FF] px-4 sm:px-6 py-3 sm:py-4">
-                <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-                        <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg flex-shrink-0">
-                            <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+        <div className="bg-white border mt-6 border-[#e5e7eb] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
+            {/* Premium Header */}
+            <div className="bg-gradient-to-r from-[#6A00FF] to-[#4A00E0] px-3 sm:px-6 py-5">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20">
+                            <Filter className="h-6 w-6 text-white" />
                         </div>
-                        <div className="min-w-0">
-                            <h2 className="text-base sm:text-xl font-bold text-white ">Attendance Report Filters</h2>
-                            <p className="text-[#bfdbfe] text-xs sm:text-sm hidden sm:block">Configure your search parameters</p>
+                        <div>
+                            <h2 className="text-xl font-bold text-white tracking-tight">Attendance Report Filters</h2>
+                            <p className="text-indigo-100 text-sm opacity-80">Refine your search by teacher, student, and course</p>
                         </div>
                     </div>
-                    <div className="flex items-center space-x-2 flex-shrink-0">
-                        {activeFiltersCount > 0 && (
-                            <div className="bg-white/20 px-2 sm:px-3 py-1 rounded-full">
-                                <span className="text-white text-xs sm:text-sm font-medium">
-                                    {activeFiltersCount} active
-                                </span>
-                            </div>
-                        )}
-                        <button
-                            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                            className={`bg-white/20 hover:bg-white/30 p-2 rounded-lg transition-colors ${isSidebarOpen ? "-z-50" : "z-auto"}`}
-                        >
-                            <Filter className={`h-4 w-4 text-white transition-transform ${isFilterExpanded ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                        className="bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all duration-200 border border-white/10 shadow-inner"
+                    >
+                        <Filter className={`h-5 w-5 text-white transition-transform duration-300 ${isFilterExpanded ? 'rotate-180' : ''}`} />
+                    </button>
                 </div>
             </div>
 
             {/* Filter Content */}
             {isFilterExpanded && (
-                <div className="p-4 sm:p-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
-                        {/* Classroom Selection */}
-                        <div className="space-y-2 sm:space-y-3">
-                            <label className="flex items-center space-x-2 text-sm font-semibold text-[#374151]">
-                                <Users className="h-4 w-4 text-[#2563eb] flex-shrink-0" />
-                                <span>Select Classroom</span>
+                <div className="p-3 sm:p-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {/* Teacher Selection */}
+                        <div className="space-y-3">
+                            <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
+                                <UserCheck className="h-4 w-4 text-[#6A00FF]" />
+                                <span>Select Teacher</span>
                             </label>
-                            <div className={`${isSidebarOpen ? "-z-50" : "z-auto"}`}>
+                            <div className="relative group">
                                 <select
-                                    value={filters.classroomId}
-                                    onChange={(e) => handleFilterChange('classroomId', e.target.value)}
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-[#d1d5db] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent transition-all duration-200 appearance-none bg-white text-sm"
+                                    value={filters.teacherId}
+                                    onChange={(e) => handleFilterChange('teacherId', e.target.value)}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6A00FF] focus:border-transparent transition-all duration-200 outline-none appearance-none group-hover:bg-white group-hover:border-[#6A00FF]/30 text-sm font-medium text-gray-800"
                                 >
-                                    <option value="">Choose a classroom...</option>
-                                    {classrooms.map(classroom => (
-                                        <option key={classroom.id} value={classroom.id}>
-                                            {classroom.name} - {classroom.level?.name || 'N/A'} ({classroom.students?.length || 0} students)
-                                        </option>
+                                    <option value="">Choose a teacher...</option>
+                                    {teachers.map(teacher => (
+                                        <option key={teacher.id} value={teacher.id}>{teacher.name}</option>
                                     ))}
                                 </select>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Subject Selection */}
-                        <div className="space-y-2 sm:space-y-3">
-                            <label className="flex items-center space-x-2 text-sm font-semibold text-[#374151]">
-                                <BookOpen className="h-4 w-4 text-[#059669] flex-shrink-0" />
-                                <span>Select Subject</span>
+                        {/* Student Selection */}
+                        <div className="space-y-3">
+                            <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
+                                <Users className="h-4 w-4 text-[#059669]" />
+                                <span>Select Student</span>
                             </label>
-                            <div className={`relative ${isSidebarOpen ? "-z-50" : "z-auto"}`}>
+                            <div className="relative group">
+                                <select
+                                    value={filters.studentId}
+                                    onChange={(e) => handleFilterChange('studentId', e.target.value)}
+                                    disabled={!filters.teacherId}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all duration-200 outline-none appearance-none disabled:opacity-50 disabled:bg-gray-100 group-hover:bg-white group-hover:border-[#059669]/30 text-sm font-medium text-gray-800"
+                                >
+                                    <option value="">{isLoadingStudents && filters.teacherId ? 'Loading students...' : 'Choose a student...'}</option>
+                                    {students.map(student => (
+                                        <option key={student.id} value={student.id}>{student.name} ({student.rollNo})</option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Course Selection */}
+                        <div className="space-y-3">
+                            <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
+                                <BookOpen className="h-4 w-4 text-[#EA580C]" />
+                                <span>Select Course</span>
+                            </label>
+                            <div className="relative group">
                                 <select
                                     value={filters.subjectId}
                                     onChange={(e) => handleFilterChange('subjectId', e.target.value)}
-                                    disabled={!filters.classroomId || availableSubjects.length === 0}
-                                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-[#d1d5db] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all duration-200 appearance-none bg-white disabled:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60 text-sm"
+                                    disabled={!filters.studentId}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EA580C] focus:border-transparent transition-all duration-200 outline-none appearance-none disabled:opacity-50 disabled:bg-gray-100 group-hover:bg-white group-hover:border-[#EA580C]/30 text-sm font-medium text-gray-800"
                                 >
-                                    <option value="">Choose a subject...</option>
-                                    {availableSubjects.map(subject => (
-                                        <option key={subject.id} value={subject.id}>
-                                            {subject.name}
-                                        </option>
+                                    <option value="">{isLoadingSubjects && filters.studentId ? 'Loading courses...' : 'Choose a course...'}</option>
+                                    {subjects.map(subject => (
+                                        <option key={subject.id} value={subject.id}>{subject.name} - {subject.classroomName}</option>
                                     ))}
                                 </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                    <svg className="h-5 w-5 text-[#9ca3af]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                                 </div>
                             </div>
-                            {!filters.classroomId && (
-                                <p className="text-xs text-[#6b7280] flex items-center">
-                                    <span className="w-2 h-2 bg-[#f59e0b] rounded-full mr-2 flex-shrink-0"></span>
-                                    Select a classroom first
-                                </p>
-                            )}
                         </div>
 
-                        {/* Start Date */}
-                        <div className="space-y-2 sm:space-y-3">
-                            <label className="flex items-center space-x-2 text-sm font-semibold text-[#374151]">
-                                <Clock className="h-4 w-4 text-[#7c3aed] flex-shrink-0" />
+                        {/* Date Range */}
+                        <div className="space-y-3">
+                            <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
+                                <Clock className="h-4 w-4 text-[#7c3aed]" />
                                 <span>Start Date</span>
                             </label>
                             <input
                                 type="date"
                                 value={filters.startDate}
                                 onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-[#d1d5db] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent transition-all duration-200 text-sm"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7c3aed] focus:border-transparent transition-all duration-200 outline-none text-sm font-medium text-gray-800"
                             />
                         </div>
 
-                        {/* End Date */}
-                        <div className="space-y-2 sm:space-y-3">
-                            <label className="flex items-center space-x-2 text-sm font-semibold text-[#374151]">
-                                <Clock className="h-4 w-4 text-[#7c3aed] flex-shrink-0" />
+                        <div className="space-y-3">
+                            <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
+                                <Clock className="h-4 w-4 text-[#7c3aed]" />
                                 <span>End Date</span>
                             </label>
                             <input
@@ -273,152 +301,80 @@ const AttendanceReportComp = () => {
                                 value={filters.endDate}
                                 onChange={(e) => handleFilterChange('endDate', e.target.value)}
                                 min={filters.startDate}
-                                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-[#d1d5db] rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent transition-all duration-200 text-sm"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7c3aed] focus:border-transparent transition-all duration-200 outline-none text-sm font-medium text-gray-800"
                             />
                         </div>
                     </div>
 
-                    {/* Active Filters Display */}
-                    {activeFiltersCount > 0 && (
-                        <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-[#f9fafb] rounded-lg border border-[#e5e7eb]">
-                            <div className="flex items-center justify-between mb-2 sm:mb-3">
-                                <h3 className="text-sm font-semibold text-[#374151] flex items-center">
-                                    <span className="w-2 h-2 bg-[#2563eb] rounded-full mr-2 flex-shrink-0"></span>
-                                    Active Filters ({activeFiltersCount})
-                                </h3>
-                                <button
-                                    onClick={handleReset}
-                                    className="text-xs text-[#6b7280] hover:text-[#6A00FF] transition-colors flex items-center flex-shrink-0"
-                                >
-                                    <X className="h-3 w-3 mr-1" />
-                                    Clear all
-                                </button>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {filters.classroomId && (
-                                    <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-[#dbeafe] text-[#1e40af] border border-[#93c5fd]">
-                                        <Users className="h-3 w-3 mr-1 flex-shrink-0" />
-                                        <span className="truncate max-w-[120px] sm:max-w-none">{selectedClassroomName}</span>
-                                        <button
-                                            onClick={() => handleFilterChange('classroomId', '')}
-                                            className="ml-1 hover:text-[#2563eb] flex-shrink-0"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    </span>
-                                )}
-                                {filters.subjectId && (
-                                    <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]">
-                                        <BookOpen className="h-3 w-3 mr-1 flex-shrink-0" />
-                                        <span className="truncate max-w-[100px] sm:max-w-none">{selectedSubjectName}</span>
-                                        <button
-                                            onClick={() => handleFilterChange('subjectId', '')}
-                                            className="ml-1 hover:text-[#059669] flex-shrink-0"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    </span>
-                                )}
-                                {filters.startDate && (
-                                    <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-[#f3e8ff] text-[#7c2d12] border border-[#e9d5ff]">
-                                        <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
-                                        From: {formatDate(filters.startDate)}
-                                        <button
-                                            onClick={() => handleFilterChange('startDate', '')}
-                                            className="ml-1 hover:text-[#7c3aed] flex-shrink-0"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    </span>
-                                )}
-                                {filters.endDate && (
-                                    <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-[#f3e8ff] text-[#7c2d12] border border-[#e9d5ff]">
-                                        <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
-                                        To: {formatDate(filters.endDate)}
-                                        <button
-                                            onClick={() => handleFilterChange('endDate', '')}
-                                            className="ml-1 hover:text-[#7c3aed] flex-shrink-0"
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 justify-end mt-4 sm:mt-6 pt-4 border-t border-[#e5e7eb]">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-end pt-8 border-t border-gray-100">
                         <button
                             onClick={handleReset}
-                            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 border border-[#d1d5db] text-[#374151] rounded-lg hover:bg-[#f9fafb] focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:ring-offset-2 transition-all duration-200 font-medium text-sm"
+                            className="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 transition-all duration-200 font-bold text-sm shadow-sm"
                         >
-                            Reset All Filters
+                            Reset Filters
                         </button>
                         <button
                             onClick={handleSearch}
-                            disabled={!filters.classroomId || attendanceSearch.isPending}
-                            className={`w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 bg-[#6A00FF] text-white rounded-lg hover:from-[#1d4ed8] hover:to-[#1e40af] focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm ${isSidebarOpen ? "-z-50" : "z-auto"}`}
+                            disabled={!filters.subjectId || attendanceSearch.isPending}
+                            className="px-8 py-3 bg-gradient-to-r from-[#6A00FF] to-[#4A00E0] text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 font-bold shadow-md disabled:opacity-50 disabled:scale-100 text-sm"
                         >
                             {attendanceSearch.isPending ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                    Generating...
-                                </>
+                                <div className="flex items-center gap-2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
+                                    <span>Fetching...</span>
+                                </div>
                             ) : (
                                 <>
                                     <Search className="h-4 w-4" />
-                                    Generate Report
+                                    <span>View Attendance</span>
                                 </>
                             )}
                         </button>
                     </div>
 
-                    {/* Results Table */}
-                    <section ref={reportRef}>
-                        {studentReport && studentReport.length > 0 && (
-                            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <div className="flex flex-row justify-between items-center px-0 sm:px-4 mb-4 sm:mb-6 gap-2">
-                                    <h3 className="text-lg sm:text-2xl font-semibold text-gray-800">
-                                        Attendance Report Results
-                                    </h3>
-                                    <button
-                                        onClick={handlePrint}
-                                        className="export-button inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#6A00FF] hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm flex-shrink-0"
-                                    >
-                                        <Download size={16} />
-                                        <span className="hidden xs:inline">Export</span>
-                                    </button>
+                    {/* Results Section */}
+                    {studentReport && (
+                        <div className="mt-12 animate-in fade-in zoom-in duration-500" ref={reportRef}>
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                                <div>
+                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Attendance Record</h3>
+                                    <p className="text-gray-500 text-sm mt-1">Showing data for {getDisplayName('student', filters.studentId)} in {getDisplayName('subject', filters.subjectId)}</p>
                                 </div>
-                                <div className="overflow-x-auto -mx-3 sm:mx-0">
-                                    <div className="min-w-full inline-block align-middle px-3 sm:px-0">
-                                        <table className="w-full border-collapse border border-gray-300 text-xs sm:text-sm">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left whitespace-nowrap">No.</th>
-                                                    <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left whitespace-nowrap">Student</th>
-                                                    <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left whitespace-nowrap">Classroom</th>
-                                                    <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left whitespace-nowrap">Subject</th>
-                                                    <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left whitespace-nowrap">Date</th>
-                                                    <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left whitespace-nowrap">Status</th>
+                                <button
+                                    onClick={handlePrint}
+                                    className="export-button group flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black transition-all duration-200 text-sm"
+                                >
+                                    <Download size={18} className="group-hover:-translate-y-0.5 transition-transform" />
+                                    <span>Export Report</span>
+                                </button>
+                            </div>
+
+                            {studentReport.length > 0 ? (
+                                <div className="overflow-hidden border border-gray-200 rounded-2xl shadow-sm bg-white">
+                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar relative">
+                                        <table className="w-full text-sm">
+                                            <thead className="sticky top-0 z-10">
+                                                <tr className="bg-gray-50 border-b border-gray-200">
+                                                    <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Date</th>
+                                                    <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Class Title</th>
+                                                    <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Status</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className="divide-y divide-gray-100">
                                                 {studentReport.map((item, index) => (
-                                                    <tr key={index} className="hover:bg-gray-50">
-                                                        <td className="border border-gray-300 px-2 sm:px-4 py-2">{index + 1}</td>
-                                                        <td className="border border-gray-300 px-2 sm:px-4 py-2">
-                                                            <span className="block font-medium">{item.studentName}</span>
-                                                            <span className="text-gray-500 text-xs">({item.rollNo})</span>
-                                                        </td>
-                                                        <td className="border border-gray-300 px-2 sm:px-4 py-2 whitespace-nowrap">{item.classroomName}</td>
-                                                        <td className="border border-gray-300 px-2 sm:px-4 py-2 whitespace-nowrap">{item.subjectName}</td>
-                                                        <td className="border border-gray-300 px-2 sm:px-4 py-2 whitespace-nowrap">{formatDate(item.date)}</td>
-                                                        <td className="border border-gray-300 px-2 sm:px-4 py-2">
-                                                            <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium whitespace-nowrap ${item.status === 'present'
-                                                                ? 'bg-green-100 text-green-800'
-                                                                : 'bg-red-100 text-red-800'
+                                                    <tr key={index} className="hover:bg-blue-50/30 transition-colors duration-150">
+                                                        <td className="px-6 py-5 font-medium text-gray-900">{formatDate(item.date)}</td>
+                                                        <td className="px-6 py-5 text-gray-600 font-medium">{item.classTitle}</td>
+                                                        <td className="px-6 py-5">
+                                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase ${item.status === 'present'
+                                                                ? 'bg-emerald-100 text-emerald-800'
+                                                                : item.status === 'present-late'
+                                                                    ? 'bg-amber-100 text-amber-800'
+                                                                    : 'bg-rose-100 text-rose-800'
                                                                 }`}>
+                                                                <span className={`w-1.5 h-1.5 rounded-full mr-2 ${item.status === 'present' ? 'bg-emerald-500' : item.status === 'present-late' ? 'bg-amber-500' : 'bg-rose-500'
+                                                                    }`}></span>
                                                                 {item.status}
                                                             </span>
                                                         </td>
@@ -427,14 +383,38 @@ const AttendanceReportComp = () => {
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
-                            </div>
-                        )}
-                    </section>
 
-                    {studentReport && studentReport.length === 0 && (
-                        <div className="mt-4 sm:mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <p className="text-yellow-800 text-center text-sm">No attendance records found for the selected criteria.</p>
+                                    {/* Summary Stats */}
+                                    <div className="bg-gray-50/50 px-6 py-4 border-t border-gray-200 flex flex-wrap gap-8">
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">Total Classes</span>
+                                            <span className="text-xl font-black text-gray-900">{studentReport.length}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-emerald-600 text-[10px] font-black uppercase tracking-widest">Present</span>
+                                            <span className="text-xl font-black text-emerald-700">{studentReport.filter(r => r.status === 'present').length}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-rose-600 text-[10px] font-black uppercase tracking-widest">Absent</span>
+                                            <span className="text-xl font-black text-rose-700">{studentReport.filter(r => r.status === 'absent').length}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-blue-600 text-[10px] font-black uppercase tracking-widest">Attendance %</span>
+                                            <span className="text-xl font-black text-blue-700">
+                                                {((studentReport.filter(r => r.status === 'present' || r.status === 'present-late').length / studentReport.length) * 100).toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="bg-amber-50 border border-amber-200 p-12 rounded-3xl text-center">
+                                    <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Filter className="h-8 w-8 text-amber-600" />
+                                    </div>
+                                    <h4 className="text-xl font-black text-amber-900 tracking-tight">No records found</h4>
+                                    <p className="text-amber-700 mt-2 max-w-xs mx-auto">We couldn't find any attendance data for the selected criteria and date range.</p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -443,4 +423,4 @@ const AttendanceReportComp = () => {
     );
 };
 
-export default AttendanceReportComp;
+export default AttendenceReportByTeacherComp;

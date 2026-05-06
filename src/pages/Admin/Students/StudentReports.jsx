@@ -34,7 +34,8 @@ const StudentReports = () => {
         <div className="flex flex-1 bg-[#F9F9F9] font-poppins min-w-0">
           <div className="flex flex-1 min-w-0">
             <div
-              className={`w-full h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80 min-w-0`}
+              // h-[100vh]
+              className={`w-full  lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80 min-w-0`}
             >
               <div className="min-h-full flex flex-col min-w-0">
                 <Navbar heading={"Student Details"} />

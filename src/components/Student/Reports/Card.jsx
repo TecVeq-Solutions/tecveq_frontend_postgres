@@ -62,7 +62,6 @@ const Card = ({ data, type, grade, percentage }) => {
         const label = countRef.current;
         if (!ring || !label) return;
 
-        // Small delay so animation triggers after mount
         const timeout = setTimeout(() => {
             ring.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)";
             ring.style.strokeDashoffset = offset;
@@ -81,7 +80,7 @@ const Card = ({ data, type, grade, percentage }) => {
 
     return (
         <div
-            className="flex-1 min-w-[300px] sm:min-w-[150px] relative overflow-hidden rounded-[20px] border border-[#00000015] 
+            className="flex-1 min-w-0 w-full relative overflow-hidden rounded-[20px] border border-[#00000015] 
                  bg-white flex flex-col items-center gap-3 pt-6 pb-5 px-4 
                  hover:-translate-y-1 transition-transform duration-300 cursor-pointer"
             style={{ boxShadow: "0 2px 16px 0 rgba(0,0,0,0.06)" }}
@@ -101,20 +100,18 @@ const Card = ({ data, type, grade, percentage }) => {
             </div>
 
             {/* Ring */}
-            <div className="relative w-[110px] h-[110px]">
+            <div className="relative w-[90px] h-[90px] sm:w-[110px] sm:h-[110px]">
                 <svg
                     viewBox="0 0 110 110"
-                    className="w-[110px] h-[110px]"
+                    className="w-full h-full"
                     style={{ transform: "rotate(-90deg)" }}
                 >
-                    {/* Background track */}
                     <circle
                         cx="55" cy="55" r="46"
                         fill="none"
                         stroke="#F0EEF8"
                         strokeWidth={8}
                     />
-                    {/* Progress arc */}
                     <circle
                         ref={ringRef}
                         cx="55" cy="55" r="46"
@@ -131,17 +128,17 @@ const Card = ({ data, type, grade, percentage }) => {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-[2px]">
                     <span
                         ref={countRef}
-                        className="text-[20px] font-bold leading-none"
+                        className="text-[17px] sm:text-[20px] font-bold leading-none"
                         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                     >
                         0%
                     </span>
-                    <span className="text-[10px] font-medium text-gray-400">
+                    <span className="text-[9px] sm:text-[10px] font-medium text-gray-400">
                         {type === "Marks" ? "Marks" : "Average"}
                     </span>
                     {grade && (
                         <span
-                            className="text-[11px] font-semibold px-[6px] py-[1px] rounded-md mt-[2px]"
+                            className="text-[10px] sm:text-[11px] font-semibold px-[6px] py-[1px] rounded-md mt-[2px]"
                             style={{ background: config.bg, color: config.text }}
                         >
                             {grade}
@@ -152,7 +149,7 @@ const Card = ({ data, type, grade, percentage }) => {
 
             {/* Title */}
             <p
-                className="text-[13px] font-semibold text-center text-gray-800"
+                className="text-[12px] sm:text-[13px] font-semibold text-center text-gray-800"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
                 {data}

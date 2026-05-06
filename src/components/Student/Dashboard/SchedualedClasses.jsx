@@ -96,7 +96,7 @@ const ScheduledClasses = ({ hideHeader }) => {
           >
             {item.subject?.name || item.subjectID?.name || "Subject"}
           </span>
-          <span className="text-[11px] text-gray-400 font-medium">
+          <span className=" mt-4 text-[11px] text-gray-400 font-medium">
             {item.teacher?.name || item.teacher?.teacherID?.name || "Teacher"}
           </span>
         </div>

@@ -1,14 +1,35 @@
 import React from "react";
 import { IoClose, IoNotificationsOutline, IoMegaphoneOutline } from "react-icons/io5";
+import { CiBellOn } from "react-icons/ci";
 import { GoDotFill } from "react-icons/go";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAllAnnouncements } from "../../api/ForAllAPIs";
+import { getAllNotifications, clearAllNotifications } from "../../api/Admin/NotificationApi";
 import moment from 'moment';
+import { toast } from "react-toastify";
 
 const Notifications = ({ onclose, dashboard }) => {
-  const { data } = useQuery({ queryKey: ["announcements"], queryFn: getAllAnnouncements });
+  const queryClient = useQueryClient();
+  const { data: announcements, isPending: isPendingAnn } = useQuery({ queryKey: ["announcements"], queryFn: getAllAnnouncements });
+  const { data: notifications, isPending: isPendingNoti } = useQuery({ queryKey: ["notifications"], queryFn: getAllNotifications });
 
-  const Notification = ({ item }) => {
+  const clearMutation = useMutation({
+    mutationFn: clearAllNotifications,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("Notifications cleared!");
+    },
+    onError: () => {
+      toast.error("Failed to clear notifications");
+    }
+  });
+
+  const allData = [
+    ...(announcements || []).map(a => ({ ...a, _type: 'announcement' })),
+    ...(notifications || []).map(n => ({ ...n, _type: 'notification' }))
+  ].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
+
+  const NotificationItem = ({ item }) => {
     const isNew = moment().diff(moment(item.createdAt), 'minutes') < 5;
 
     return (
@@ -27,9 +48,9 @@ const Notifications = ({ onclose, dashboard }) => {
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-start mb-1">
                 <span className={`text-[11px] font-bold uppercase tracking-widest ${isNew ? 'text-blue-600' : 'text-slate-400'}`}>
-                  {isNew ? "Recent Update" : "Announcement"}
+                  {item._type === 'announcement' ? (isNew ? "Recent Update" : "Announcement") : "Notification"}
                 </span>
-                {!item.isRead && (
+                {item.isRead === false && (
                   <span className="flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -59,57 +80,76 @@ const Notifications = ({ onclose, dashboard }) => {
   };
 
   return (
-    <div className={`fixed inset-y-0 right-0 z-[200] flex flex-col bg-[#F8FAFC] border-l border-slate-200 shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] transition-all duration-500 md:w-[420px] w-full ${!dashboard ? "pt-20" : "pt-0"}`}>
+    <div className={`fixed top-20 right-0 bottom-0 z-[200] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[420px] w-full shadow-2xl`}>
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .notifications-scroll::-webkit-scrollbar { width: 5px; }
+        .notifications-scroll::-webkit-scrollbar-track { background: transparent; }
+        .notifications-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+      `}</style>
 
       {/* Header with Gradient Background */}
       <div className="relative overflow-hidden bg-white px-3 sm:px-6 py-8 border-b border-slate-100">
-        {/* Abstract Background Shapes for Visual Interest */}
         <div className="absolute top-[-10%] right-[-10%] w-32 h-32 bg-blue-50 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-24 h-24 bg-indigo-50 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-60"></div>
 
-        <div className="relative flex items-center justify-between">
+        <div className="relative flex justify-between items-start">
           <div>
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-              Feed <span className="text-blue-600">.</span>
-            </h2>
-            <p className="text-sm font-medium text-slate-500">
-              You have <span className="text-blue-600 font-bold">{data?.length || 0}</span> updates today
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Feed</h2>
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse mt-2"></div>
+            </div>
+            <p className="text-slate-500 text-xs sm:text-sm font-medium">
+              You have <span className="text-blue-600 font-bold">{allData.length}</span> updates today
             </p>
           </div>
           <button
             onClick={onclose}
-            className="group p-2 bg-slate-50 hover:bg-red-50 rounded-xl transition-all duration-300"
+            className="group p-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all active:scale-95 shadow-sm"
           >
-            <IoClose size={24} className="text-slate-400 group-hover:text-red-500 transition-colors" />
+            <IoClose size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
           </button>
         </div>
       </div>
 
-      {/* Scrollable Area */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 no-scrollbar custom-scroll">
-        {data && data.length > 0 ? (
-          data.map((item, index) => (
-            <div key={item.id} className="animate-in slide-in-from-right duration-500" style={{ animationDelay: `${index * 50}ms` }}>
-              <Notification item={item} />
-            </div>
+      {/* Notifications List - Now Scrollable */}
+      <div className="flex-1 p-4 sm:p-6 space-y-4 overflow-y-auto notifications-scroll">
+        {(isPendingNoti || isPendingAnn) ? (
+          <div className="flex flex-col items-center justify-center h-40 gap-3 opacity-40">
+            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-xs font-bold tracking-widest uppercase">Loading</p>
+          </div>
+        ) : allData.length > 0 ? (
+          allData.map((item, idx) => (
+            <NotificationItem key={item.id || idx} item={item} />
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <IoNotificationsOutline size={40} className="text-slate-300" />
+          <div className="flex flex-col items-center justify-center h-64 text-center px-6">
+            <div className="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
+              <CiBellOn size={32} className="text-slate-300" />
             </div>
-            <p className="text-slate-500 font-medium">No new announcements</p>
-            <p className="text-xs text-slate-400 px-10">We'll notify you when something important arrives.</p>
+            <p className="text-slate-900 font-bold text-base mb-1">All caught up!</p>
+            <p className="text-slate-400 text-xs">No new updates or announcements for you right now.</p>
           </div>
         )}
       </div>
 
       {/* Premium Footer */}
-      <div className="p-6 bg-white border-t border-slate-100">
-        <button className="w-full py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all active:scale-95">
-          Clear All Notifications
+      {/* <div className="p-6 bg-white border-t border-slate-100">
+        <button
+          onClick={() => clearMutation.mutate()}
+          disabled={clearMutation.isPending}
+          className="w-full py-3 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {clearMutation.isPending ? "Clearing..." : "Clear All Notifications"}
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import { useBlur } from "../../../context/BlurContext";
 import { useUser } from "../../../context/UserContext";
 import { useQuery } from "@tanstack/react-query";
 import { getAllNotifications } from "../../../api/Admin/NotificationApi";
+import { useSidebar } from "../../../context/SidebarContext";
 
 const Navbar = ({ heading }) => {
   const [mail, setMail] = useState(false);
@@ -16,6 +17,7 @@ const Navbar = ({ heading }) => {
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
   const { isBlurred, toggleBlur } = useBlur();
   const { userData } = useUser();
+  const { isSidebarOpen, setIsSidebarOpen, isopen, setIsopen } = useSidebar();
 
   const mailRef = useRef(null);
   const bellRef = useRef(null);
@@ -82,19 +84,33 @@ const Navbar = ({ heading }) => {
 
   return (
     <nav className="admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+      {/* Mobile Hamburger Trigger */}
+      <div
+        className="absolute left-1  sm:left-2  top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
+        onClick={() => {
+          setIsopen(!isopen);
+          setIsSidebarOpen(!isSidebarOpen);
+        }}
+      >
+        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5 shadow-sm active:scale-95 transition-transform">
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-5 bg-white h-0.5 rounded-full block" />
+          <span className="w-3.5 bg-white h-0.5 rounded-full block" />
+        </div>
+      </div>
       {/* Background layer that blurs */}
       <div
         className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}
       >
         {/* Left: Heading */}
-        <div className="flex-shrink-0 max-w-[150px] sm:max-w-none">
+        <div className="flex-shrink-0 flex flex-col items-start justify-center pl-2 sm:pl-0">
           {heading ? (
-            <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">
+            <h1 className="text-lg md:text-2xl pl-12 lg:pl-0 font-bold text-[#1e293b] leading-tight truncate max-w-[150px] sm:max-w-none">
               {heading}
             </h1>
           ) : (
             <div className="flex flex-col pl-12 sm:pl-0">
-              <p className="text-lg md:text-xl font-bold text-[#1e293b]">Hello {userData.name}</p>
+              <p className="text-lg md:text-xl font-bold text-[#1e293b] truncate max-w-[150px] sm:max-w-none">Hello {userData.name}</p>
               <p className="hidden sm:block text-xs text-gray-500">Welcome to your dashboard!</p>
             </div>
           )}

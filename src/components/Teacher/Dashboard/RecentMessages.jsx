@@ -45,7 +45,7 @@ const styles = {
     width: "100%", height: "100%", background: "#fff",
   },
   sidebarHeader: {
-    padding: "18px 16px 0", borderBottom: "1px solid rgba(0,0,0,.07)",
+    padding: "24px 16px 0", borderBottom: "1px solid rgba(0,0,0,.07)",
   },
   titleRow: {
     display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14,
@@ -329,7 +329,7 @@ const RecentMessages = ({ onclose, dashboard }) => {
   );
 
   return (
-    <div ref={containerRef} className="fixed right-0 inset-y-0 z-[250] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden">
+    <div ref={containerRef} className="fixed right-0 top-16 sm:top-20 bottom-0 z-[250] flex flex-row-reverse items-start pointer-events-none w-full sm:w-auto overflow-hidden">
       <style>{`
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0.5; } to { transform: translateX(0); opacity: 1; } }
         .animate-chat-slide { animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }

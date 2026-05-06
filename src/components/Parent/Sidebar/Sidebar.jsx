@@ -198,18 +198,6 @@ const Sidebar = () => {
 
   return (
     <div className="flex flex-col">
-      {/* Mobile hamburger */}
-      <div
-        className="px-3 py-3 cursor-pointer lg:hidden h-16 flex items-center"
-        onClick={() => { setIsopen(!isopen); setIsSidebarOpen(!isSidebarOpen); }}
-      >
-        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5">
-          <span className="w-5 bg-white h-0.5 rounded-full block" />
-          <span className="w-5 bg-white h-0.5 rounded-full block" />
-          <span className="w-3.5 bg-white h-0.5 rounded-full block" />
-        </div>
-      </div>
-
       {/* Mobile overlay */}
       <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>

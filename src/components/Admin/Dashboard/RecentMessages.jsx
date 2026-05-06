@@ -1,236 +1,199 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import moment from "moment/moment";
 import Loader from "../../../utils/Loader";
-import { IoClose, IoSend } from "react-icons/io5"; // Added IoSend for look
+import { IoClose, IoSend, IoArrowBack } from "react-icons/io5";
 import { useQuery } from "@tanstack/react-query";
 import { getAllChatrooms, getChatroomData } from "../../../api/Admin/ChatroomApi";
 import { getChatsRoomData, getMyChats } from "../../../api/UserApis";
-import IMAGES from "../../../assets/images";
-import { useBlur } from "../../../context/BlurContext";
+import { io } from "socket.io-client";
+import { useUser } from "../../../context/UserContext";
+import { BACKEND_URL_SOCKET } from "../../../constants/api";
+import { toast } from "react-toastify";
 
-const RecentMessages = ({ onclose, dashboard }) => {
+const RecentMessages = ({ onclose }) => {
+  const { userData } = useUser();
   const [msgArray, setMsgArray] = useState([]);
   const [loading, setLoading] = useState(false);
   const [groupActive, setGroupActive] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
   const [showFullChat, setShowFullChat] = useState(false);
   const [individualActive, setIndividualActive] = useState(true);
+  const [msgstr, setmsgStr] = useState("");
+  const socket = useRef(null);
+  const messagesEndRef = useRef(null);
 
-  const { data: groupChats, isPending: groupIsPending } = useQuery({ queryKey: ["chatrooms"], queryFn: getAllChatrooms });
-  const { data: individualChats, isPending: individualIsPending } = useQuery({ queryKey: ["individualChats"], queryFn: getMyChats });
+  // Dynamic Data Fetching using React Query
+  const { data: groupChats, isPending: groupIsPending } = useQuery({
+    queryKey: ["chatrooms"],
+    queryFn: getAllChatrooms
+  });
+  const { data: individualChats, isPending: individualIsPending } = useQuery({
+    queryKey: ["individualChats"],
+    queryFn: getMyChats
+  });
 
-  const toggleGroupActive = () => {
-    setGroupActive(true);
-    setIndividualActive(false);
-  };
+  useEffect(() => {
+    socket.current = io(BACKEND_URL_SOCKET);
+    return () => { socket.current.disconnect(); };
+  }, []);
 
-  const toggleIndividualActive = () => {
-    setIndividualActive(true);
-    setGroupActive(false);
-  };
+  useEffect(() => {
+    if (selectedChat && socket.current) {
+      socket.current.emit("join_room", selectedChat.id);
+
+      const handleNewMessage = (newMessage) => {
+        if (newMessage.chatroomID === selectedChat.id || newMessage.roomID === selectedChat.id) {
+          setMsgArray((prev) => [...prev, newMessage]);
+        }
+      };
+
+      socket.current.on("receive_message", handleNewMessage);
+      return () => { socket.current.off("receive_message", handleNewMessage); };
+    }
+  }, [selectedChat]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [msgArray]);
 
   const openFullchat = async (chatData, isGroup = false) => {
-    setLoading(true);
+    // Agar mobile nahi hai to sidebar remove nahi hoga
+    setSelectedChat({ ...chatData, isGroup });
     setShowFullChat(true);
-    setSelectedChat(chatData);
-    let result;
-    if (isGroup) {
-      result = await getChatroomData(chatData?.id);
-      setMsgArray(result[0]?.messages || []);
-    } else {
-      result = await getChatsRoomData(chatData?.id);
-      setMsgArray(result?.messages || []);
+
+    if (selectedChat?.id === chatData.id) return;
+
+    setLoading(true);
+    setMsgArray([]);
+    try {
+      let result;
+      if (isGroup) {
+        result = await getChatroomData(chatData?.id);
+        setMsgArray(result[0]?.messages || []);
+      } else {
+        result = await getChatsRoomData(chatData?.id);
+        setMsgArray(result?.messages || []);
+      }
+    } catch (error) {
+      toast.error("Failed to load messages");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleShowFullChat = () => setShowFullChat(!showFullChat);
+  const handleSendMessage = () => {
+    if (!msgstr.trim() || !selectedChat) return;
 
-  const ref = useRef(null);
+    const messageData = {
+      roomID: selectedChat.id,
+      chatroomID: selectedChat.isGroup ? selectedChat.id : undefined,
+      message: msgstr,
+      sentBy: { id: userData.id, name: userData.name, profilePic: userData.profilePic },
+      time: new Date()
+    };
 
-  // Sub-Component: Message Item
-  const MessageItem = ({ data, onpress }) => (
+    socket.current.emit("send_message", messageData);
+    setMsgArray((prev) => [...prev, messageData]);
+    setmsgStr("");
+  };
+
+  // --- Sub-Components ---
+  const MessageItem = ({ data, onpress, isActive }) => (
     <div
       onClick={onpress}
-      className="group flex items-center gap-3 p-3 mb-2 rounded-xl cursor-pointer transition-all duration-300 hover:bg-blue-50 hover:shadow-sm active:scale-95"
+      className={`group flex items-center gap-3 p-3 mb-2 rounded-xl cursor-pointer transition-all duration-300 
+      ${isActive ? "bg-blue-50 border-blue-200 border shadow-sm" : "hover:bg-gray-50 border border-transparent"}`}
     >
-      <div className="relative">
-        <img src={IMAGES?.Profile} alt="" className="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" />
-        <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></div>
+      <div className="relative flex-shrink-0">
+        <div className="h-11 w-11 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200 overflow-hidden">
+          {data?.profilePic ? <img src={data.profilePic} className="h-full w-full object-cover" /> : data?.name?.charAt(0)}
+        </div>
       </div>
-      <div className="flex flex-col flex-1">
+      <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center">
-          <p className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{data?.name}</p>
-          <p className="text-[10px] font-medium text-gray-400">{moment(data?.lastMsg?.time).format("hh:mm a")}</p>
+          <p className={`text-sm font-bold truncate ${isActive ? "text-blue-700" : "text-gray-800"}`}>{data?.name}</p>
+          <span className="text-[10px] text-gray-400">{data?.lastMsg?.time ? moment(data.lastMsg.time).format("hh:mm a") : ""}</span>
         </div>
-        <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{data?.lastMsg?.message || "No recent messages"}</p>
-      </div>
-    </div>
-  );
-
-  // Sub-Component: Chat Bubble
-  const ChatBubble = ({ msg }) => (
-    <div className="flex items-start gap-3 mb-6 px-4">
-      <img src={msg?.sentBy?.profilePic || IMAGES?.Profile} alt="" className="h-8 w-8 rounded-full shadow-sm mt-1" />
-      <div className="flex flex-col max-w-[80%]">
-        <div className="flex items-baseline gap-2 mb-1">
-          <span className="text-[11px] font-bold text-gray-700">{msg?.sentBy?.name}</span>
-          <span className="text-[9px] text-gray-400">{moment(msg?.time).format("ddd, hh:mm a")}</span>
-        </div>
-        <div className="bg-white text-gray-800 text-sm p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100">
-          {msg?.message}
-        </div>
-      </div>
-    </div>
-  );
-
-  // Sub-Component: Full Chat Modal
-  const FullChat = ({ onclose, data }) => (
-    <div className="fixed sm:w-96 w-full top-20 right-0 bg-[#F8FAFC] z-[210] h-[calc(100vh-80px)] shadow-2xl border-l border-gray-200 flex flex-col animate-in slide-in-from-right duration-300">
-      <div className="p-4 bg-white border-b flex justify-between items-center shadow-sm">
-        <div className="flex items-center gap-3">
-          <img src={IMAGES.Profile} alt="" className="h-10 w-10 rounded-full border border-blue-100" />
-          <div>
-            <p className="font-bold text-gray-800 text-sm">{data?.name}</p>
-            <p className="text-[10px] text-green-500 font-medium">Online</p>
-          </div>
-        </div>
-        <button onClick={onclose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <IoClose size={20} className="text-gray-500" />
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto py-6 register-scrollbar bg-[#F8FAFC]">
-        {loading ? (
-          <div className="h-full flex items-center justify-center"><Loader /></div>
-        ) : msgArray.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-            <p className="text-sm italic">Start a conversation...</p>
-          </div>
-        ) : (
-          msgArray.map((item, index) => <ChatBubble key={index} msg={item} />)
-        )}
-      </div>
-
-      {/* Visual Input Placeholder to make it look like a real chat */}
-      <div className="p-4 bg-white border-t">
-        <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
-          <input disabled placeholder="Type a message..." className="bg-transparent text-sm w-full outline-none" />
-          <IoSend className="text-blue-500 opacity-50" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const SidebarPanel = () => (
-    <div className="flex flex-col w-full h-full bg-white">
-      {/* Header */}
-      <div className="p-6 pb-4 border-b border-gray-100">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-extrabold text-gray-800 tracking-tight">Messages</h2>
-          <button onClick={onclose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-            <IoClose size={22} className="text-gray-500" />
-          </button>
-        </div>
-
-        {/* Custom Tabs */}
-        <div className="flex p-1 bg-gray-100 rounded-2xl mb-2">
-          <button
-            onClick={toggleIndividualActive}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${individualActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            DIRECT
-          </button>
-          <button
-            onClick={toggleGroupActive}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${groupActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-          >
-            GROUPS
-          </button>
-        </div>
-      </div>
-
-      {/* Chat List */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 register-scrollbar">
-        {(individualIsPending || groupIsPending) ? (
-          <div className="flex justify-center py-10"><Loader /></div>
-        ) : (
-          <>
-            {individualActive && individualChats?.map((item) => (
-              <MessageItem key={item.id} data={item} onpress={() => openFullchat(item, false)} />
-            ))}
-            {groupActive && groupChats?.map((item) => (
-              <MessageItem key={item.id} data={item} onpress={() => openFullchat(item, true)} />
-            ))}
-          </>
-        )}
+        <p className="text-xs text-gray-500 truncate">{data?.lastMsg?.message || "Start a conversation"}</p>
       </div>
     </div>
   );
 
   return (
-    <div 
-      className={`fixed inset-y-0 right-0 z-[250] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden`}
-    >
-      <style>{`
-        @keyframes chatSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .animate-chat-panel { animation: chatSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      `}</style>
+    <div className="fixed top-20 right-0 bottom-0 z-[250] flex flex-row-reverse items-start pointer-events-none gap-4 px-4 overflow-hidden">
 
-      {/* Main List Panel */}
-      <div 
-        ref={ref}
-        className={`
-          ${showFullChat ? "hidden sm:flex" : "flex"}
-          flex-col bg-white border-l border-gray-200 shadow-2xl sm:w-96 w-full pointer-events-auto h-full animate-chat-panel ${!dashboard ? "pt-20" : "pt-0"}
-        `}
-      >
-        <SidebarPanel />
-      </div>
-
-      {/* Chat Detail Panel */}
+      {/* 1. CHAT DETAIL PANEL (Right Side) */}
       {showFullChat && (
-        <div className={`flex flex-col bg-[#F8FAFC] sm:w-96 w-full h-full shadow-2xl border-l border-gray-200 pointer-events-auto animate-chat-panel ${!dashboard ? "pt-20" : "pt-0"}`}>
-          <div className="p-4 bg-white border-b flex justify-between items-center shadow-sm">
+        <div className="flex flex-col bg-white sm:w-96 w-[90vw] shadow-2xl border border-gray-100 pointer-events-auto h-full rounded-t-2xl animate-chat-panel">
+          {/* Header */}
+          <div className="p-4 border-b flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <button onClick={handleShowFullChat} className="p-2 hover:bg-gray-100 rounded-full sm:hidden">
-                <IoClose size={20} className="text-gray-500" />
-              </button>
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
-                {selectedChat?.name?.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="font-bold text-gray-800 text-sm truncate max-w-[150px]">{selectedChat?.name}</p>
-                <p className="text-[10px] text-green-500 font-medium">Online</p>
-              </div>
+              <button onClick={() => setShowFullChat(false)} className="md:hidden p-1"><IoArrowBack size={20} /></button>
+              <p className="font-bold text-gray-800">{selectedChat?.name}</p>
             </div>
-            <button onClick={handleShowFullChat} className="p-2 hover:bg-gray-100 rounded-full hidden sm:block">
-              <IoClose size={20} className="text-gray-500" />
-            </button>
+            <button onClick={() => setShowFullChat(false)}><IoClose size={20} className="text-gray-400" /></button>
           </div>
-
-          <div className="flex-1 overflow-y-auto py-6 register-scrollbar">
-            {loading ? (
-              <div className="h-full flex items-center justify-center"><Loader /></div>
-            ) : msgArray.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                <p className="text-sm italic">No messages yet</p>
-              </div>
-            ) : (
-              msgArray.map((item, index) => <ChatBubble key={index} msg={item} />)
-            )}
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+            {loading ? <div className="flex justify-center mt-10"><Loader /></div> :
+              msgArray.map((m, i) => (
+                <div key={i} className={`mb-4 flex ${m.sentBy?.id === userData.id ? "justify-end" : "justify-start"}`}>
+                  <div className={`p-3 rounded-2xl max-w-[80%] text-sm ${m.sentBy?.id === userData.id ? "bg-blue-600 text-white" : "bg-white border shadow-sm"}`}>
+                    {m.message}
+                  </div>
+                </div>
+              ))
+            }
+            <div ref={messagesEndRef} />
           </div>
-
-          <div className="p-4 bg-white border-t">
-            <div className="flex items-center gap-2 bg-gray-100 px-4 py-2.5 rounded-full">
-              <input placeholder="Type a message..." className="bg-transparent text-sm w-full outline-none text-gray-700" />
-              <button className="text-blue-500 hover:text-blue-600 transition-colors">
-                <IoSend size={18} />
-              </button>
+          {/* Input Area */}
+          <div className="p-4 border-t bg-white">
+            <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
+              <input
+                className="bg-transparent w-full outline-none text-sm"
+                value={msgstr}
+                onChange={(e) => setmsgStr(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder="Type..."
+              />
+              <button onClick={handleSendMessage} className="text-blue-600"><IoSend /></button>
             </div>
           </div>
         </div>
       )}
+
+      {/* 2. RECENT MESSAGES SIDEBAR (Main List) */}
+      {/* "hidden md:flex" condition ko hata diya taake click par sidebar na chhupay */}
+      <div className={`flex flex-col bg-white border border-gray-100 shadow-xl w-80 md:w-96 pointer-events-auto h-full rounded-t-2xl 
+        ${showFullChat ? "hidden sm:flex" : "flex"}`}>
+
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Messages</h2>
+            <button onClick={onclose}><IoClose size={22} className="text-gray-400" /></button>
+          </div>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
+            <button onClick={() => { setIndividualActive(true); setGroupActive(false) }}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg ${individualActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}>DIRECT</button>
+            <button onClick={() => { setGroupActive(true); setIndividualActive(false) }}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg ${groupActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}>GROUPS</button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4">
+          {individualIsPending || groupIsPending ? <Loader /> : (
+            <>
+              {individualActive && individualChats?.map(chat => (
+                <MessageItem key={chat.id} data={chat} isActive={selectedChat?.id === chat.id} onpress={() => openFullchat(chat, false)} />
+              ))}
+              {groupActive && groupChats?.map(group => (
+                <MessageItem key={group.id} data={group} isActive={selectedChat?.id === group.id} onpress={() => openFullchat(group, true)} />
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 };
