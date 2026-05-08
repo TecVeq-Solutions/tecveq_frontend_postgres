@@ -27,8 +27,8 @@ const Fees = () => {
             <div className="flex h-20 md:px-14 lg:px-0 lg:ml-80">
                 <Navbar />
             </div>
-
-            <div className={`flex flex-col flex-1 w-full max-w-full px-3 sm:px-4 lg:ml-80 overflow-x-hidden ${isBlurred ? "blur" : ""}`}>
+            {/* w-full */}
+            <div className={`flex flex-col flex-1  max-w-full px-3 sm:px-4 lg:ml-80 overflow-x-hidden ${isBlurred ? "blur" : ""}`}>
 
                 <div className="py-6 px-0 sm:px-2 sm:px-10 lg:px-0">
                     <h1 className="text-2xl font-bold text-[#0B1053] mb-2 uppercase tracking-tight">Student Fees Portal</h1>

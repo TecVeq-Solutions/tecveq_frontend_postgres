@@ -17,8 +17,8 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col flex-1 bg-[#f9f9f9]/50 font-poppins min-h-screen overflow-x-hidden">
       <div className="flex flex-1 flex-col lg:ml-80 transition-all duration-300">
-        {/* Navbar Container   z-[500]*/}
-        <div className="sticky top-0  bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center lg:pl-0">
+        {/* Navbar Container */}
+        <div className="sticky top-0 z-[1000] bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center lg:pl-0">
           <Navbar />
         </div>
 
@@ -30,7 +30,7 @@ const Dashboard = () => {
             <div className="flex-1 xl:flex-[2] min-w-0">
               <Announcements data={allAnnouncements} />
             </div>
-            <div className={`hidden lg:block flex-1 xl:flex-[3] min-w-0 ${isSidebarOpen ? "z-0" : "z-auto"}`}>
+            <div className={` lg:block flex-1 xl:flex-[3] min-w-0 ${isSidebarOpen ? "z-0" : "z-auto"}`}>
               <UpcomingClasses />
             </div>
           </div>

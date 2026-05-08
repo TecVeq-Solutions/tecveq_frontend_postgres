@@ -9,8 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllNotifications } from "../../api/Admin/NotificationApi";
 
 import { useSidebar } from "../../context/SidebarContext";
+import { useAdmin } from "../../context/AdminContext";
 
 const Navbar = ({ heading }) => {
+  const { unreadSupportCount } = useAdmin();
   const [mail, setMail] = useState(false);
   const [bell, setBell] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
@@ -131,13 +133,18 @@ const Navbar = ({ heading }) => {
           <div className="relative" ref={mailRef}>
             <button
               onClick={toggleMail}
-              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300 relative
                 ${mail
                   ? "bg-[#0B1053] text-white"
                   : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
                 }`}
             >
               <IoMailOutline className="text-xl sm:text-2xl" />
+              {unreadSupportCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg shadow-rose-200">
+                  {unreadSupportCount}
+                </span>
+              )}
             </button>
           </div>
 

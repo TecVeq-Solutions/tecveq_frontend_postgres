@@ -241,6 +241,16 @@ const ClassModal = ({ open, setopen, isEditTrue, refetch, editData }) => {
   });
 
   const handleCreateClass = () => {
+    const { subscriptionData, allClassrooms } = useAdmin();
+    const { subscription } = subscriptionData || {};
+
+    if (!isEditTrue && subscription?.classLimit > 0) {
+      const currentClassrooms = allClassrooms?.length || 0;
+      if (currentClassrooms >= subscription.classLimit) {
+        return toast.error(`Limit reached! Your current package allows only ${subscription.classLimit} classrooms. Please upgrade your plan.`);
+      }
+    }
+
     const nameOk = /^[a-zA-Z0-9\s]+$/.test(classroomName.trim());
     if (!classroomName.trim()) return toast.error("Enter a classroom name.");
     if (!nameOk) return toast.error("No special characters allowed.");

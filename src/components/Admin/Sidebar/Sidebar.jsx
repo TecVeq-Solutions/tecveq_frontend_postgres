@@ -93,7 +93,9 @@ const Sidebar = () => {
     { key: "subjects", title: "Subjects", icon: "subjects", route: "/admin/subjects" },
     { key: "classroom", title: "Classroom", icon: "classroom", route: "/admin/classrooms" },
     { key: "fees", title: "Fees", icon: "levels", route: "/admin/fees" },
-    { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" }
+    { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" },
+    { key: "platformSupport", title: "Platform Support", icon: "announcement", route: "/admin/platform-support" },
+    { key: "subscription", title: "My Subscription", icon: "card", route: "/admin/subscription" }
   ];
 
   const { userData } = useUser();
@@ -101,7 +103,18 @@ const Sidebar = () => {
     menuItems.unshift({ key: "superAdminDashboard", title: "Super Admin", icon: "home", route: "/superadmin/dashboard" });
   }
 
-  const menuGroups = [
+  const isBlocked = userData?.userType === 'admin' && userData?.status === 'blocked';
+
+  const menuGroups = isBlocked ? [
+    {
+      label: "Support",
+      items: menuItems.filter(i => ["platformSupport"].includes(i.key))
+    },
+    {
+      label: "Account",
+      items: menuItems.filter(i => ["subscription"].includes(i.key))
+    }
+  ] : [
     {
       label: "Main",
       items: menuItems.filter(i => ["dashboard", "superAdminDashboard", "timetable", "reports"].includes(i.key))
@@ -117,6 +130,14 @@ const Sidebar = () => {
     {
       label: "Config",
       items: menuItems.filter(i => ["attendence-reprt", "fees", "settings"].includes(i.key))
+    },
+    {
+      label: "Support",
+      items: menuItems.filter(i => ["platformSupport"].includes(i.key))
+    },
+    {
+      label: "Account",
+      items: menuItems.filter(i => ["subscription"].includes(i.key))
     }
   ];
 

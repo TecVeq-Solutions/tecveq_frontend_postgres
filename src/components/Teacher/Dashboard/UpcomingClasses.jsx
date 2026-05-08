@@ -86,7 +86,7 @@ const UpcomingClasses = () => {
         )}
 
         {/* Subject & Teacher/Classroom row */}
-        <div className="flex justify-between items-center pl-3">
+        <div className="flex justify-between items-center pl-1 sm:pl-3">
           <span
             className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
             style={{ backgroundColor: `${color}25`, color: color }}
@@ -99,13 +99,13 @@ const UpcomingClasses = () => {
         </div>
 
         {/* Title */}
-        <div className="pl-3">
+        <div className="pl-1 sm:pl-3">
           <p className="text-sm font-semibold text-gray-800 leading-snug">{item.title}</p>
         </div>
 
         {/* Time / Join row */}
         {isStarted ? (
-          <div className="flex items-center justify-between pl-3 mt-1">
+          <div className="flex items-center justify-between pl-1 sm:pl-3 mt-1">
             <div className="flex items-center gap-1.5 text-green-500 text-xs font-medium">
               <FiVideo size={13} />
               <span>Class is live now</span>

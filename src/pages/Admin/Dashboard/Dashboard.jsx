@@ -5,6 +5,7 @@ import Navbar from "../../../components/Admin/Navbar";
 import TotalUsers from "../../../components/Admin/Dashboard/TotalUsers";
 import StudentsCard from "../../../components/Admin/Dashboard/StudentsCard";
 import SystemOverview from "../../../components/Admin/Dashboard/SystemOverview";
+import SubscriptionStatus from "../../../components/Admin/Dashboard/SubscriptionStatus";
 
 import { useBlur } from "../../../context/BlurContext";
 import { useAdmin } from "../../../context/AdminContext";
@@ -15,7 +16,7 @@ const Dashboard = () => {
 
   const { isBlurred } = useBlur();
   const { isSidebarOpen } = useSidebar(); // new
-  const { adminUsersData, adminUsersDataPending } = useAdmin();
+  const { adminUsersData, adminUsersDataPending, subscriptionData, allClassrooms } = useAdmin();
 
   const [students, setStudents] = useState({
     allEnrolled: adminUsersData.allStudents.filter((item) => item.isAccepted == true),
@@ -90,23 +91,47 @@ const Dashboard = () => {
               <div className="flex min-h-20 md:px-14 lg:pt-3 lg:px-0">
                 <Navbar heading={"Admin Dashboard"} />
               </div>
+
+              <div className="md:px-10 lg:px-0 mt-6">
+                <SubscriptionStatus
+                  data={subscriptionData}
+                  stats={{
+                    allStudents: students.allEnrolled,
+                    allTeachers: adminUsersData.allTeachers,
+                    allClassrooms: allClassrooms?.length || 0
+                  }}
+                />
+              </div>
+
               <div
-                className={`flex flex-col  md:px-10  sm:py-3 lg:px-0 lg:mt-0 sm:mt-16 sm:mt-1 md:mt-1 lg:flex-row flex-1 gap-5 my-2  ${isBlurred ? "blur" : ""
+                className={`flex flex-col  md:px-10  sm:pt-6 sm:pb-3 lg:px-0 lg:mt-0  sm:mt-8 lg:flex-row flex-1 gap-5 mb-2  ${isBlurred ? "blur" : ""
                   } ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}
               >
 
 
                 {/* grap................................................................ */}
                 <div className="flex flex-[5] flex-col gap-3 min-w-0">
-                  <p className="text-xl font-semibold">System Overview</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex gap-[3px] items-center">
+                      <div className="w-1 h-[18px] rounded-full bg-indigo-500" />
+                      <div className="w-1 h-3 rounded-full bg-indigo-300" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900 tracking-tight">System Overview</h2>
+                  </div>
                   <SystemOverview />
                 </div>
 
                 {/* total user */}
                 <div className="flex flex-[2] flex-col gap-4 min-w-0">
                   <div className="flex flex-col gap-1 px-1">
-                    <p className="text-xl font-semibold text-slate-800 tracking-tight">Students Statistics</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Enrollment Metrics</p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex gap-[3px] items-center">
+                        <div className="w-1 h-[18px] rounded-full bg-emerald-500" />
+                        <div className="w-1 h-3 rounded-full bg-emerald-300" />
+                      </div>
+                      <h2 className="text-xl font-bold text-gray-900 tracking-tight">Students Statistics</h2>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] ml-7">Enrollment Metrics</p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3">

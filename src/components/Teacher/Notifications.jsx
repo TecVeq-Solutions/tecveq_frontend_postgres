@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { IoClose, IoNotificationsOutline, IoMegaphoneOutline } from "react-icons/io5";
 import { CiBellOn } from "react-icons/ci";
 import pdf from "../../assets/pdf.png";
@@ -101,8 +102,8 @@ const Notifications = ({ onclose, dashboard }) => {
     );
   };
 
-  return (
-    <div className={`fixed top-16 sm:top-20 right-0 bottom-0 z-[200] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[400px] w-full shadow-2xl`}>
+  return createPortal(
+    <div className={`fixed top-16 sm:top-20 right-0 bottom-0 z-[2000] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[400px] w-full shadow-2xl`}>
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); }
@@ -174,7 +175,8 @@ const Notifications = ({ onclose, dashboard }) => {
           End of Updates
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

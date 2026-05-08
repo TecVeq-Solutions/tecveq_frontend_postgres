@@ -110,6 +110,24 @@ const AddUserModal = ({ closeModal, refetch }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const { subscriptionData, adminUsersData } = useAdmin();
+        const { subscription } = subscriptionData || {};
+
+        // Enforcement: Check limits
+        if (role === "student" && subscription?.studentLimit > 0) {
+            const currentStudents = adminUsersData.allStudents.length;
+            if (currentStudents >= subscription.studentLimit) {
+                return toast.error(`Limit reached! Your current package allows only ${subscription.studentLimit} students. Please upgrade your plan.`);
+            }
+        }
+
+        if (role === "teacher" && subscription?.teacherLimit > 0) {
+            const currentTeachers = adminUsersData.allTeachers.length;
+            if (currentTeachers >= subscription.teacherLimit) {
+                return toast.error(`Limit reached! Your current package allows only ${subscription.teacherLimit} teachers. Please upgrade your plan.`);
+            }
+        }
+
         setLoading(true);
         const elements = e.target.elements;
         try {
@@ -123,6 +141,9 @@ const AddUserModal = ({ closeModal, refetch }) => {
             if (!emailPattern.test(email)) return toast.error("Invalid Email!");
             if (password.length < 6) return toast.error("Password must be at least 6 characters.");
             if (confirmPassword !== password) return toast.error("Passwords do not match!");
+
+            const currentAdmin = JSON.parse(localStorage.getItem('tcauser'));
+            const adminId = currentAdmin?.id;
 
             if (role === "student") {
                 const levelDataRaw = elements.levelID.value;
@@ -138,6 +159,7 @@ const AddUserModal = ({ closeModal, refetch }) => {
                     guardianEmail: elements.guardianEmail.value,
                     guardianPhoneNumber: elements.guardianPhoneNumber.value,
                     password, profilePic: default_profile,
+                    adminId: adminId, // Link student to the current admin
                 };
             } else {
                 dataBody = {
@@ -145,6 +167,7 @@ const AddUserModal = ({ closeModal, refetch }) => {
                     phoneNumber: elements.phoneNumber.value, gender: elements.gender.value,
                     referenceNo: elements.referenceNo.value, isAccepted: true,
                     password, profilePic: default_profile,
+                    adminId: adminId, // Link teacher to the current admin
                 };
             }
 

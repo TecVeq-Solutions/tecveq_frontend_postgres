@@ -36,7 +36,7 @@ const Navbar = ({ heading }) => {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center sticky top-0  px-0 sm:px-4 md:px-6">
+    <nav className="w-full bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center sticky top-0 z-[999] px-0 sm:px-4 md:px-6">
       {/* Mobile Hamburger Trigger  z-[100]*/}
       <div
         className="absolute left-3 top-0 h-16 flex items-center lg:hidden z-50 cursor-pointer"
