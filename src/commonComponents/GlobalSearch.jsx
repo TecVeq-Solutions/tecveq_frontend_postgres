@@ -69,7 +69,17 @@ const GlobalSearch = ({ desktopOnly = false, mobileOnly = false }) => {
         setIsOpen(false);
         setIsMobileSearchOpen(false);
         setQuery("");
-        navigate(`/student-profile/${studentId}`);
+        
+        const role = userData?.userType;
+        if (role === 'admin' || role === 'super_admin') {
+            navigate(`/admin/student-profile/${studentId}`);
+        } else if (role === 'teacher') {
+            navigate(`/teacher/student-profile/${studentId}`);
+        } else if (role === 'parent') {
+            navigate(`/parent/student-profile/${studentId}`);
+        } else {
+            navigate(`/student/student-profile/${studentId}`);
+        }
     };
 
     const SearchInput = ({ isMobile = false }) => (

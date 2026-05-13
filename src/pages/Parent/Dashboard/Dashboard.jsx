@@ -33,7 +33,7 @@ const Dashboard = () => {
           </div>
 
           {/* Subjects Table Section */}
-          <div className="flex flex-col lg:flex-row flex-1 gap-4 sm:gap-5 pb-8 sm:pb-10 pt-2 my-2">
+          <div className="flex px-2 flex-col lg:flex-row flex-1 gap-4 sm:gap-5 pb-8 sm:pb-10 pt-2 my-2">
             <div className="flex flex-col flex-1 gap-2 sm:gap-3 py-2">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
@@ -75,7 +75,7 @@ const Dashboard = () => {
           </div>
 
           {/* Bottom Stats Section */}
-          <div className="flex flex-col lg:flex-row flex-1 gap-4 sm:gap-5 pb-8 sm:pb-10 pt-2 my-2">
+          <div className="flex flex-col px-2 lg:flex-row flex-1 gap-4 sm:gap-5 pb-8 sm:pb-10 pt-2 my-2">
             <div className="flex flex-[2]">
               <LastDeliverables />
             </div>

@@ -374,7 +374,8 @@ const StudentProfileDashboard = () => {
     );
 
     return (
-        <div className="spd-root min-h-screen w-full md:px-8 pb-16 lg:ml-80 ml-0 spd-mesh-bg">
+        // w-full
+        <div className="spd-root min-h-screen  md:px-8 pb-16 lg:ml-80 ml-0 spd-mesh-bg">
 
             {/* Navbar */}
             <div className=" mx-auto mb-4 px-4 sm:px-0">
@@ -1157,18 +1158,18 @@ const StudentProfileDashboard = () => {
                             {activeTab === "timetable" && (() => {
                                 // Accent palette per weekday
                                 const DAY_ACCENT = {
-                                    'Monday':    { hdr: 'rgba(99,102,241,0.08)',  hdrBorder: 'rgba(99,102,241,0.2)',  dot: '#6366f1', dotBg: 'rgba(99,102,241,0.12)',  txt: '#3730a3' },
-                                    'Tuesday':   { hdr: 'rgba(16,185,129,0.08)', hdrBorder: 'rgba(16,185,129,0.2)', dot: '#10b981', dotBg: 'rgba(16,185,129,0.12)', txt: '#065f46' },
+                                    'Monday': { hdr: 'rgba(99,102,241,0.08)', hdrBorder: 'rgba(99,102,241,0.2)', dot: '#6366f1', dotBg: 'rgba(99,102,241,0.12)', txt: '#3730a3' },
+                                    'Tuesday': { hdr: 'rgba(16,185,129,0.08)', hdrBorder: 'rgba(16,185,129,0.2)', dot: '#10b981', dotBg: 'rgba(16,185,129,0.12)', txt: '#065f46' },
                                     'Wednesday': { hdr: 'rgba(245,158,11,0.08)', hdrBorder: 'rgba(245,158,11,0.2)', dot: '#f59e0b', dotBg: 'rgba(245,158,11,0.12)', txt: '#92400e' },
-                                    'Thursday':  { hdr: 'rgba(239,68,68,0.08)',  hdrBorder: 'rgba(239,68,68,0.2)',  dot: '#ef4444', dotBg: 'rgba(239,68,68,0.12)',  txt: '#991b1b' },
-                                    'Friday':    { hdr: 'rgba(168,85,247,0.08)', hdrBorder: 'rgba(168,85,247,0.2)', dot: '#a855f7', dotBg: 'rgba(168,85,247,0.12)', txt: '#6b21a8' },
-                                    'Saturday':  { hdr: 'rgba(20,184,166,0.08)', hdrBorder: 'rgba(20,184,166,0.2)', dot: '#14b8a6', dotBg: 'rgba(20,184,166,0.12)', txt: '#134e4a' },
-                                    'Sunday':    { hdr: 'rgba(249,115,22,0.08)', hdrBorder: 'rgba(249,115,22,0.2)', dot: '#f97316', dotBg: 'rgba(249,115,22,0.12)', txt: '#9a3412' },
+                                    'Thursday': { hdr: 'rgba(239,68,68,0.08)', hdrBorder: 'rgba(239,68,68,0.2)', dot: '#ef4444', dotBg: 'rgba(239,68,68,0.12)', txt: '#991b1b' },
+                                    'Friday': { hdr: 'rgba(168,85,247,0.08)', hdrBorder: 'rgba(168,85,247,0.2)', dot: '#a855f7', dotBg: 'rgba(168,85,247,0.12)', txt: '#6b21a8' },
+                                    'Saturday': { hdr: 'rgba(20,184,166,0.08)', hdrBorder: 'rgba(20,184,166,0.2)', dot: '#14b8a6', dotBg: 'rgba(20,184,166,0.12)', txt: '#134e4a' },
+                                    'Sunday': { hdr: 'rgba(249,115,22,0.08)', hdrBorder: 'rgba(249,115,22,0.2)', dot: '#f97316', dotBg: 'rgba(249,115,22,0.12)', txt: '#9a3412' },
                                 };
-                                const CLR_CYCLE = ['#6366f1','#10b981','#f59e0b','#a855f7','#ef4444','#14b8a6','#f97316','#3b82f6'];
+                                const CLR_CYCLE = ['#6366f1', '#10b981', '#f59e0b', '#a855f7', '#ef4444', '#14b8a6', '#f97316', '#3b82f6'];
 
                                 // Group & sort classes by day
-                                const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                                const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                                 const grouped = classes.reduce((acc, cls) => {
                                     const d = moment(cls.startTime).format('dddd');
                                     if (!acc[d]) acc[d] = [];
@@ -1200,7 +1201,7 @@ const StudentProfileDashboard = () => {
                                         <div className="tt-wrap" style={{ maxHeight: 580, overflowY: 'auto', paddingRight: 2, marginTop: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
                                             {days.map((dayName, di) => {
                                                 const a = DAY_ACCENT[dayName] || DAY_ACCENT['Monday'];
-                                                const dayCls = [...grouped[dayName]].sort((x,y) => new Date(x.startTime) - new Date(y.startTime));
+                                                const dayCls = [...grouped[dayName]].sort((x, y) => new Date(x.startTime) - new Date(y.startTime));
                                                 return (
                                                     <motion.div key={dayName} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: di * 0.07 }}>
                                                         {/* ── Day Header ── */}
@@ -1243,7 +1244,7 @@ const StudentProfileDashboard = () => {
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingLeft: 4 }}>
                                                             {dayCls.map((cls, ci) => {
                                                                 const accentColor = CLR_CYCLE[(globalClsIdx++) % CLR_CYCLE.length];
-                                                                const initials = cls.teacher?.name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '??';
+                                                                const initials = cls.teacher?.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??';
                                                                 return (
                                                                     <div
                                                                         key={ci}

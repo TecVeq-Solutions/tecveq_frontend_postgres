@@ -176,7 +176,7 @@ const ClassroomAttendence = () => {
                   ) : (
                     <button
                       onClick={!getAttandence ? attendenceMutation.mutate : () => setShowPopup(true)}
-                      className="flex items-center gap-2 px-2 sm:px-10 py-3 text-sm font-bold text-white rounded-2xl bg-[#0B1053] hover:bg-[#161d7a] active:scale-95 shadow-lg shadow-indigo-100 transition-all"
+                      className="flex items-center gap-1 sm:gap-2 px-2 sm:px-10 py-3 text-[11px] sm:text-sm font-bold text-white rounded-2xl bg-[#0B1053] hover:bg-[#161d7a] active:scale-95 shadow-lg shadow-indigo-100 transition-all"
                     >
                       <BiCheckCircle className="text-lg" />
                       {!getAttandence ? "Submit Attendance" : "Update Attendance"}

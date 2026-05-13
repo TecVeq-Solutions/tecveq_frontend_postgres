@@ -103,7 +103,8 @@ const Notifications = ({ onclose, dashboard }) => {
   };
 
   return createPortal(
-    <div className={`fixed top-16 sm:top-20 right-0 bottom-0 z-[2000] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[400px] w-full shadow-2xl`}>
+    // top - 16 
+    <div className={`fixed  top-0 sm:top-20 right-0 bottom-0 z-[2000] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[400px] w-full shadow-2xl`}>
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); }

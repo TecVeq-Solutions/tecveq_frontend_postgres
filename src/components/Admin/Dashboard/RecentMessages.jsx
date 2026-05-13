@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import moment from "moment/moment";
 import Loader from "../../../utils/Loader";
 import { IoClose, IoSend, IoArrowBack, IoTrash } from "react-icons/io5";
@@ -248,8 +249,17 @@ const RecentMessages = ({ onclose }) => {
     );
   };
 
-  return (
-    <div className="fixed top-20 right-0 bottom-0 z-[250] flex flex-row-reverse items-start pointer-events-none gap-4 px-4 overflow-hidden">
+  return createPortal(
+    <div className="fixed inset-y-0 right-0 z-[2000] flex flex-row-reverse items-start pointer-events-none gap-4 px-4 overflow-hidden h-full w-full sm:w-auto">
+      <style>{`
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0.5; } to { transform: translateX(0); opacity: 1; } }
+        .animate-chat-panel { animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+        .animate-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      `}</style>
 
       {/* 1. CHAT DETAIL PANEL (Right Side) */}
       {showFullChat && (
@@ -422,7 +432,8 @@ const RecentMessages = ({ onclose }) => {
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 };
 
