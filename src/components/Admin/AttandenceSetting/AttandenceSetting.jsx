@@ -42,8 +42,8 @@ const AttandenceSetting = () => {
 
     return (
         <>
-            <div className='lg:ml-72 p-8'>
-                <div className='flex flex-col w-full justify-end items-end'>
+            <div className='w-full p-0 sm:p-4'>
+                <div className='flex flex-col w-full justify-end items-end mb-8'>
                     <Link to="/admin/add-csv-file">
                         <button
                             className="px-6 py-2 rounded-lg bg-[#6A00FF] text-white"

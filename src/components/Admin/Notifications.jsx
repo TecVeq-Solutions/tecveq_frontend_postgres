@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { IoClose, IoNotificationsOutline, IoMegaphoneOutline } from "react-icons/io5";
 import { CiBellOn } from "react-icons/ci";
 import { GoDotFill } from "react-icons/go";
@@ -79,8 +80,8 @@ const Notifications = ({ onclose, dashboard }) => {
     );
   };
 
-  return (
-    <div className={`fixed top-20 right-0 bottom-0 z-[200] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[420px] w-full shadow-2xl`}>
+  return createPortal(
+    <div className={`fixed inset-y-0 right-0 z-[1999] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[420px] w-full shadow-2xl h-full`}>
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); }
@@ -150,7 +151,8 @@ const Notifications = ({ onclose, dashboard }) => {
           {clearMutation.isPending ? "Clearing..." : "Clear All Notifications"}
         </button>
       </div> */}
-    </div>
+    </div>,
+    document.body
   );
 };
 

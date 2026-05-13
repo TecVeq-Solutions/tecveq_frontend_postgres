@@ -8,6 +8,8 @@ import {
   useUpdateStudentSubject,
 } from "../../../api/Admin/bulkAssign";
 import Loader from "../../../utils/Loader";
+import Navbar from "../../../components/Admin/Navbar";
+import { useBlur } from "../../../context/BlurContext";
 
 // ─── Icons (Clean & Sharp) ───────────────────────────────────────────────────
 const CheckIcon = () => (
@@ -59,6 +61,7 @@ const SELECT_CLS = [
 
 const UnifiedSubjectAssign = () => {
   const { isSidebarOpen } = useSidebar();
+  const { isBlurred } = useBlur();
   const { levels, levelsLoading } = useGetLevels();
   const { bulkAssignSubjects, isLoading: isAssigningBulk } = useBulkAssignSubjects();
   const { updateStudentSubject } = useUpdateStudentSubject();
@@ -156,9 +159,17 @@ const UnifiedSubjectAssign = () => {
     levelSubjects.every((s) => bulkSelectedSubjects.includes(s.id));
 
   return (
-    <div className="lg:ml-80 min-h-screen w-full bg-[#F8FAFC] pb-20 px-4 sm:px-10 py-10 transition-all duration-300">
+    <div className="flex flex-col flex-1 bg-[#F8FAFC] font-poppins min-h-screen overflow-x-hidden w-full">
+      <div className="flex flex-col flex-1 px-3 sm:px-5 ml-0 lg:ml-72 xl:ml-80 min-h-full pb-10">
+        <header className="sticky top-0 px-2 z-40 bg-[#f9f9f9]/90 backdrop-blur-sm flex h-16 sm:h-20 md:px-14 lg:px-0">
+          <Navbar heading={"Bulk Assign"} />
+        </header>
 
-      {/* ── Header Section ───────────────────────────────────────────────── */}
+        <div
+          className={`flex flex-col md:px-10 lg:px-0 w-full gap-3 sm:gap-5 pt-6 pb-2 flex-1 transition-all duration-300 ${isBlurred ? "blur" : ""
+            } ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}
+        >
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
         <div>
           <div className="flex items-center gap-2 mb-3">
@@ -389,6 +400,8 @@ const UnifiedSubjectAssign = () => {
           </p>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };

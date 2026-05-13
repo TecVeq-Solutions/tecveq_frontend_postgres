@@ -83,10 +83,10 @@ const Navbar = ({ heading }) => {
   };
 
   return (
-    <nav className="admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
+    <nav className="admin px-2 w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
       {/* Mobile Hamburger Trigger */}
       <div
-        className="absolute left-1  sm:left-2  top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
+        className="absolute left-2  top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
         onClick={() => {
           setIsopen(!isopen);
           setIsSidebarOpen(!isSidebarOpen);

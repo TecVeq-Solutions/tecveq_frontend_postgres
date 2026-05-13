@@ -1,57 +1,31 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import pdf from "../../../assets/pdf.png";
-import profile from "../../../assets/profile.png";
-
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoNotificationsOutline, IoMegaphoneOutline } from "react-icons/io5";
 import { useUser } from "../../../context/UserContext";
 import { useStudent } from "../../../context/StudentContext";
-import { useQuery } from "@tanstack/react-query";
-import { getMyChats } from "../../../api/UserApis";
 import { useGetAnnoucementByUserType } from "../../../api/Teacher/Annoucement";
-import { formatDate } from "../../../constants/formattedDate";
+import moment from "moment";
 
 const Notifications = ({ onclose, dashboard, data }) => {
   const [activeTab, setActiveTab] = useState("notification");
-  const { socketContext } = useUser();
   const { allAssignments } = useStudent();
 
-  useEffect(() => {
-    console.log("now rendering navbar");
-  }, []);
-
-  const chatquery = useQuery({ queryKey: ["chat"], queryFn: getMyChats });
-
-  // Helper: initials from name
-  const getInitials = (name = "") =>
-    name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
-
-  const avatarColors = [
-    "linear-gradient(135deg, #667eea, #764ba2)",
-    "linear-gradient(135deg, #f093fb, #f5576c)",
-    "linear-gradient(135deg, #4facfe, #00f2fe)",
-    "linear-gradient(135deg, #43e97b, #38f9d7)",
-    "linear-gradient(135deg, #fa709a, #fee140)",
-  ];
-
-  const getAvatarColor = (name = "") => {
-    const idx = name.charCodeAt(0) % avatarColors.length;
-    return avatarColors[idx];
-  };
-
-  const Notification = ({ item, isAssignment = true }) => {
+  // Notification Item Component
+  const NotificationItem = ({ item, isAssignment = true }) => {
     const [moredetails, setMoredetails] = useState(false);
 
-    const teacherName = isAssignment
+    const senderName = isAssignment
       ? item?.createdBy?.name || "Teacher"
       : item?.userID?.name || "Teacher";
 
     const timeDisplay = isAssignment
-      ? formatDate(item?.dueDate)
-      : formatDate(item?.createdAt);
+      ? item?.dueDate
+      : item?.createdAt;
 
     const message = isAssignment
-      ? "Added an Assignment"
-      : item?.message || "Notification";
+      ? "Added a new Assignment"
+      : item?.message || "New Notification";
 
     const subjectName = isAssignment
       ? item?.subjectID?.name || "Subject"
@@ -62,70 +36,51 @@ const Notifications = ({ onclose, dashboard, data }) => {
       : item?.classroomName || "";
 
     return (
-      <div
-        className="flex gap-3 p-3 rounded-xl cursor-pointer border border-transparent hover:bg-[#f8f9ff] hover:border-[#e0e3f5] transition-all duration-150 mb-1"
-        onClick={() => setMoredetails(!moredetails)}
-      >
-        {/* Avatar */}
-        <div
-          className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white text-sm font-semibold"
-          style={{ background: getAvatarColor(teacherName) }}
-        >
-          {getInitials(teacherName)}
-        </div>
-
-        {/* Body */}
-        <div className="flex-1">
-          <div className="flex justify-between items-start gap-2">
-            <span className="text-sm font-semibold text-gray-900">{teacherName}</span>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] text-gray-400 whitespace-nowrap">{timeDisplay}</span>
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+      <div className="relative group mb-4 transition-all duration-300">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#149B9A] to-[#0B1053] rounded-2xl opacity-0 group-hover:opacity-10 transition duration-300 blur"></div>
+        <div className="relative flex flex-col p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
+          <div className="flex gap-4">
+            <div className={`flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 bg-slate-50 text-[#149B9A]`}>
+              <IoNotificationsOutline size={22} />
+            </div>
+            <div className="flex-1 min-w-0" onClick={() => setMoredetails(!moredetails)}>
+              <div className="flex justify-between items-start mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#149B9A]">
+                  {senderName}
+                </span>
+                <span className={`h-2 w-2 rounded-full ${isAssignment ? "bg-amber-500" : "bg-[#149B9A]"} animate-pulse`} />
+              </div>
+              <h4 className="text-[13px] font-bold text-slate-800 leading-tight mb-1 group-hover:text-[#0B1053] transition-colors">
+                {message}
+              </h4>
+              <p className="text-slate-500 text-[12px] leading-relaxed">
+                <span className="text-[#0B1053] font-medium">{subjectName} {className && `• ${className}`}</span>
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <div className="h-[1px] flex-1 bg-slate-50"></div>
+                <span className="text-[10px] font-semibold text-slate-400">
+                  {moment(timeDisplay).fromNow()}
+                </span>
+              </div>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5 leading-snug">
-            {message}{" "}
-            <span className="text-[#0B1053] font-medium">
-              {subjectName}
-              {className && ` - ${className}`}
-            </span>
-          </p>
 
-          {/* File preview */}
+          {/* File previews */}
           {moredetails && isAssignment && item?.files?.length > 0 && (
-            <div className="flex items-center gap-2 mt-2 bg-[#f3f4ff] border border-[#d4d8f5] rounded-lg px-3 py-2">
-              <div className="w-8 h-8 rounded-md bg-red-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
-                PDF
-              </div>
-              <div>
-                <a
-                  href={item.files[0]?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-medium text-[#0B1053] hover:underline block"
-                >
-                  {item.files[0]?.name || "Assignment File"}
-                </a>
-                <p className="text-[11px] text-gray-400">{item.title}</p>
-              </div>
+            <div className="mt-4 pt-3 border-t border-slate-50 flex items-center gap-3 ml-1 animate-in fade-in slide-in-from-top-1 duration-200">
+              <img src={pdf} alt="pdf" className="w-8 h-8 object-contain" />
+              <a href={item.files[0]?.url} target="_blank" rel="noopener noreferrer" className="text-[13px] font-medium text-[#149B9A] hover:underline truncate">
+                {item.files[0]?.name || "Assignment File"}
+              </a>
             </div>
           )}
 
           {moredetails && !isAssignment && item?.file && (
-            <div className="flex items-center gap-2 mt-2 bg-[#f3f4ff] border border-[#d4d8f5] rounded-lg px-3 py-2">
-              <div className="w-8 h-8 rounded-md bg-red-600 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
-                PDF
-              </div>
-              <div>
-                <a
-                  href={item.file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-medium text-[#0B1053] hover:underline block"
-                >
-                  {item.file.name}
-                </a>
-              </div>
+            <div className="mt-4 pt-3 border-t border-slate-50 flex items-center gap-3 ml-1 animate-in fade-in slide-in-from-top-1 duration-200">
+              <img src={pdf} alt="pdf" className="w-8 h-8 object-contain" />
+              <a href={item.file.url} target="_blank" rel="noopener noreferrer" className="text-[13px] font-medium text-[#149B9A] hover:underline truncate">
+                {item.file.name}
+              </a>
             </div>
           )}
         </div>
@@ -133,63 +88,58 @@ const Notifications = ({ onclose, dashboard, data }) => {
     );
   };
 
-  const Announcement = () => {
+  // Announcement List Component
+  const AnnouncementList = () => {
     const { announcementByUsertype, isLoading } = useGetAnnoucementByUserType();
-    const [activeAnnouncement, setActiveAnnouncement] = useState(null);
-
-    const handleToggleDetails = (id) => {
-      setActiveAnnouncement((prevId) => (prevId === id ? null : id));
-    };
+    const [activeId, setActiveId] = useState(null);
 
     return (
-      <div className="py-2 w-full">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-3">
-          📢 Announcements
-        </p>
-        {announcementByUsertype && announcementByUsertype.length > 0 ? (
-          announcementByUsertype.map((announcement) => (
-            <div
-              key={announcement.id}
-              className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-2.5 hover:shadow-sm transition-shadow duration-200"
-            >
-              <div
-                className="p-4 cursor-pointer"
-                onClick={() => handleToggleDetails(announcement.id)}
-              >
-                <p className="text-[10px] font-semibold text-indigo-500 uppercase tracking-widest">
-                  {announcement.type}
-                </p>
-                <h3 className="text-sm font-semibold text-gray-900 mt-1">
-                  {announcement.title}
-                </h3>
-                <p className="text-[11px] text-gray-400 mt-1">
-                  {new Date(announcement.date).toLocaleString()}
-                </p>
-              </div>
-
-              {activeAnnouncement === announcement.id && (
-                <div className="px-4 pb-4 pt-2 bg-[#f8f9ff] border-t border-gray-100">
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    {announcement.description}
-                  </p>
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="flex flex-col gap-4">
+            {[1, 2].map(i => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse border border-slate-100" />)}
+          </div>
+        ) : announcementByUsertype && announcementByUsertype.length > 0 ? (
+          announcementByUsertype.map((item) => (
+            <div key={item.id} className="relative group transition-all duration-300">
+              <div className="relative flex flex-col p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <div className="flex gap-4 cursor-pointer" onClick={() => setActiveId(activeId === item.id ? null : item.id)}>
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <IoMegaphoneOutline size={22} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-[11px] font-bold uppercase tracking-widest text-indigo-600">
+                        {item.type || "Global"}
+                      </span>
+                      <span className="text-[10px] font-medium text-slate-400">
+                        {moment(item.date).format("MMM DD")}
+                      </span>
+                    </div>
+                    <h4 className="text-[14px] font-bold text-slate-800 leading-tight mb-1">
+                      {item.title}
+                    </h4>
+                    <p className={`text-slate-500 text-[12px] leading-relaxed ${activeId === item.id ? "" : "line-clamp-2"}`}>
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-400 text-sm py-10">
-            No announcements have been created
-          </p>
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <IoMegaphoneOutline size={40} className="text-slate-200 mb-2" />
+            <p className="text-slate-400 text-sm font-medium">No announcements found</p>
+          </div>
         )}
       </div>
     );
   };
 
-  return (
-    <div
-      className="z-10 fixed flex flex-col px-0 overflow-hidden bg-white top-20 right-0 md:right-2 w-80 md:w-96 h-[calc(100vh-80px)] animate-slide-in shadow-2xl"
-      style={{ boxShadow: "0 8px 32px rgba(11,16,83,0.12)", borderRadius: "0 0 0 16px" }}
-    >
+  return createPortal(
+    // sm:top-20
+    <div className={`fixed top-0  right-0 bottom-0 z-[2000] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[400px] w-full shadow-2xl`}>
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); }
@@ -198,78 +148,78 @@ const Notifications = ({ onclose, dashboard, data }) => {
         .animate-slide-in {
           animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .no-scrollbar::-webkit-scrollbar { width: 5px; }
-        .no-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .no-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .notifications-scroll::-webkit-scrollbar { width: 5px; }
+        .notifications-scroll::-webkit-scrollbar-track { background: transparent; }
+        .notifications-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
       `}</style>
-      {/* Header */}
-      <div className="px-5 pt-5 pb-0 bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-base font-semibold text-[#0B1053]">Inbox</h2>
-          <button
-            onClick={onclose}
-            className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-colors"
-          >
-            <IoClose size={15} />
-          </button>
-        </div>
 
-        {/* Tab bar */}
-        <div className="flex gap-1.5 bg-gray-100 p-1 rounded-xl mb-4">
-          <button
-            className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-              activeTab === "notification"
-                ? "bg-[#0B1053] text-white shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("notification")}
-          >
-            Notification
-          </button>
-          <button
-            className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-              activeTab === "announcement"
-                ? "bg-[#0B1053] text-white shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setActiveTab("announcement")}
-          >
-            Announcement
+      {/* Header */}
+      <div className="relative overflow-hidden bg-white px-3 sm:px-6 py-8 border-b border-slate-100">
+        <div className="absolute top-[-10%] right-[-10%] w-32 h-32 bg-[#149B9A]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-24 h-24 bg-[#149B9A]/5 rounded-full blur-2xl opacity-60"></div>
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+              Updates <span className="text-[#149B9A]">.</span>
+            </h2>
+            <div className="mt-4 flex bg-slate-50 gap-2 p-1 rounded-xl border border-slate-100">
+              <button
+                className={`flex-1 py-2 px-2 text-[12px] font-bold rounded-lg transition-all ${activeTab === "notification" ? "bg-white text-[#0B1053] shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
+                onClick={() => setActiveTab("notification")}
+              >
+                Notifications
+              </button>
+              <button
+                className={`flex-1 py-2 px-2 text-[12px] font-bold rounded-lg transition-all ${activeTab === "announcement" ? "bg-white text-[#0B1053] shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
+                onClick={() => setActiveTab("announcement")}
+              >
+                Announcements
+              </button>
+            </div>
+          </div>
+          <button onClick={onclose} className="p-2 hover:bg-red-50 rounded-xl transition-all group">
+            <IoClose size={24} className="text-slate-400 group-hover:text-red-500" />
           </button>
         </div>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3">
+      {/* List Content */}
+      <div className="flex-1 p-4 sm:p-6 space-y-4 overflow-y-auto notifications-scroll">
         {activeTab === "notification" ? (
           <>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 mb-2">
-              Recent
-            </p>
             {data && data.length > 0 ? (
               data
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((not) => (
-                  <Notification key={not.id} item={not} isAssignment={false} />
+                  <NotificationItem key={not.id} item={not} isAssignment={false} />
                 ))
             ) : allAssignments && allAssignments.length > 0 ? (
               allAssignments
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .slice(0, 5)
+                .slice(0, 10)
                 .map((assignment) => (
-                  <Notification key={assignment.id} item={assignment} isAssignment={true} />
+                  <NotificationItem key={assignment.id} item={assignment} isAssignment={true} />
                 ))
             ) : (
-              <p className="text-center text-gray-400 text-sm py-10">
-                No notifications yet
-              </p>
+              <div className="flex flex-col items-center justify-center h-full text-center py-10">
+                <IoNotificationsOutline size={40} className="text-slate-200 mb-2" />
+                <p className="text-slate-400 text-sm font-medium">No new updates</p>
+              </div>
             )}
           </>
         ) : (
-          <Announcement />
+          <AnnouncementList />
         )}
       </div>
-    </div>
+
+      {/* Footer */}
+      <div className="p-6 bg-white border-t border-slate-100">
+        <p className="text-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+          End of Updates
+        </p>
+      </div>
+    </div>,
+    document.body
   );
 };
 

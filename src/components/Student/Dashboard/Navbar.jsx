@@ -60,7 +60,7 @@ const Navbar = ({ heading }) => {
   }, [notifyQuery.isSuccess, notifyQuery.data]);
 
   return (
-    <nav className="student-navbar w-full bg-white h-20 flex items-center sticky top-0 z-[100] sm:px-4 md:px-6">
+    <nav className="student-navbar px-2 w-full bg-white h-20 flex items-center sticky top-0 z-[100] sm:px-4 md:px-6">
       {/* Mobile Hamburger Trigger z-[100] border-b border-gray-100  */}
       <div
         className="absolute left-1  sm:left-2  top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"

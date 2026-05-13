@@ -312,7 +312,7 @@ function App() {
             }
           />
           <Route
-            path="/student-profile/:studentId"
+            path="/admin/student-profile/:studentId"
             element={
               <AdminLayout>
                 <StudentProfileDashboard />
@@ -485,7 +485,7 @@ function App() {
             }
           />
           <Route
-            path="/student-profile/:studentId"
+            path="/student/student-profile/:studentId"
             element={
               <StudentLayout>
                 <StudentProfileDashboard />
@@ -642,7 +642,7 @@ function App() {
             }
           />
           <Route
-            path="/student-profile/:studentId"
+            path="/teacher/student-profile/:studentId"
             element={
               <TeacherLayout>
                 <StudentProfileDashboard />
@@ -754,7 +754,7 @@ function App() {
             }
           />
           <Route
-            path="/student-profile/:studentId"
+            path="/parent/student-profile/:studentId"
             element={
               <ParentLayout>
                 <StudentProfileDashboard />
