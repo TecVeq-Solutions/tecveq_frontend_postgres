@@ -52,7 +52,26 @@ const AttendenceReportByTeacherComp = () => {
         }
     });
 
-    const teachers = useMemo(() => teachersData?.data || [], [teachersData]);
+    const teachers = useMemo(() => {
+        if (!teachersData) return [];
+        // Handle both Array format and Object-of-Arrays format from backend
+        const rawData = teachersData?.data || teachersData;
+        if (!Array.isArray(rawData)) {
+            const uniqueTeachersMap = new Map();
+            Object.values(rawData).forEach(classroomList => {
+                if (Array.isArray(classroomList)) {
+                    classroomList.forEach(item => {
+                        if (item.teacher && !uniqueTeachersMap.has(item.teacher.id)) {
+                            uniqueTeachersMap.set(item.teacher.id, item.teacher);
+                        }
+                    });
+                }
+            });
+            return Array.from(uniqueTeachersMap.values());
+        }
+        return rawData;
+    }, [teachersData]);
+
     const students = useMemo(() => studentsData?.data || [], [studentsData]);
     const subjects = useMemo(() => subjectsData?.data || [], [subjectsData]);
     const studentReport = attendanceData?.data;
@@ -61,7 +80,7 @@ const AttendenceReportByTeacherComp = () => {
     const handleFilterChange = useCallback((field, value) => {
         setFilters(prev => {
             const newFilters = { ...prev, [field]: value };
-            
+
             // Cascading resets
             if (field === 'teacherId') {
                 newFilters.studentId = '';
@@ -75,7 +94,7 @@ const AttendenceReportByTeacherComp = () => {
                 const selectedSub = subjects.find(s => s.id === value);
                 newFilters.classroomId = selectedSub?.classroomId || '';
             }
-            
+
             return newFilters;
         });
     }, [subjects]);
@@ -163,7 +182,7 @@ const AttendenceReportByTeacherComp = () => {
     return (
         <div className="bg-white border mt-6 border-[#e5e7eb] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
             {/* Premium Header */}
-            <div className="bg-gradient-to-r from-[#6A00FF] to-[#4A00E0] px-6 py-5">
+            <div className="bg-gradient-to-r from-[#6A00FF] to-[#4A00E0] px-3 sm:px-6 py-5">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20">
@@ -185,7 +204,7 @@ const AttendenceReportByTeacherComp = () => {
 
             {/* Filter Content */}
             {isFilterExpanded && (
-                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="p-3 sm:p-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Teacher Selection */}
                         <div className="space-y-3">
@@ -223,7 +242,7 @@ const AttendenceReportByTeacherComp = () => {
                                     disabled={!filters.teacherId}
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all duration-200 outline-none appearance-none disabled:opacity-50 disabled:bg-gray-100 group-hover:bg-white group-hover:border-[#059669]/30 text-sm font-medium text-gray-800"
                                 >
-                                    <option value="">{isLoadingStudents ? 'Loading students...' : 'Choose a student...'}</option>
+                                    <option value="">{isLoadingStudents && filters.teacherId ? 'Loading students...' : 'Choose a student...'}</option>
                                     {students.map(student => (
                                         <option key={student.id} value={student.id}>{student.name} ({student.rollNo})</option>
                                     ))}
@@ -247,7 +266,7 @@ const AttendenceReportByTeacherComp = () => {
                                     disabled={!filters.studentId}
                                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EA580C] focus:border-transparent transition-all duration-200 outline-none appearance-none disabled:opacity-50 disabled:bg-gray-100 group-hover:bg-white group-hover:border-[#EA580C]/30 text-sm font-medium text-gray-800"
                                 >
-                                    <option value="">{isLoadingSubjects ? 'Loading courses...' : 'Choose a course...'}</option>
+                                    <option value="">{isLoadingSubjects && filters.studentId ? 'Loading courses...' : 'Choose a course...'}</option>
                                     {subjects.map(subject => (
                                         <option key={subject.id} value={subject.id}>{subject.name} - {subject.classroomName}</option>
                                     ))}
@@ -333,38 +352,38 @@ const AttendenceReportByTeacherComp = () => {
 
                             {studentReport.length > 0 ? (
                                 <div className="overflow-hidden border border-gray-200 rounded-2xl shadow-sm bg-white">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="bg-gray-50/50 border-b border-gray-200">
-                                                <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Date</th>
-                                                <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Class Title</th>
-                                                <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {studentReport.map((item, index) => (
-                                                <tr key={index} className="hover:bg-blue-50/30 transition-colors duration-150">
-                                                    <td className="px-6 py-5 font-medium text-gray-900">{formatDate(item.date)}</td>
-                                                    <td className="px-6 py-5 text-gray-600 font-medium">{item.classTitle}</td>
-                                                    <td className="px-6 py-5">
-                                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase ${
-                                                            item.status === 'present'
+                                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar relative">
+                                        <table className="w-full text-sm">
+                                            <thead className="sticky top-0 z-10">
+                                                <tr className="bg-gray-50 border-b border-gray-200">
+                                                    <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Date</th>
+                                                    <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Class Title</th>
+                                                    <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                {studentReport.map((item, index) => (
+                                                    <tr key={index} className="hover:bg-blue-50/30 transition-colors duration-150">
+                                                        <td className="px-6 py-5 font-medium text-gray-900">{formatDate(item.date)}</td>
+                                                        <td className="px-6 py-5 text-gray-600 font-medium">{item.classTitle}</td>
+                                                        <td className="px-6 py-5">
+                                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase ${item.status === 'present'
                                                                 ? 'bg-emerald-100 text-emerald-800'
                                                                 : item.status === 'present-late'
-                                                                ? 'bg-amber-100 text-amber-800'
-                                                                : 'bg-rose-100 text-rose-800'
-                                                        }`}>
-                                                            <span className={`w-1.5 h-1.5 rounded-full mr-2 ${
-                                                                item.status === 'present' ? 'bg-emerald-500' : item.status === 'present-late' ? 'bg-amber-500' : 'bg-rose-500'
-                                                            }`}></span>
-                                                            {item.status}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    
+                                                                    ? 'bg-amber-100 text-amber-800'
+                                                                    : 'bg-rose-100 text-rose-800'
+                                                                }`}>
+                                                                <span className={`w-1.5 h-1.5 rounded-full mr-2 ${item.status === 'present' ? 'bg-emerald-500' : item.status === 'present-late' ? 'bg-amber-500' : 'bg-rose-500'
+                                                                    }`}></span>
+                                                                {item.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
                                     {/* Summary Stats */}
                                     <div className="bg-gray-50/50 px-6 py-4 border-t border-gray-200 flex flex-wrap gap-8">
                                         <div className="flex flex-col">

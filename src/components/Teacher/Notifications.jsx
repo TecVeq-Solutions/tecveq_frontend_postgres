@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { IoClose, IoNotificationsOutline, IoMegaphoneOutline } from "react-icons/io5";
+import { CiBellOn } from "react-icons/ci";
 import pdf from "../../assets/pdf.png";
 import { GoDotFill } from "react-icons/go";
 import { useGetAnnoucementByUserType } from "../../api/Teacher/Annoucement";
@@ -100,11 +102,25 @@ const Notifications = ({ onclose, dashboard }) => {
     );
   };
 
-  return (
-    <div className={`fixed inset-y-0 right-0 z-[200] flex flex-col bg-[#F8FAFC] border-l border-slate-200 shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] transition-all duration-500 md:w-[400px] w-full ${!dashboard ? "pt-20" : "pt-0"}`}>
+  return createPortal(
+    <div className={`fixed top-16 sm:top-20 right-0 bottom-0 z-[2000] flex flex-col bg-[#F8FAFC] border-l border-slate-200 animate-slide-in md:w-[400px] w-full shadow-2xl`}>
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .notifications-scroll::-webkit-scrollbar { width: 5px; }
+        .notifications-scroll::-webkit-scrollbar-track { background: transparent; }
+        .notifications-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+      `}</style>
+
       {/* Header */}
       <div className="relative overflow-hidden bg-white px-3 sm:px-6 py-8 border-b border-slate-100">
         <div className="absolute top-[-10%] right-[-10%] w-32 h-32 bg-[#149B9A]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-24 h-24 bg-[#149B9A]/5 rounded-full blur-2xl opacity-60"></div>
         <div className="relative flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
@@ -131,8 +147,8 @@ const Notifications = ({ onclose, dashboard }) => {
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 no-scrollbar custom-scroll">
+      {/* Notifications List */}
+      <div className="flex-1 p-4 sm:p-6 space-y-4 overflow-y-auto notifications-scroll">
         {activeTab === "notification" ? (
           notificationsLoading ? (
             <div className="flex flex-col gap-4">
@@ -159,7 +175,8 @@ const Notifications = ({ onclose, dashboard }) => {
           End of Updates
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

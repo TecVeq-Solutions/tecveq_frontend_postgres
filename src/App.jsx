@@ -83,9 +83,25 @@ import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import ProtectedSuperAdmin from "./utils/ProtectedSuperAdmin";
 import SAPlatformFees from "./pages/SuperAdmin/PlatformFees/PlatformFees";
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
+import SAManagement from "./pages/SuperAdmin/AdminManagement";
+import SAPackages from "./pages/SuperAdmin/SubscriptionPackages";
+import SAPayments from "./pages/SuperAdmin/Payments";
+import SAChat from "./pages/SuperAdmin/Chat";
+import SANotifications from "./pages/SuperAdmin/Notifications";
+import SAReports from "./pages/SuperAdmin/Reports";
+import SABlocked from "./pages/SuperAdmin/BlockedAccounts";
+import SASettings from "./pages/SuperAdmin/Settings";
+import SAProfile from "./pages/SuperAdmin/Profile";
 import BulkSubjectAssign from "./pages/Admin/BulkSubjectAssign/BulkSubjectAssign";
 import ChatBot from "./components/ChatBot/ChatBot";
 import StudentProfileDashboard from "./pages/Common/StudentProfileDashboard";
+import APlatformSupport from "./pages/Admin/PlatformSupport/PlatformSupport";
+import ABlocked from "./pages/Admin/Blocked/BlockedAccount";
+import ASubscription from "./pages/Admin/Subscription/MySubscription";
+import StudentLeaves from "./pages/Student/Leaves/Leaves";
+import TeacherMyLeaves from "./pages/Teacher/Leaves/MyLeaves";
+import TeacherStudentLeaves from "./pages/Teacher/Leaves/StudentLeaves";
+import AdminTeacherLeaves from "./pages/Admin/Leaves/TeacherLeaves";
 
 function App() {
 
@@ -136,6 +152,22 @@ function App() {
                 <ADashboard />
               </AdminLayout>
             }
+          />
+          <Route
+            path="/admin/blocked"
+            element={<ABlocked />}
+          />
+          <Route
+            path="/admin/platform-support"
+            element={
+              <AdminLayout>
+                <APlatformSupport />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/blocked"
+            element={<ABlocked />}
           />
 
 
@@ -264,6 +296,22 @@ function App() {
             }
           />
           <Route
+            path="/admin/subscription"
+            element={
+              <AdminLayout>
+                <ASubscription />
+              </AdminLayout>
+            }
+          />
+          <Route
+            path="/admin/teacher-leaves"
+            element={
+              <AdminLayout>
+                <AdminTeacherLeaves />
+              </AdminLayout>
+            }
+          />
+          <Route
             path="/student-profile/:studentId"
             element={
               <AdminLayout>
@@ -286,6 +334,78 @@ function App() {
             element={
               <SuperAdminLayout>
                 <SAPlatformFees />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/admins"
+            element={
+              <SuperAdminLayout>
+                <SAManagement />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/packages"
+            element={
+              <SuperAdminLayout>
+                <SAPackages />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/payments"
+            element={
+              <SuperAdminLayout>
+                <SAPayments />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/chat"
+            element={
+              <SuperAdminLayout>
+                <SAChat />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/notifications"
+            element={
+              <SuperAdminLayout>
+                <SANotifications />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/reports"
+            element={
+              <SuperAdminLayout>
+                <SAReports />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/blocked-accounts"
+            element={
+              <SuperAdminLayout>
+                <SABlocked />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/settings"
+            element={
+              <SuperAdminLayout>
+                <SASettings />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/profile"
+            element={
+              <SuperAdminLayout>
+                <SAProfile />
               </SuperAdminLayout>
             }
           />
@@ -357,6 +477,14 @@ function App() {
             }
           />
           <Route
+            path="/student/leaves"
+            element={
+              <StudentLayout>
+                <StudentLeaves />
+              </StudentLayout>
+            }
+          />
+          <Route
             path="/student-profile/:studentId"
             element={
               <StudentLayout>
@@ -413,6 +541,22 @@ function App() {
             element={
               <TeacherLayout>
                 <TSubjectReport />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/leaves"
+            element={
+              <TeacherLayout>
+                <TeacherMyLeaves />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/student-leaves"
+            element={
+              <TeacherLayout>
+                <TeacherStudentLeaves />
               </TeacherLayout>
             }
           />

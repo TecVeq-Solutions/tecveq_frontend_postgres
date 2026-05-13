@@ -79,13 +79,13 @@ const AddCSVFileComponent = () => {
             <div>
                 <button
                     onClick={handleDownloadAll}
-                    className="w-full flex items-center justify-center gap-2 bg-[#6A00FF] hover:bg-[#6A00FF]/40 text-white py-2 rounded-md font-medium transition mb-4"
+                    className="w-full flex items-center justify-center gap-2 bg-[#6A00FF] hover:bg-[#6A00FF]/40 text-white py-2 rounded-md font-medium transition mb-2 sm:mb-4"
                 >
                     <Download className="w-5 h-5" />
                     Download All CSV Files
                 </button>
             </div>
-            <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+            <div className="flex justify-center items-center sm:min-h-screen bg-gray-100 p-0 sm:p-4">
                 <div className="w-full max-w-md bg-white shadow-md rounded-lg p-3 sm:p-6 border border-gray-200">
                     {/* Header */}
                     <h2 className="text-xl font-semibold text-center flex items-center justify-center gap-2 mb-4">

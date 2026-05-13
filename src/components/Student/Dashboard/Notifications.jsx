@@ -187,11 +187,21 @@ const Notifications = ({ onclose, dashboard, data }) => {
 
   return (
     <div
-      className={`${
-        !dashboard ? "mt-10 h-[calc(100vh-2.5rem)]" : "mt-0 h-full"
-      } z-10 fixed flex flex-col px-0 overflow-hidden bg-white top-0 right-0 md:right-2 w-80 md:w-96`}
+      className="z-10 fixed flex flex-col px-0 overflow-hidden bg-white top-20 right-0 md:right-2 w-80 md:w-96 h-[calc(100vh-80px)] animate-slide-in shadow-2xl"
       style={{ boxShadow: "0 8px 32px rgba(11,16,83,0.12)", borderRadius: "0 0 0 16px" }}
     >
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .no-scrollbar::-webkit-scrollbar { width: 5px; }
+        .no-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .no-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+      `}</style>
       {/* Header */}
       <div className="px-5 pt-5 pb-0 bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="flex justify-between items-center mb-4">

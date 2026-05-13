@@ -126,7 +126,7 @@ const MultiSelectField = ({ options = [], placeholder, onSelect, isLoading }) =>
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-2.5 max-h-52 overflow-y-auto custom-scrollbar pr-1">
+      <div className="grid grid-cols-2 px-1 md:grid-cols-3 gap-1 sm:gap-2.5 max-h-52 overflow-y-auto custom-scrollbar pr-1">
         {filtered.map(option => {
           const isChecked = selectedOptions.some(i => i.id === option.id);
           return (
@@ -179,7 +179,7 @@ const ClassModal = ({ open, setopen, isEditTrue, refetch, editData }) => {
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [teacherArr, setTeachersArr] = useState([]);
 
-  const { adminUsersData, allLevels } = useAdmin();
+  const { adminUsersData, allLevels, subscriptionData, allClassrooms } = useAdmin();
   const { toggleBlur } = useBlur();
 
   const { studentWithLevel = [], isLoading: studentsLoading } = useGetAllStudentsWithLevel(selectedLevel?.id);
@@ -241,6 +241,15 @@ const ClassModal = ({ open, setopen, isEditTrue, refetch, editData }) => {
   });
 
   const handleCreateClass = () => {
+    const { subscription } = subscriptionData || {};
+
+    if (!isEditTrue && subscription?.classLimit > 0) {
+      const currentClassrooms = allClassrooms?.length || 0;
+      if (currentClassrooms >= subscription.classLimit) {
+        return toast.error(`Limit reached! Your current package allows only ${subscription.classLimit} classrooms. Please upgrade your plan.`);
+      }
+    }
+
     const nameOk = /^[a-zA-Z0-9\s]+$/.test(classroomName.trim());
     if (!classroomName.trim()) return toast.error("Enter a classroom name.");
     if (!nameOk) return toast.error("No special characters allowed.");
@@ -368,7 +377,7 @@ const ClassModal = ({ open, setopen, isEditTrue, refetch, editData }) => {
                             {subjectWithLevel.map(subject => {
                               const checked = selectedSubjects[teacher.id]?.some(s => s.id === subject.id);
                               return (
-                                <label key={subject.id} className={`flex items-center gap-1sm:gap-3 px-4 py-2.5 rounded-xl cursor-pointer border-2 transition-all active:scale-95 ${checked ? 'bg-[#6A00FF]/5 border-[#6A00FF]/20 text-[#6A00FF]' : 'bg-gray-50 border-transparent text-gray-500'}`}>
+                                <label key={subject.id} className={`flex items-center gap-1 sm:gap-3 px-4 py-2.5 rounded-xl cursor-pointer border-2 transition-all active:scale-95 ${checked ? 'bg-[#6A00FF]/5 border-[#6A00FF]/20 text-[#6A00FF]' : 'bg-gray-50 border-transparent text-gray-500'}`}>
                                   <input type="checkbox" className="hidden" checked={checked} onChange={e => handleSubjectCheckboxChange(teacher.id, subject, e.target.checked)} />
                                   <IoBook className={`w-3.5 h-3.5 ${checked ? 'text-[#6A00FF]' : 'text-gray-300'}`} />
                                   <span className="text-[11px] font-bold truncate">{subject.name}</span>

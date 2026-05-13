@@ -199,7 +199,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 pt-20">
       <div
         ref={ref}
         className="relative bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"
@@ -271,6 +271,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
                                   ? prev.filter((c) => c.id !== item.id)
                                   : [...prev, item]
                               );
+                              setDropdownOpen(false);
                             }}
                             className="accent-purple-600 w-3.5 h-3.5"
                           />

@@ -5,17 +5,20 @@ import Navbar from "../../../components/Admin/Navbar";
 import TotalUsers from "../../../components/Admin/Dashboard/TotalUsers";
 import StudentsCard from "../../../components/Admin/Dashboard/StudentsCard";
 import SystemOverview from "../../../components/Admin/Dashboard/SystemOverview";
+import SubscriptionStatus from "../../../components/Admin/Dashboard/SubscriptionStatus";
 
 import { useBlur } from "../../../context/BlurContext";
 import { useAdmin } from "../../../context/AdminContext";
 import { useSidebar } from "../../../context/SidebarContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { IoAlertCircleOutline } from "react-icons/io5";
 
 
 const Dashboard = () => {
 
   const { isBlurred } = useBlur();
   const { isSidebarOpen } = useSidebar(); // new
-  const { adminUsersData, adminUsersDataPending } = useAdmin();
+  const { adminUsersData, adminUsersDataPending, subscriptionData, allClassrooms } = useAdmin();
 
   const [students, setStudents] = useState({
     allEnrolled: adminUsersData.allStudents.filter((item) => item.isAccepted == true),
@@ -90,23 +93,47 @@ const Dashboard = () => {
               <div className="flex min-h-20 md:px-14 lg:pt-3 lg:px-0">
                 <Navbar heading={"Admin Dashboard"} />
               </div>
+
+              <div className="md:px-10 lg:px-0 mt-6">
+                <SubscriptionStatus
+                  data={subscriptionData}
+                  stats={{
+                    allStudents: students.allEnrolled,
+                    allTeachers: adminUsersData.allTeachers,
+                    allClassrooms: allClassrooms?.length || 0
+                  }}
+                />
+              </div>
+
               <div
-                className={`flex flex-col  md:px-10  sm:py-3 lg:px-0 lg:mt-0 sm:mt-16 sm:mt-1 md:mt-1 lg:flex-row flex-1 gap-5 my-2  ${isBlurred ? "blur" : ""
+                className={`flex flex-col  md:px-10  sm:pt-6 sm:pb-3 lg:px-0 lg:mt-0  sm:mt-8 lg:flex-row flex-1 gap-5 mb-2  ${isBlurred ? "blur" : ""
                   } ${isSidebarOpen ? "-z-10" : "z-auto"} lg:z-auto`}
               >
 
 
                 {/* grap................................................................ */}
                 <div className="flex flex-[5] flex-col gap-3 min-w-0">
-                  <p className="text-xl font-semibold">System Overview</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex gap-[3px] items-center">
+                      <div className="w-1 h-[18px] rounded-full bg-indigo-500" />
+                      <div className="w-1 h-3 rounded-full bg-indigo-300" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900 tracking-tight">System Overview</h2>
+                  </div>
                   <SystemOverview />
                 </div>
 
                 {/* total user */}
                 <div className="flex flex-[2] flex-col gap-4 min-w-0">
                   <div className="flex flex-col gap-1 px-1">
-                    <p className="text-xl font-semibold text-slate-800 tracking-tight">Students Statistics</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Enrollment Metrics</p>
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex gap-[3px] items-center">
+                        <div className="w-1 h-[18px] rounded-full bg-emerald-500" />
+                        <div className="w-1 h-3 rounded-full bg-emerald-300" />
+                      </div>
+                      <h2 className="text-xl font-bold text-gray-900 tracking-tight">Students Statistics</h2>
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] ml-7">Enrollment Metrics</p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3">
@@ -161,6 +188,34 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        <AnimatePresence>
+          {subscriptionData?.subscription?.totalBalance > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              className="fixed bottom-6 right-6 z-50 w-72 overflow-hidden rounded-3xl bg-white p-5 shadow-2xl ring-1 ring-rose-100"
+            >
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl bg-rose-50 p-3 text-rose-600">
+                  <IoAlertCircleOutline size={24} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Payment Reminder</h3>
+                  <p className="mt-0.5 text-xs font-bold text-rose-500">
+                    Remaining Balance: Rs.{subscriptionData.subscription.totalBalance.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => window.location.href = '/admin/subscription'}
+                className="mt-4 w-full rounded-2xl bg-rose-600 py-3 text-xs font-black text-white shadow-lg shadow-rose-900/20 transition hover:bg-rose-700"
+              >
+                Clear Outstanding Dues
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </>
   );
 };

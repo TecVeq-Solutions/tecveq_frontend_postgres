@@ -92,8 +92,11 @@ const Sidebar = () => {
     { key: "bulkAssign", title: "Bulk Assign", icon: "subjects", route: "/admin/bulk-subject-assign" },
     { key: "subjects", title: "Subjects", icon: "subjects", route: "/admin/subjects" },
     { key: "classroom", title: "Classroom", icon: "classroom", route: "/admin/classrooms" },
+    { key: "teacher-leaves", title: "Teacher Leaves", icon: "calendar", route: "/admin/teacher-leaves" },
     { key: "fees", title: "Fees", icon: "levels", route: "/admin/fees" },
-    { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" }
+    { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" },
+    { key: "platformSupport", title: "Platform Support", icon: "announcement", route: "/admin/platform-support" },
+    { key: "subscription", title: "My Subscription", icon: "card", route: "/admin/subscription" }
   ];
 
   const { userData } = useUser();
@@ -101,14 +104,25 @@ const Sidebar = () => {
     menuItems.unshift({ key: "superAdminDashboard", title: "Super Admin", icon: "home", route: "/superadmin/dashboard" });
   }
 
-  const menuGroups = [
+  const isBlocked = userData?.userType === 'admin' && userData?.status === 'blocked';
+
+  const menuGroups = isBlocked ? [
+    {
+      label: "Support",
+      items: menuItems.filter(i => ["platformSupport"].includes(i.key))
+    },
+    {
+      label: "Account",
+      items: menuItems.filter(i => ["subscription"].includes(i.key))
+    }
+  ] : [
     {
       label: "Main",
       items: menuItems.filter(i => ["dashboard", "superAdminDashboard", "timetable", "reports"].includes(i.key))
     },
     {
       label: "Management",
-      items: menuItems.filter(i => ["teachers", "manageUsers", "classroom"].includes(i.key))
+      items: menuItems.filter(i => ["teachers", "manageUsers", "classroom", "teacher-leaves"].includes(i.key))
     },
     {
       label: "Academics",
@@ -117,12 +131,20 @@ const Sidebar = () => {
     {
       label: "Config",
       items: menuItems.filter(i => ["attendence-reprt", "fees", "settings"].includes(i.key))
+    },
+    {
+      label: "Support",
+      items: menuItems.filter(i => ["platformSupport"].includes(i.key))
+    },
+    {
+      label: "Account",
+      items: menuItems.filter(i => ["subscription"].includes(i.key))
     }
   ];
 
   const Menubar = ({ isMobile }) => (
     // w-64 
-    <div className="admin-sidebar flex flex-col w-80   lg:w-72  xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
+    <div className="admin-sidebar flex flex-col w-full sm:w-80   lg:w-72  xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
       <div className=" flex items-center justify-between px-[16px] pt-6 pb-5 border-b 
        border-gray-200">
@@ -242,6 +264,7 @@ const Sidebar = () => {
       {/* Desktop */}
       <div className="max-lg:hidden">
         <Menubar isMobile={false} />
+
       </div>
 
       {isProfileDetails && <ProfileDetails onClose={toggleProfileDetails} />}

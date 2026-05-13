@@ -88,13 +88,24 @@ const Deliverables = () => {
 
   useEffect(() => {
     if (allAssignments.length > 0 || allQuizes.length > 0) {
-      const assignmentsWithType = matchedAssignments.map(a => ({...a, itemType: "assignment"}));
-      const quizesWithType = matchedQuizes.map(q => ({...q, itemType: "quiz"}));
+      const assignmentsWithType = matchedAssignments.map(a => ({ ...a, itemType: "assignment" }));
+      const quizesWithType = matchedQuizes.map(q => ({ ...q, itemType: "quiz" }));
       const arr = [...assignmentsWithType, ...quizesWithType];
-      arr.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-      setAllDeliverables(arr);
+
+      // Filter out items already submitted by the student
+      const pendingDeliverables = arr.filter(item => {
+        const isSubmitted = item.submissions?.some(sub =>
+          sub.studentID === userData?.id || sub.studentID?.id === userData?.id
+        );
+        return !isSubmitted;
+      });
+
+      pendingDeliverables.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+      setAllDeliverables(pendingDeliverables);
+    } else {
+      setAllDeliverables([]);
     }
-  }, [allAssignments, allQuizes]);
+  }, [allAssignments, allQuizes, userData?.id]);
 
   return (
     <div className="flex flex-1">

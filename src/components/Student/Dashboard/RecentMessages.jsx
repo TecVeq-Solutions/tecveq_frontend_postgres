@@ -1,615 +1,318 @@
-import React, { useEffect, useRef, useState } from "react";
-
+import React, { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import moment from "moment/moment";
 import Loader from "../../../utils/Loader";
-import IMAGES from "../../../assets/images";
-import profile from "../../../assets/profile.png";
-
+import { IoClose, IoSend, IoArrowBack } from "react-icons/io5";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getMyChats, getChatsRoomData } from "../../../api/UserApis";
+import { getAllUsers } from "../../../api/Admin/AdminApi";
 import { io } from "socket.io-client";
-import { toast } from "react-toastify";
-import { IoClose, IoArrowBack } from "react-icons/io5";
-import { RiAttachment2 } from "react-icons/ri";
-import { BsFillSendFill } from "react-icons/bs";
-import { HiOutlineSearch } from "react-icons/hi";
-import { useQuery } from "@tanstack/react-query";
 import { useUser } from "../../../context/UserContext";
 import { BACKEND_URL_SOCKET } from "../../../constants/api";
-import { getChatsRoomData, getMyChats, getTeachersForChat } from "../../../api/UserApis";
-import { useBlur } from "../../../context/BlurContext";
-import useClickOutside from "../../../hooks/useClickOutlise";
+import { toast } from "react-toastify";
 
-const NAVY = "#0B1053";
-
-/* ─── small helpers ─── */
-function getInitials(name = "") {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
-}
-
-const AVATAR_COLORS = [
-  "#0B1053", "#1D9E75", "#D4537E", "#378ADD",
-  "#BA7517", "#D85A30", "#534AB7", "#0F6E56",
-];
-function avatarColor(name = "") {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
-  return AVATAR_COLORS[h % AVATAR_COLORS.length];
-}
-
-/* ─── tiny styled primitives (inline-only, no external CSS) ─── */
-const styles = {
-  /* sidebar */
-  sidebar: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    background: "#fff",
-  },
-  sidebarHeader: {
-    padding: "18px 16px 0",
-    borderBottom: "1px solid rgba(0,0,0,.07)",
-  },
-  titleRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 14,
-  },
-  title: { fontSize: 16, fontWeight: 600, color: "#101828" },
-  closeBtn: {
-    width: 28, height: 28, borderRadius: "50%",
-    background: "#F2F4F7",
-    border: "none", cursor: "pointer",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    color: "#667085",
-  },
-  searchWrap: {
-    display: "flex", alignItems: "center", gap: 8,
-    background: "#F9FAFB",
-    border: "1px solid #EAECF0",
-    borderRadius: 10, padding: "8px 12px", marginBottom: 14,
-  },
-  searchInput: {
-    border: "none", background: "transparent",
-    fontSize: 13, color: "#344054", outline: "none", width: "100%",
-  },
-  tabBar: {
-    display: "flex",
-    borderBottom: "1px solid rgba(0,0,0,.07)",
-  },
-  tab: (active) => ({
-    flex: 1, padding: "10px 0", fontSize: 13,
-    textAlign: "center", cursor: "pointer",
-    color: active ? NAVY : "#667085",
-    fontWeight: active ? 600 : 400,
-    borderBottom: active ? `2px solid ${NAVY}` : "2px solid transparent",
-    background: "none", border: "none",
-    borderBottom: active ? `2px solid ${NAVY}` : "2px solid transparent",
-    transition: "all .15s",
-  }),
-  chatList: {
-    flex: 1, overflowY: "auto",
-    padding: "6px 0",
-  },
-
-  /* chat item */
-  chatItem: (active) => ({
-    display: "flex", alignItems: "center", gap: 10,
-    padding: "10px 16px", cursor: "pointer",
-    background: active ? "#EEF0FA" : "transparent",
-    transition: "background .12s",
-  }),
-  avatarWrap: { position: "relative", flexShrink: 0 },
-  avatar: (color, group) => ({
-    width: 42, height: 42,
-    borderRadius: group ? 10 : "50%",
-    background: color,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: 14, fontWeight: 600, color: "#fff",
-    flexShrink: 0,
-  }),
-  onlineDot: {
-    width: 10, height: 10,
-    background: "#12B76A",
-    border: "2px solid #fff",
-    borderRadius: "50%",
-    position: "absolute", bottom: 1, right: 1,
-  },
-  chatInfo: { flex: 1, minWidth: 0 },
-  nameRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },
-  chatName: {
-    fontSize: 13, fontWeight: 500, color: "#101828",
-    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140,
-  },
-  chatTime: { fontSize: 11, color: "#98A2B3", flexShrink: 0 },
-  previewRow: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4 },
-  chatPreview: {
-    fontSize: 12, color: "#667085",
-    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 170,
-  },
-  badge: {
-    background: NAVY, color: "#fff",
-    fontSize: 10, fontWeight: 600,
-    minWidth: 18, height: 18,
-    borderRadius: 99,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    padding: "0 5px", flexShrink: 0,
-  },
-
-  /* full chat panel */
-  panel: {
-    display: "flex", flexDirection: "column",
-    width: "100%", height: "100%",
-    background: "#fff",
-    position: "relative",
-  },
-  panelHeader: {
-    padding: "14px 18px",
-    borderBottom: "1px solid rgba(0,0,0,.07)",
-    display: "flex", alignItems: "center", justifyContent: "space-between",
-    flexShrink: 0,
-  },
-  panelHeaderLeft: { display: "flex", alignItems: "center", gap: 10 },
-  panelName: { fontSize: 14, fontWeight: 600, color: "#101828" },
-  panelSub: { fontSize: 11, color: "#667085", marginTop: 1 },
-  iconBtn: {
-    width: 32, height: 32, borderRadius: "50%",
-    background: "#F2F4F7",
-    border: "none", cursor: "pointer",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    color: "#667085",
-  },
-
-  /* messages */
-  messagesArea: {
-    flex: 1, overflowY: "auto",
-    padding: "16px 18px",
-    display: "flex", flexDirection: "column", gap: 4,
-  },
-  dateDivider: {
-    textAlign: "center", fontSize: 11, color: "#98A2B3",
-    margin: "8px 0",
-    display: "flex", alignItems: "center", gap: 8,
-  },
-  msgRow: (mine) => ({
-    display: "flex", alignItems: "flex-end", gap: 8, margin: "2px 0",
-    flexDirection: mine ? "row-reverse" : "row",
-  }),
-  msgAvatar: (color) => ({
-    width: 28, height: 28, borderRadius: "50%",
-    background: color,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontSize: 10, fontWeight: 600, color: "#fff", flexShrink: 0,
-  }),
-  bubble: (mine) => ({
-    maxWidth: 220, padding: "9px 12px",
-    fontSize: 13, lineHeight: 1.5, wordBreak: "break-word",
-    background: mine ? NAVY : "#F2F4F7",
-    color: mine ? "#fff" : "#101828",
-    borderRadius: mine ? "12px 4px 12px 12px" : "4px 12px 12px 12px",
-  }),
-  bubbleMeta: (mine) => ({
-    fontSize: 10, color: "#98A2B3",
-    marginTop: 3, padding: "0 4px",
-    textAlign: mine ? "right" : "left",
-  }),
-
-  /* input */
-  inputArea: {
-    padding: "12px 16px",
-    background: "#fff",
-    borderTop: "1px solid rgba(0,0,0,.05)",
-    display: "flex", alignItems: "center", gap: 10,
-    flexShrink: 0,
-    zIndex: 10,
-  },
-  msgInput: {
-    flex: 1,
-    background: "#F9FAFB",
-    border: "1px solid #EAECF0",
-    borderRadius: 10,
-    padding: "9px 12px", fontSize: 13,
-    color: "#344054", outline: "none",
-  },
-  attachBtn: {
-    width: 36, height: 36, borderRadius: "50%",
-    background: "#F2F4F7", border: "none", cursor: "pointer",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    color: NAVY, flexShrink: 0,
-  },
-  sendBtn: {
-    width: 36, height: 36, borderRadius: "50%",
-    background: NAVY, border: "none", cursor: "pointer",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    color: "#fff", flexShrink: 0,
-  },
-};
-
-/* ────────────────────────────────────────────────────────── */
-
-const RecentMessages = ({ onclose, dashboard }) => {
-  const ref = useRef(null);
-  const { toggleBlur } = useBlur();
-
-  useClickOutside(ref, () => { onclose(); });
-
-  const [loading, setLoading] = useState(false);
-  const [queryData, setQueryData] = useState(null);
-  const [groupActive, setGroupActive] = useState(false);
-  const [enableChatQuery, setEnableChatQuery] = useState(true);
-  const [individualActive, setIndividualActive] = useState(true);
-  const [selectedChatParticipants, setSelectedChatParticipants] = useState([]);
+const RecentMessages = ({ onclose }) => {
+  const { userData } = useUser();
+  const containerRef = useRef(null);
   const [msgArray, setMsgArray] = useState([]);
-  const [msgArrayDirect, setMsgArrayDirect] = useState([]);
-  const [localSocket, setLocalSocket] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [groupActive, setGroupActive] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
-  const [showDirectChat, setShowDirectChat] = useState(false);
-  const [subTab, setSubTab] = useState("recent");
-  const [searchText, setSearchText] = useState("");
-
-  const { socketContext, setSocketContext, userData } = useUser();
-
-  const toggleGroupActive = () => { setGroupActive(!groupActive); setIndividualActive(false); };
-  const toggleIndividualActive = () => { setIndividualActive(!individualActive); setGroupActive(false); };
-
-  const handleSendMessage = (msgstr) => {
-    if (msgstr === "") {
-      toast.error("Cannot send empty message!");
-    } else {
-      const messageObj = {
-        sentBy: userData.id,
-        time: new Date(),
-        type: "text",
-        message: msgstr,
-      };
-      if (showFullChat) {
-        setMsgArray((prev) => [...prev, { ...messageObj, sentBy: userData }]);
-      } else if (showDirectChat) {
-        setMsgArrayDirect((prev) => [...prev, { ...messageObj, sentBy: userData }]);
-      }
-      if (localSocket) {
-        if (showFullChat) {
-          localSocket.emit("message", { room: selectedChat?.id, message: messageObj });
-        } else if (showDirectChat) {
-          localSocket.emit("message", { members: [userData?.id, selectedChat?.id], message: messageObj });
-        }
-      }
-    }
-  };
-
   const [showFullChat, setShowFullChat] = useState(false);
+  const [individualActive, setIndividualActive] = useState(true);
+  const [msgstr, setmsgStr] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const socket = useRef(null);
+  const messagesEndRef = useRef(null);
+  const queryClient = useQueryClient();
 
-  const handleShowFullChat = () => { setShowFullChat(!showFullChat); };
+  // Dynamic Data Fetching
+  const { data: groupChats, isPending: groupIsPending } = useQuery({
+    queryKey: ["student-chatrooms"],
+    queryFn: getMyChats
+  });
+  
+  const { data: allUsersResponse, isPending: usersIsPending } = useQuery({
+    queryKey: ["allUsers"],
+    queryFn: getAllUsers
+  });
 
-  const openFullchat = async (data) => {
-    setLoading(true);
-    setShowDirectChat(false);
-    setShowFullChat(true);
-    let conn = io(`${BACKEND_URL_SOCKET}/chatroom`);
-    setSocketContext(conn);
-    setLocalSocket(conn);
-    setSelectedChat(data);
-    setSelectedChatParticipants(data.participants);
-    conn.emit("join", { room: data.id });
-    const result = await getChatsRoomData(data.id);
-    setMsgArray(result.messages);
-    setLoading(false);
-  };
+  // Combine and Filter Users
+  const combinedUsers = allUsersResponse || [];
+  
+  const filteredUsers = combinedUsers.filter(u => {
+    if (u.id === userData.id) return false;
+    const role = u.userType?.toLowerCase();
+    if (role !== 'teacher' && role !== 'student') return false;
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return u.name?.toLowerCase().includes(search) || 
+           u.userType?.toLowerCase().includes(search) ||
+           (u.classroomStudents?.[0]?.name || "").toLowerCase().includes(search);
+  });
 
-  const openDirectChat = async (data) => {
-    setLoading(true);
-    setShowFullChat(false);
-    setShowDirectChat(true);
-    const conn = io(`${BACKEND_URL_SOCKET}/one-to-one`);
-    setLocalSocket(conn);
-    setSelectedChat(data);
-    conn.emit("join", [userData.id, data.id]);
-    conn.emit("get-chats", [userData.id, data.id]);
-    conn.on("chat-history", (chats) => {
-      setSelectedChatParticipants(chats?.participants);
-      setMsgArrayDirect(chats?.messages);
-    });
-    setLoading(false);
-  };
+  // Group users by role
+  const groupedUsers = filteredUsers.reduce((acc, user) => {
+    let role = user.userType?.toUpperCase() || 'USER';
+    if (role === 'SUPER_ADMIN') role = 'ADMIN';
+    if (!acc[role]) acc[role] = [];
+    acc[role].push(user);
+    return acc;
+  }, {});
 
-  const getParticipantData = (pid) => {
-    if (pid === userData.id) return userData;
-    let user = {};
-    selectedChatParticipants.forEach((item) => { if (item.id === pid) user = item; });
-    return user;
-  };
+  // Sort groups and users
+  const roleOrder = ["TEACHER", "STUDENT"];
+  const sortedRoles = Object.keys(groupedUsers).sort((a, b) => roleOrder.indexOf(a) - roleOrder.indexOf(b));
+  sortedRoles.forEach(role => {
+    if (groupedUsers[role]) {
+      groupedUsers[role].sort((a, b) => (a?.name || "").localeCompare(b?.name || ""));
+    }
+  });
+
+  // Group Group Chats by Classroom
+  const groupedGroups = groupChats?.reduce((acc, chat) => {
+    if (!chat.classroomID) return acc;
+    const className = chat.classroom?.name || "General Groups";
+    if (!acc[className]) acc[className] = [];
+    acc[className].push(chat);
+    return acc;
+  }, {}) || {};
+
+  const sortedGroupClasses = Object.keys(groupedGroups).sort();
 
   useEffect(() => {
-    if (localSocket) {
-      localSocket.on("message", (data) => {
-        if (data.message.sentBy === userData.id) return;
-        let user = getParticipantData(data.message.sentBy);
-        if (showFullChat) {
-          setMsgArray((prev) => [...prev, { ...data.message, sentBy: user }]);
-        } else if (showDirectChat) {
-          setMsgArrayDirect((prev) => [...prev, { ...data.message, sentBy: user }]);
-        }
+    return () => {
+      if (socket.current) socket.current.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [msgArray]);
+
+  const openFullchat = async (chatData, isGroup = false) => {
+    if (!userData?.id || !chatData) return;
+    if (socket.current) socket.current.disconnect();
+
+    const targetId = isGroup ? chatData.id : (chatData.participants ? chatData.participants.find(p => p.id !== userData.id)?.id : chatData.id);
+    const chatName = chatData.name || (chatData.participants ? chatData.participants.find(p => p.id !== userData.id)?.name : chatData.name) || "Chat";
+
+    setSelectedChat({ ...chatData, id: targetId, name: chatName, isGroup });
+    setShowFullChat(true);
+    setLoading(true);
+
+    const namespace = isGroup ? "/chatroom" : "/one-to-one";
+    const conn = io(`${BACKEND_URL_SOCKET}${namespace}`);
+    socket.current = conn;
+
+    if (isGroup) {
+      conn.emit("join", { room: targetId });
+      try {
+        const result = await getChatsRoomData(targetId);
+        const messages = Array.isArray(result) ? result[0]?.messages : result?.messages;
+        setMsgArray(messages || []);
+      } catch (error) {
+        toast.error("Failed to load group messages");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      conn.emit("join", [userData.id, targetId]);
+      conn.emit("get-chats", [userData.id, targetId]);
+      conn.on("chat-history", (history) => {
+        setMsgArray(history?.messages || []);
+        setLoading(false);
       });
     }
-  }, [localSocket, showFullChat, showDirectChat, userData.id]);
 
-  /* ── ChatListItem ── */
-  const ChatListItem = ({ data, onpress, isGroup, isActive }) => (
-    <div
-      style={styles.chatItem(isActive)}
-      onClick={onpress}
-      onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#F9FAFB"; }}
-      onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
-    >
-      <div style={styles.avatarWrap}>
-        <div style={styles.avatar(avatarColor(data?.name), isGroup)}>
-          {getInitials(data?.name)}
-        </div>
-        {data?.online && <div style={styles.onlineDot} />}
-      </div>
-      <div style={styles.chatInfo}>
-        <div style={styles.nameRow}>
-          <span style={styles.chatName}>{data?.name}</span>
-          <span style={styles.chatTime}>{moment(data?.lastMsg?.time).format("hh:mm a")}</span>
-        </div>
-        <div style={styles.previewRow}>
-          <span style={styles.chatPreview}>{data?.lastMsg?.message}</span>
-          {data?.unread > 0 && <span style={styles.badge}>{data.unread}</span>}
-        </div>
-      </div>
-    </div>
-  );
-
-  /* ── GroupMsg bubble ── */
-  const GroupMsg = ({ msg }) => {
-    const mine = msg?.sentBy?.id === userData.id;
-    const name = msg?.sentBy?.name || "You";
-    const color = avatarColor(name);
-
-    return (
-      <div>
-        <div style={styles.msgRow(mine)}>
-          {!mine && (
-            <div style={styles.msgAvatar(color)}>{getInitials(name)}</div>
-          )}
-          <div style={styles.bubble(mine)}>{msg.message}</div>
-        </div>
-        <div style={styles.bubbleMeta(mine)}>
-          {mine ? "You" : name} · {moment(msg.time).format("hh:mm a")}
-        </div>
-      </div>
-    );
+    conn.on("message", (data) => {
+      if (!data?.message) return;
+      if (data.message.sentBy === userData.id) return;
+      setMsgArray((prev) => [...prev, { 
+        ...data.message, 
+        sentBy: { 
+          id: data.message.sentBy,
+          name: data.message.senderName,
+          userType: data.message.senderRole
+        } 
+      }]);
+    });
   };
 
-  /* ── FullChat panel ── */
-  const FullChat = ({ onclose, data, type }) => {
-    const [msgstr, setmsgStr] = useState("");
-    const messagesEndRef = useRef(null);
+  const handleSendMessage = () => {
+    if (!msgstr.trim() || !selectedChat || !socket.current) return;
 
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleSendMessage(msgstr);
-        setmsgStr("");
-      }
+    const messageObj = {
+      sentBy: userData.id,
+      senderName: userData.name,
+      senderRole: userData.userType,
+      time: new Date(),
+      type: "text",
+      message: msgstr,
     };
 
-    const currentMsgArray = type === "group" ? msgArray : msgArrayDirect;
+    if (selectedChat.isGroup) {
+      socket.current.emit("message", { room: selectedChat.id, message: messageObj });
+    } else {
+      socket.current.emit("message", { members: [userData.id, selectedChat.id], message: messageObj });
+    }
 
-    useEffect(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [currentMsgArray]);
+    setMsgArray((prev) => [...prev, { ...messageObj, sentBy: userData }]);
+    setmsgStr("");
+  };
+
+  // --- Sub-Components ---
+  const MessageItem = ({ data, onpress, isActive, isGroup = false }) => {
+    const displayName = isGroup ? data?.name : (data?.name || data?.participants?.find(p => p.id !== userData.id)?.name || "Unknown");
+    const displayPic = isGroup ? null : (data?.profilePic || data?.participants?.find(p => p.id !== userData.id)?.profilePic);
+    const lastMsg = data?.lastMsg?.message || data?.lastMsgText || "Start a conversation";
+    const lastTime = data?.lastMsg?.time || data?.lastMsgTime;
+    const userRole = !isGroup ? (data?.userType || data?.participants?.find(p => p.id !== userData.id)?.userType) : null;
+
+    const className = !isGroup ? (
+      data?.classroomStudents?.[0]?.name || 
+      data?.classroomTeachers?.[0]?.classroom?.name || 
+      data?.students?.[0]?.classroomStudents?.[0]?.name || 
+      data?.level?.name || ""
+    ) : null;
 
     return (
-      <div style={styles.panel}>
-        {/* header */}
-        <div style={styles.panelHeader}>
-          <div style={styles.panelHeaderLeft}>
-            <button style={styles.iconBtn} onClick={onclose} className="sm:hidden">
-              <IoArrowBack size={16} />
-            </button>
-            <div style={styles.avatar(avatarColor(data?.name), type === "group")}>
-              {getInitials(data?.name)}
-            </div>
-            <div>
-              <div style={styles.panelName}>{data?.name}</div>
-              <div style={styles.panelSub}>
-                {type === "group" ? `${data?.participants?.length ?? ""} members` : "Online"}
+      <div onClick={onpress} className={`group relative flex items-center gap-3 p-3 mb-2 rounded-xl cursor-pointer transition-all duration-300 ${isActive ? "bg-blue-50 border-blue-200 border shadow-sm" : "hover:bg-gray-50 border border-transparent"}`}>
+        <div className="relative flex-shrink-0">
+          <div className={`h-11 w-11 rounded-full ${isGroup ? "bg-indigo-100 text-indigo-600" : "bg-blue-100 text-blue-600"} flex items-center justify-center font-bold border border-blue-200 overflow-hidden`}>
+            {displayPic ? <img src={displayPic} className="h-full w-full object-cover" alt="" /> : displayName?.charAt(0)}
+          </div>
+        </div>
+        <div className="flex-1 min-w-0 pr-6">
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col">
+              <p className={`text-sm font-bold truncate ${isActive ? "text-blue-700" : "text-gray-800"}`}>{displayName}</p>
+              <div className="flex items-center gap-1">
+                {userRole && <span className="text-[9px] uppercase text-gray-400 font-semibold">{userRole}</span>}
+                {className && <span className="text-[9px] text-blue-500 font-medium">• {className}</span>}
               </div>
             </div>
+            <span className="text-[10px] text-gray-400">{lastTime ? moment(lastTime).format("hh:mm a") : ""}</span>
           </div>
-          <button style={styles.iconBtn} onClick={onclose}>
-            <IoClose size={16} />
-          </button>
-        </div>
-
-        {/* messages */}
-        {loading ? (
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Loader />
-          </div>
-        ) : (
-          <div style={styles.messagesArea}>
-            <div style={styles.dateDivider}>
-              <span style={{ flex: 1, height: 1, background: "rgba(0,0,0,.07)" }} />
-              <span>Today</span>
-              <span style={{ flex: 1, height: 1, background: "rgba(0,0,0,.07)" }} />
-            </div>
-            {currentMsgArray.map((item, index) => (
-              <GroupMsg key={index} msg={item} />
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-
-        {/* input */}
-        <div style={styles.inputArea}>
-          <input
-            type="text"
-            value={msgstr}
-            onChange={(e) => setmsgStr(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            style={styles.msgInput}
-          />
-          <button style={styles.attachBtn}>
-            <RiAttachment2 size={18} />
-          </button>
-          <button
-            style={styles.sendBtn}
-            onClick={() => { handleSendMessage(msgstr); setmsgStr(""); }}
-          >
-            <BsFillSendFill size={14} />
-          </button>
+          <p className="text-xs text-gray-500 truncate">{lastMsg}</p>
         </div>
       </div>
     );
   };
 
-  /* ── queries ── */
-  const chatquery = useQuery({ queryKey: ["chat"], queryFn: getMyChats, staleTime: 30000, enabled: enableChatQuery });
-  const teacherquery = useQuery({ queryKey: ["teachers-for-chat"], queryFn: getTeachersForChat, staleTime: 30000, enabled: individualActive });
+  return createPortal(
+    <div ref={containerRef} className="fixed right-0 inset-y-0 z-[2000] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden">
+      <style>{`
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0.5; } to { transform: translateX(0); opacity: 1; } }
+        .animate-chat-panel { animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+        .animate-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      `}</style>
 
-  useEffect(() => {
-    if (!queryData) setEnableChatQuery(true);
-    if (!chatquery.isPending) { setQueryData(chatquery?.data); setEnableChatQuery(false); }
-  }, [chatquery.isPending]);
-
-  /* ── search filter ── */
-  const filterBySearch = (arr) =>
-    arr?.filter((d) => d?.name?.toLowerCase().includes(searchText.toLowerCase())) ?? [];
-
-  /* ── sidebar panel ── */
-  const SidebarPanel = () => (
-    <div style={styles.sidebar}>
-      {/* header */}
-      <div style={styles.sidebarHeader}>
-        <div style={styles.titleRow}>
-          <span style={styles.title}>Messages</span>
-          <button style={styles.closeBtn} onClick={onclose}>
-            <IoClose size={14} />
-          </button>
-        </div>
-
-        {/* search */}
-        <div style={styles.searchWrap}>
-          <HiOutlineSearch size={15} color="#98A2B3" />
-          <input
-            style={styles.searchInput}
-            type="text"
-            placeholder="Search conversations..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </div>
-
-        {/* tabs */}
-        {individualActive && (
-          <div style={styles.tabBar}>
-            <button
-              style={styles.tab(subTab === "recent")}
-              onClick={() => setSubTab("recent")}
-            >
-              Group Chats
-            </button>
-            <button
-              style={styles.tab(subTab === "teachers")}
-              onClick={() => setSubTab("teachers")}
-            >
-              Teachers
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* list */}
-      <div style={styles.chatList}>
-        {chatquery.isPending && subTab === "recent" && <Loader />}
-        {teacherquery.isPending && subTab === "teachers" && <Loader />}
-
-        {!chatquery.isPending && subTab === "recent" && (
-          <>
-            {filterBySearch(chatquery?.data).map((item) => (
-              <ChatListItem
-                key={item.id}
-                data={item}
-                isGroup
-                isActive={selectedChat?.id === item.id && showFullChat}
-                onpress={() => openFullchat(item)}
-              />
-            ))}
-          </>
-        )}
-
-        {!teacherquery.isPending && subTab === "teachers" && (
-          <>
-            {filterBySearch(teacherquery?.data).map((item) => (
-              <ChatListItem
-                key={item.id}
-                data={item}
-                isGroup={false}
-                isActive={selectedChat?.id === item.id && showDirectChat}
-                onpress={() => openDirectChat(item)}
-              />
-            ))}
-          </>
-        )}
-      </div>
-    </div>
-  );
-
-  /* ── root ── */
-  return (
-    <div
-      ref={ref}
-      className="fixed right-0 inset-y-0 z-[250] flex flex-row-reverse items-start pointer-events-none h-full w-full sm:w-auto overflow-hidden"
-    >
-      <style>
-        {`
-          @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0.5; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-          .animate-chat-slide {
-            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          }
-        `}
-      </style>
-      {/* sidebar — hidden on mobile when chat is open */}
-      <div
-        className={`
-          ${(showFullChat || showDirectChat) ? "hidden sm:flex" : "flex"}
-          flex-col overflow-hidden bg-white border-l border-black/10 shadow-2xl sm:w-96 w-full pointer-events-auto h-full
-          animate-chat-slide
-        `}
-        style={{ boxShadow: "-4px 0 24px rgba(11,16,83,.10)" }}
-      >
-        <SidebarPanel />
-      </div>
-
-      {/* full chat */}
+      {/* 1. CHAT DETAIL PANEL */}
       {showFullChat && (
-        <div
-          className="w-full sm:w-96 pointer-events-auto h-full overflow-hidden animate-chat-slide"
-          style={{ boxShadow: "-4px 0 24px rgba(11,16,83,.10)" }}
-        >
-          <FullChat onclose={() => setShowFullChat(false)} data={selectedChat} type="group" />
+        <div onMouseDown={(e) => e.stopPropagation()} className="flex flex-col bg-white sm:w-96 w-[90vw] shadow-2xl border border-gray-100 pointer-events-auto h-full rounded-t-2xl animate-chat-panel">
+          <div className="p-4 border-b flex justify-between items-center bg-white">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setShowFullChat(false)} className="md:hidden p-1 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"><IoArrowBack size={20} /></button>
+              <div>
+                <p className="font-bold text-gray-800 leading-tight">{selectedChat?.name}</p>
+                {selectedChat?.isGroup && <p className="text-[10px] text-blue-500 font-semibold uppercase tracking-wider">Group • {selectedChat?.participants?.length || 0} Members</p>}
+              </div>
+            </div>
+            <button onClick={() => setShowFullChat(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><IoClose size={20} className="text-gray-400" /></button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 custom-scrollbar">
+            {loading ? <div className="flex justify-center mt-10"><Loader /></div> :
+              msgArray.map((m, i) => {
+                const isMe = m?.sentBy?.id === userData?.id;
+                const senderRole = m?.sentBy?.userType?.toUpperCase() || "USER";
+                const senderName = m?.sentBy?.name || "Unknown";
+                return (
+                  <div key={i} className={`mb-4 flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                    <div className={`flex items-center gap-1.5 mb-1 px-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+                      <span className="text-[10px] font-bold text-gray-700">{senderName}</span>
+                      <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black tracking-tighter ${senderRole === 'ADMIN' ? 'bg-red-100 text-red-600' : senderRole === 'TEACHER' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>{senderRole}</span>
+                    </div>
+                    <div className={`p-2 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
+                      {m?.message}
+                      <p className={`text-[8px] mt-1 text-right ${isMe ? "text-blue-100" : "text-gray-400"}`}>{moment(m.time).format("hh:mm a")}</p>
+                    </div>
+                  </div>
+                );
+              })
+            }
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="p-4 border-t bg-white">
+            <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
+              <input type="text" value={msgstr} onChange={(e) => setmsgStr(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} placeholder="Type a message..." className="flex-1 bg-transparent border-none outline-none text-sm py-1" />
+              <button onClick={handleSendMessage} className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md active:scale-95"><IoSend size={18} /></button>
+            </div>
+          </div>
         </div>
       )}
-      {showDirectChat && (
-        <div
-          className="w-full sm:w-96 pointer-events-auto h-full overflow-hidden animate-chat-slide"
-          style={{ boxShadow: "-4px 0 24px rgba(11,16,83,.10)" }}
-        >
-          <FullChat onclose={() => setShowDirectChat(false)} data={selectedChat} type="direct" />
+
+      {/* 2. RECENT MESSAGES LIST */}
+      <div onMouseDown={(e) => e.stopPropagation()} className={`${showFullChat ? "hidden sm:flex" : "flex"} flex-col bg-white sm:w-96 w-full shadow-2xl border-l border-gray-100 pointer-events-auto h-full animate-chat-panel`} style={{ boxShadow: "-10px 0 30px -15px rgba(0,0,0,0.1)" }}>
+        <div className="p-6 border-b">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Messages</h2>
+            <button onClick={onclose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><IoClose size={20} className="text-gray-500" /></button>
+          </div>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
+            <button onClick={() => { setIndividualActive(true); setGroupActive(false) }} className={`flex-1 py-2 text-xs font-bold rounded-lg ${individualActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}>DIRECT</button>
+            <button onClick={() => { setGroupActive(true); setIndividualActive(false) }} className={`flex-1 py-2 text-xs font-bold rounded-lg ${groupActive ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}>GROUPS</button>
+          </div>
+          {individualActive && (
+            <div className="mt-4">
+              <input type="text" placeholder="Search by name or class..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all" />
+            </div>
+          )}
         </div>
-      )}
-    </div>
+
+        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-gray-50/30">
+          {usersIsPending || groupIsPending ? <div className="flex justify-center p-10"><Loader /></div> : (
+            <>
+              {individualActive && sortedRoles.map(role => (
+                <div key={role} className="mb-6">
+                  <div className="flex items-center gap-2 mb-3 px-1">
+                    <span className="text-[10px] font-black tracking-[0.1em] text-gray-400 uppercase">{role}S</span>
+                    <div className="h-[1px] flex-1 bg-gray-100"></div>
+                    <span className="text-[10px] font-bold text-gray-300">{groupedUsers[role].length}</span>
+                  </div>
+                  {groupedUsers[role].map(user => (
+                    <MessageItem key={user.id} data={user} isActive={selectedChat?.id === user.id} onpress={() => openFullchat(user, false)} />
+                  ))}
+                </div>
+              ))}
+              {groupActive && (
+                <div className="space-y-6">
+                  {sortedGroupClasses.map(className => (
+                    <div key={className}>
+                      <div className="flex items-center gap-2 mb-3 px-1">
+                        <span className="text-[10px] font-black tracking-[0.1em] text-blue-400 uppercase">{className}</span>
+                        <div className="h-[1px] flex-1 bg-blue-50"></div>
+                      </div>
+                      {groupedGroups[className].map(group => (
+                        <MessageItem key={group.id} data={group} isGroup={true} isActive={selectedChat?.id === group.id} onpress={() => openFullchat(group, true)} />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+    </div>,
+    document.body
   );
 };
 

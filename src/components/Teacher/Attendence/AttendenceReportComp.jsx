@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { Search, Filter, Users, BookOpen, Clock, Download } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getMyStudentsForReport, getMyTeacherStudentSubjects } from '../../../api/Teacher/TeacherApi';
+import { getMyStudentsForReport, getMyTeacherStudentSubjects } from '../../../api/Teacher/StudentReport';
 import { fetchStudentAttendanceReport } from '../../../api/Admin/classroomApi';
 
 const INITIAL_FILTERS = {
@@ -18,15 +18,15 @@ const AttendenceReportComp = () => {
     const [attendanceData, setAttendanceData] = useState(null);
     const reportRef = useRef();
 
-    // Fetch students taught by this teacher
+    // Fetch students assigned to teacher
     const { data: studentsData, isPending: isLoadingStudents } = useQuery({
         queryKey: ["myStudentsForReport"],
         queryFn: getMyStudentsForReport
     });
 
-    // Fetch subjects taught by this teacher to selected student
+    // Fetch subjects for selected student
     const { data: subjectsData, isPending: isLoadingSubjects } = useQuery({
-        queryKey: ["mySubjectsForStudent", filters.studentId],
+        queryKey: ["myStudentSubjects", filters.studentId],
         queryFn: () => getMyTeacherStudentSubjects(filters.studentId),
         enabled: !!filters.studentId
     });
@@ -46,21 +46,16 @@ const AttendenceReportComp = () => {
     const subjects = useMemo(() => subjectsData?.data || [], [subjectsData]);
     const studentReport = attendanceData?.data;
 
-    // Handle filter changes
     const handleFilterChange = useCallback((field, value) => {
         setFilters(prev => {
             const newFilters = { ...prev, [field]: value };
-            
-            // Cascading resets
             if (field === 'studentId') {
                 newFilters.subjectId = '';
                 newFilters.classroomId = '';
             } else if (field === 'subjectId') {
-                // Find classroomId for the selected subject
                 const selectedSub = subjects.find(s => s.id === value);
                 newFilters.classroomId = selectedSub?.classroomId || '';
             }
-            
             return newFilters;
         });
     }, [subjects]);
@@ -72,19 +67,14 @@ const AttendenceReportComp = () => {
 
     const handleSearch = useCallback(async () => {
         if (!filters.studentId || !filters.subjectId) {
-            alert('Please select Student and Subject');
-            return;
-        }
-
-        if (filters.startDate && filters.endDate && new Date(filters.startDate) > new Date(filters.endDate)) {
-            alert('Start date cannot be after end date');
+            alert('Please select a Student and Subject');
             return;
         }
 
         const searchPayload = {
-            classroomId: filters.classroomId,
             subjectId: filters.subjectId,
             studentId: filters.studentId,
+            classroomId: filters.classroomId,
             startDate: filters.startDate || null,
             endDate: filters.endDate || null
         };
@@ -124,7 +114,7 @@ const AttendenceReportComp = () => {
                         th { background-color: #f3f4f6; }
                         .status-present { color: #059669; font-weight: bold; }
                         .status-absent { color: #dc2626; font-weight: bold; }
-                        .header { margin-bottom: 30px; border-bottom: 2px solid #6A00FF; padding-bottom: 10px; }
+                        .header { margin-bottom: 30px; border-bottom: 2px solid #6366f1; padding-bottom: 10px; }
                     </style>
                 </head>
                 <body>
@@ -147,17 +137,17 @@ const AttendenceReportComp = () => {
     };
 
     return (
-        <div className="bg-white border mt-6 border-[#e5e7eb] rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
             {/* Premium Header */}
-            <div className="bg-gradient-to-r from-[#6A00FF] to-[#4A00E0] px-6 py-5">
+            <div className="bg-gradient-to-r from-indigo-600 to-violet-700 px-3 sm:px-6 py-5">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20">
                             <Filter className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-white tracking-tight">Attendance Report Filters</h2>
-                            <p className="text-indigo-100 text-sm opacity-80">Refine your search by student and course</p>
+                            <h2 className="text-xl font-bold text-white tracking-tight">Attendance Insights</h2>
+                            <p className="text-indigo-100 text-sm opacity-80">Analyze student consistency and patterns</p>
                         </div>
                     </div>
                     <button
@@ -171,21 +161,21 @@ const AttendenceReportComp = () => {
 
             {/* Filter Content */}
             {isFilterExpanded && (
-                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="p-3 sm:p-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {/* Student Selection */}
+                        {/* Student */}
                         <div className="space-y-3">
                             <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
-                                <Users className="h-4 w-4 text-[#059669]" />
+                                <Users className="h-4 w-4 text-indigo-600" />
                                 <span>Select Student</span>
                             </label>
                             <div className="relative group">
                                 <select
                                     value={filters.studentId}
                                     onChange={(e) => handleFilterChange('studentId', e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all duration-200 outline-none appearance-none group-hover:bg-white group-hover:border-[#059669]/30 text-sm font-medium text-gray-800"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 outline-none appearance-none group-hover:bg-white group-hover:border-indigo-300 text-sm font-medium text-gray-800"
                                 >
-                                    <option value="">{isLoadingStudents ? 'Loading students...' : 'Choose a student...'}</option>
+                                    <option value="">{isLoadingStudents ? 'Loading students...' : 'Choose student...'}</option>
                                     {students.map(student => (
                                         <option key={student.id} value={student.id}>{student.name} ({student.rollNo})</option>
                                     ))}
@@ -196,20 +186,20 @@ const AttendenceReportComp = () => {
                             </div>
                         </div>
 
-                        {/* Course Selection */}
+                        {/* Subject */}
                         <div className="space-y-3">
                             <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
-                                <BookOpen className="h-4 w-4 text-[#EA580C]" />
-                                <span>Select Course</span>
+                                <BookOpen className="h-4 w-4 text-violet-600" />
+                                <span>Subject</span>
                             </label>
                             <div className="relative group">
                                 <select
                                     value={filters.subjectId}
                                     onChange={(e) => handleFilterChange('subjectId', e.target.value)}
                                     disabled={!filters.studentId}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#EA580C] focus:border-transparent transition-all duration-200 outline-none appearance-none disabled:opacity-50 disabled:bg-gray-100 group-hover:bg-white group-hover:border-[#EA580C]/30 text-sm font-medium text-gray-800"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200 outline-none appearance-none group-hover:bg-white group-hover:border-violet-300 text-sm font-medium text-gray-800 disabled:opacity-50"
                                 >
-                                    <option value="">{isLoadingSubjects ? 'Loading courses...' : 'Choose a course...'}</option>
+                                    <option value="">{isLoadingSubjects ? 'Loading subjects...' : 'Choose subject...'}</option>
                                     {subjects.map(subject => (
                                         <option key={subject.id} value={subject.id}>{subject.name} - {subject.classroomName}</option>
                                     ))}
@@ -220,23 +210,24 @@ const AttendenceReportComp = () => {
                             </div>
                         </div>
 
-                        {/* Date Range */}
+                        {/* Start Date */}
                         <div className="space-y-3">
                             <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
-                                <Clock className="h-4 w-4 text-[#7c3aed]" />
+                                <Clock className="h-4 w-4 text-emerald-600" />
                                 <span>Start Date</span>
                             </label>
                             <input
                                 type="date"
                                 value={filters.startDate}
                                 onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7c3aed] focus:border-transparent transition-all duration-200 outline-none text-sm font-medium text-gray-800"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 outline-none text-sm font-medium text-gray-800"
                             />
                         </div>
 
+                        {/* End Date */}
                         <div className="space-y-3">
                             <label className="flex items-center space-x-2 text-sm font-bold text-gray-700">
-                                <Clock className="h-4 w-4 text-[#7c3aed]" />
+                                <Clock className="h-4 w-4 text-emerald-600" />
                                 <span>End Date</span>
                             </label>
                             <input
@@ -244,7 +235,7 @@ const AttendenceReportComp = () => {
                                 value={filters.endDate}
                                 onChange={(e) => handleFilterChange('endDate', e.target.value)}
                                 min={filters.startDate}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7c3aed] focus:border-transparent transition-all duration-200 outline-none text-sm font-medium text-gray-800"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 outline-none text-sm font-medium text-gray-800"
                             />
                         </div>
                     </div>
@@ -259,8 +250,8 @@ const AttendenceReportComp = () => {
                         </button>
                         <button
                             onClick={handleSearch}
-                            disabled={!filters.subjectId || attendanceSearch.isPending}
-                            className="px-8 py-3 bg-gradient-to-r from-[#6A00FF] to-[#4A00E0] text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 font-bold shadow-md disabled:opacity-50 disabled:scale-100 text-sm"
+                            disabled={!filters.subjectId || !filters.studentId || attendanceSearch.isPending}
+                            className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-violet-700 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 font-bold shadow-md disabled:opacity-50 disabled:scale-100 text-sm"
                         >
                             {attendanceSearch.isPending ? (
                                 <div className="flex items-center gap-2">
@@ -270,7 +261,7 @@ const AttendenceReportComp = () => {
                             ) : (
                                 <>
                                     <Search className="h-4 w-4" />
-                                    <span>View Attendance</span>
+                                    <span>Generate Report</span>
                                 </>
                             )}
                         </button>
@@ -281,8 +272,10 @@ const AttendenceReportComp = () => {
                         <div className="mt-12 animate-in fade-in zoom-in duration-500" ref={reportRef}>
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                                 <div>
-                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Attendance Record</h3>
-                                    <p className="text-gray-500 text-sm mt-1">Showing data for {getDisplayName('student', filters.studentId)} in {getDisplayName('subject', filters.subjectId)}</p>
+                                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Record Summary</h3>
+                                    <p className="text-gray-500 text-sm mt-1">
+                                        Data for {getDisplayName('student', filters.studentId)} in {getDisplayName('subject', filters.subjectId)}
+                                    </p>
                                 </div>
                                 <button
                                     onClick={handlePrint}
@@ -298,7 +291,7 @@ const AttendenceReportComp = () => {
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
-                                                <tr className="bg-gray-50/50 border-b border-gray-200">
+                                                <tr className="bg-gray-50 border-b border-gray-200">
                                                     <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Date</th>
                                                     <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Class Title</th>
                                                     <th className="px-6 py-4 text-left font-black text-gray-700 uppercase tracking-wider">Start Time</th>
@@ -307,23 +300,21 @@ const AttendenceReportComp = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
-                                                {studentReport.map((item, index) => (
-                                                    <tr key={index} className="hover:bg-blue-50/30 transition-colors duration-150">
+                                                {studentReport.sort((a, b) => new Date(a.date) - new Date(b.date)).map((item, index) => (
+                                                    <tr key={index} className="hover:bg-indigo-50/30 transition-colors duration-150">
                                                         <td className="px-6 py-5 font-medium text-gray-900">{formatDate(item.date)}</td>
                                                         <td className="px-6 py-5 text-gray-600 font-medium">{item.classTitle}</td>
                                                         <td className="px-6 py-5 text-gray-600 font-medium">{formatTime(item.startTime || item.startEventDate)}</td>
                                                         <td className="px-6 py-5 text-gray-600 font-medium">{formatTime(item.endTime || item.endEventDate)}</td>
                                                         <td className="px-6 py-5">
-                                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase ${
-                                                                item.status === 'present'
-                                                                    ? 'bg-emerald-100 text-emerald-800'
-                                                                    : item.status === 'present-late'
+                                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase ${item.status === 'present'
+                                                                ? 'bg-emerald-100 text-emerald-800'
+                                                                : item.status === 'present-late'
                                                                     ? 'bg-amber-100 text-amber-800'
                                                                     : 'bg-rose-100 text-rose-800'
-                                                            }`}>
-                                                                <span className={`w-1.5 h-1.5 rounded-full mr-2 ${
-                                                                    item.status === 'present' ? 'bg-emerald-500' : item.status === 'present-late' ? 'bg-amber-500' : 'bg-rose-500'
-                                                                }`}></span>
+                                                                }`}>
+                                                                <span className={`w-1.5 h-1.5 rounded-full mr-2 ${item.status === 'present' ? 'bg-emerald-500' : item.status === 'present-late' ? 'bg-amber-500' : 'bg-rose-500'
+                                                                    }`}></span>
                                                                 {item.status}
                                                             </span>
                                                         </td>
@@ -332,11 +323,11 @@ const AttendenceReportComp = () => {
                                             </tbody>
                                         </table>
                                     </div>
-                                    
+
                                     {/* Summary Stats */}
-                                    <div className="bg-gray-50/50 px-6 py-4 border-t border-gray-200 flex flex-wrap gap-8">
+                                    <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-wrap gap-8">
                                         <div className="flex flex-col">
-                                            <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">Total Classes</span>
+                                            <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">Total Sessions</span>
                                             <span className="text-xl font-black text-gray-900">{studentReport.length}</span>
                                         </div>
                                         <div className="flex flex-col">
@@ -348,8 +339,8 @@ const AttendenceReportComp = () => {
                                             <span className="text-xl font-black text-rose-700">{studentReport.filter(r => r.status === 'absent').length}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-blue-600 text-[10px] font-black uppercase tracking-widest">Attendance %</span>
-                                            <span className="text-xl font-black text-blue-700">
+                                            <span className="text-indigo-600 text-[10px] font-black uppercase tracking-widest">Attendance %</span>
+                                            <span className="text-xl font-black text-indigo-700">
                                                 {((studentReport.filter(r => r.status === 'present' || r.status === 'present-late').length / studentReport.length) * 100).toFixed(1)}%
                                             </span>
                                         </div>

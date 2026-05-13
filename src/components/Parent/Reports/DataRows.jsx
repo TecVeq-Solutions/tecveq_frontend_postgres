@@ -1,9 +1,9 @@
 import React from "react";
 
 const getAttendanceLevel = (pct) => {
-  if (pct >= 75) return { bar: "from-emerald-500 to-green-600", text: "text-green-600", bg: "bg-green-50", label: pct >= 85 ? "Excellent" : "Good" };
-  if (pct >= 60) return { bar: "from-amber-400 to-yellow-500", text: "text-amber-600", bg: "bg-amber-50", label: "Average" };
-  return { bar: "from-red-400 to-red-600", text: "text-red-600", bg: "bg-red-50", label: "At Risk" };
+  if (pct >= 75) return { bar: "from-[#10b981] to-[#059669]", text: "text-[#059669]", bg: "bg-[#ecfdf5]", label: pct >= 85 ? "Excellent" : "Good" };
+  if (pct >= 60) return { bar: "from-[#fbbf24] to-[#eab308]", text: "text-[#d97706]", bg: "bg-[#fffbeb]", label: "Average" };
+  return { bar: "from-[#f87171] to-[#dc2626]", text: "text-[#dc2626]", bg: "bg-[#fef2f2]", label: "At Risk" };
 };
 
 const getInitials = (name = "") =>

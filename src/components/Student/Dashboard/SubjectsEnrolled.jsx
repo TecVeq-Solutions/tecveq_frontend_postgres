@@ -148,14 +148,15 @@ const SubjectsEnrolled = () => {
   };
 
   const subjectQuery = useQuery({
-    queryKey: ["subjects"],
+    queryKey: ["subjects", userData?.id],
     queryFn: async () => {
+      if (!userData?.id) return [];
       const results = await getAllSubjects(userData.id);
       setAllSubjects(results);
       return results;
     },
     refetchInterval: 10000,
-    enabled: studentLogedIn,
+    enabled: !!userData?.id && studentLogedIn,
   });
 
   const filteredSubjects = subjectQuery?.data?.subjects || subjectQuery?.data || [];

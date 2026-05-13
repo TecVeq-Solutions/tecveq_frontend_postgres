@@ -26,7 +26,7 @@ export const fetchStudentAttendanceReport = async (params) => {
 
         // Build query parameters
         const queryParams = new URLSearchParams({
-            classroomId,
+            ...(classroomId && { classroomId }),
             ...(subjectId && { subjectId }),
             ...(studentId && { studentId }),
             ...(startDate && { startDate }),

@@ -13,7 +13,7 @@ export const CusotmInputField = ({ valuesObj, value, type, name, status, title, 
                         type={type}
                         value={value}
                         placeholder={`Enter ${name}`}
-                        className="flex flex-1 w-full py-1 outline-none"
+                        className="flex flex-1 w-full py-1 outline-none text-black"
                         min={type === "date" ? new Date().toISOString().split("T")[0] : undefined}
                         onChange={(e) => setValue({ ...valuesObj, [name]: e.target.value })}
 

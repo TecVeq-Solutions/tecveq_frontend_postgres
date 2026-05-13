@@ -378,14 +378,14 @@ const ProfileDetails = ({ onclose }) => {
           <div className="flex-shrink-0 px-6 sm:px-7 py-5 bg-slate-50/80 border-t border-slate-100 flex gap-3">
             <button
               onClick={handleCancel}
-              className="flex-1 py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
+              className="flex-1 py-2 sm:py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveDetails}
               disabled={loading}
-              className={`flex-1 py-3.5 text-white rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-2 transition-all ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}`}
+              className={`flex-1 py-2 sm:py-3.5 text-white rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-all ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}`}
               style={{
                 background:
                   "linear-gradient(135deg, #0a0a1a 0%, #007EEA 100%)",

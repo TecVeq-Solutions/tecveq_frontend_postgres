@@ -198,13 +198,13 @@ const GlobalSearch = ({ desktopOnly = false, mobileOnly = false }) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex flex-col bg-white/80 backdrop-blur-xl p-4 sm:p-6"
+                        className="fixed inset-0 z-[100] flex flex-col bg-white backdrop-blur-xl p-4 sm:p-6"
                     >
                         <motion.div
                             initial={{ y: -20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -20, opacity: 0 }}
-                            className="w-full max-w-2xl mx-auto"
+                            className="w-full max-w-2xl mx-auto bg-white shadow-md"
                             ref={mobileSearchRef}
                         >
                             <div className="flex items-center gap-3 mb-6">

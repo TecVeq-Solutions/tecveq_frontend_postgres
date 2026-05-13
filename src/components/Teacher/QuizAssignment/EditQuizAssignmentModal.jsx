@@ -104,7 +104,7 @@ const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz 
   const closeModal = () => { setIsEdit(false); toggleBlur(); };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 pt-20">
       <div
         ref={modalRef}
         className="relative bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"

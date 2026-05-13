@@ -4,17 +4,17 @@ import AttendenceReportComp from '../../../components/Student/Attendence/Attende
 
 const StudentAttendenceReport = () => {
     return (
-        <div className="flex flex-col flex-1 overflow-hidden h-screen bg-[#F8F9FA]">
-            <Navbar heading="Personal Attendance Report" />
-            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-col space-y-2 mb-8">
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Attendance History</h1>
-                        <p className="text-gray-500 font-medium">Track your academic presence and consistency across all subjects</p>
+        <div className="flex flex-1 min-h-screen font-poppins px-3 sm:px-4 md:px-10" style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f9f9f9 100%)" }}>
+            <div className="flex flex-1 lg:ml-72 xl:ml-80 w-full min-h-screen pb-10 overflow-x-hidden">
+                <div className="w-full max-w-[1400px]">
+                    <div className="pt-1">
+                        <Navbar heading="Attendance Report" />
+                        <div className="mt-8 px-0 sm:px-4">
+                            <AttendenceReportComp />
+                        </div>
                     </div>
-                    <AttendenceReportComp />
                 </div>
-            </main>
+            </div>
         </div>
     );
 };

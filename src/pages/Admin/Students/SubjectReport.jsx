@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Loader from "../../../utils/Loader";
 import IMAGES from "../../../assets/images";
-import LargeLoader from "../../../utils/LargeLoader";
 import Navbar from "../../../components/Admin/Navbar";
 import Card from "../../../components/Admin/StudentReports/Card";
 import ActivityCard from "../../../components/Admin/StudentReports/ActivityCard";
@@ -130,7 +129,7 @@ const SubjectReport = () => {
   if (isPending || subjectPending) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[#F4F6FB]">
-        <LargeLoader />
+        <Loader />
       </div>
     );
   }

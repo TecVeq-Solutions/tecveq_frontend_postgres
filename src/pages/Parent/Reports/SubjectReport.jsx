@@ -41,6 +41,43 @@ const SubjectReport = () => {
 
   //console.log("query data is : ", reportQuery.data);
 
+  // Process attendance data for dynamic stats
+  const processedAttendance = React.useMemo(() => {
+    const rawData = reportQuery?.data?.attendance || [];
+    const seenDates = new Map();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    rawData.forEach(item => {
+      const itemDate = new Date(item.startTime || item.date);
+      itemDate.setHours(0, 0, 0, 0);
+      const status = item?.isPresent ? (item?.late ? "Late" : "Present") : "Absent";
+      
+      // Filter out future absent records
+      if (itemDate > today && status === 'Absent') return;
+
+      const dateKey = itemDate.toDateString();
+      const existing = seenDates.get(dateKey);
+      const isPlaceholder = (time) => {
+        if (!time) return true;
+        const d = new Date(time);
+        return d.getHours() === 5 && d.getMinutes() === 0;
+      };
+      const currentIsPlaceholder = isPlaceholder(item.startTime);
+      if (!existing || (isPlaceholder(existing.startTime) && !currentIsPlaceholder)) {
+        seenDates.set(dateKey, item);
+      }
+    });
+    return Array.from(seenDates.values());
+  }, [reportQuery?.data?.attendance]);
+
+  const attendanceStats = React.useMemo(() => {
+    const total = processedAttendance.length;
+    const present = processedAttendance.filter(item => item.isPresent).length;
+    const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+    return { total, present, percentage };
+  }, [processedAttendance]);
+
   const stats = [
     {
       type: "Assignments",
@@ -54,7 +91,7 @@ const SubjectReport = () => {
     },
     {
       type: "Attendance",
-      percentage: parseInt(reportQuery?.data?.avgAttendancePer) || 0,
+      percentage: attendanceStats.percentage,
       grade: "",
     },
   ];
@@ -105,7 +142,7 @@ const SubjectReport = () => {
               <div className="mt-7">
                 <div className="flex flex-col gap-2">
                   <p className="md:text-[20px]">
-                    Attendance <span className="text-xs">10/12 days present</span>{" "}
+                    Attendance <span className="text-xs">{attendanceStats.present}/{attendanceStats.total} days present</span>{" "}
                   </p>
                   <div className="flex flex-row items-center gap-2">
                     <AttendanceTable data={reportQuery?.data?.attendance} />

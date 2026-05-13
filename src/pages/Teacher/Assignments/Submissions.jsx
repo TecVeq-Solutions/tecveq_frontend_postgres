@@ -12,7 +12,7 @@ import { useUser } from "../../../context/UserContext";
 import { useBlur } from "../../../context/BlurContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { getMultipleAssignmentsForGrading, checkAssignmentPlagiarism } from "../../../api/Teacher/Assignments";
+import { getMultipleAssignmentsForGrading, checkAssignmentPlagiarism, checkSingleAssignmentSubmission } from "../../../api/Teacher/Assignments";
 import ProfileDetails from "../../../components/Teacher/ProfileDetails";
 import PlagiarismReportModal from "../../../components/Teacher/QuizAssignment/PlagiarismReportModal";
 import { LuBrainCircuit } from "react-icons/lu";
@@ -54,13 +54,62 @@ const Submissions = () => {
   });
 
   const handleGlobalPlagiarismCheck = async () => {
+    const assignmentId = location.state?.id;
+    if (!assignmentId) {
+      toast.error("Assignment ID not found. Please refresh and try again.");
+      return;
+    }
+
+    if (submittedCount === 0) {
+      toast.info("No student submissions found to analyze yet.");
+      return;
+    }
+
     setIsGlobalAnalyzing(true);
+    const toastId = toast.loading(
+      submittedCount === 1
+        ? "Analyzing submission for AI & Web plagiarism..."
+        : "Analyzing class-wide plagiarism... This may take a moment."
+    );
+
     try {
-      const response = await checkAssignmentPlagiarism(location.state.id);
-      if (response) { setGlobalReportData(response); setIsGlobalModalOpen(true); }
-      else { toast.error("Failed to run global plagiarism scan."); }
-    } catch (error) { console.error("Global analysis error:", error); }
-    finally { setIsGlobalAnalyzing(false); }
+      let response;
+      if (submittedCount === 1) {
+        // Smart fallback: Check the single student individually
+        const singleSub = data?.submissions?.find(s => s.submission?.file);
+        if (singleSub?.studentID?.id) {
+          response = await checkSingleAssignmentSubmission(assignmentId, singleSub.studentID.id);
+        } else {
+          throw new Error("Could not identify the submitted student.");
+        }
+      } else {
+        // Normal Global Check: Class-wide comparison
+        response = await checkAssignmentPlagiarism(assignmentId);
+      }
+
+      if (response) {
+        setGlobalReportData(response);
+        setIsGlobalModalOpen(true);
+        toast.update(toastId, {
+          render: submittedCount === 1 ? "Individual analysis complete!" : "Global analysis complete!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000
+        });
+      } else {
+        toast.update(toastId, { render: "No analysis data returned from server.", type: "warning", isLoading: false, autoClose: 3000 });
+      }
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.update(toastId, {
+        render: error?.response?.data?.message || "Failed to run plagiarism scan.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000
+      });
+    } finally {
+      setIsGlobalAnalyzing(false);
+    }
   };
 
   const handleDownloadAll = () => {
@@ -83,8 +132,8 @@ const Submissions = () => {
     }
   };
 
-  const submittedCount = data?.submissions?.filter(s => s.submission)?.length || 0;
-  const totalCount = data?.submissions?.length || 0;
+  const submittedCount = data?.submissions?.filter(s => s.submission?.file)?.length || 0;
+  const totalCount = location.state?.classroomID?.students?.length || data?.submissions?.length || 0;
   const progressPercent = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0;
 
   if (isPending || isRefetching) return <div className="flex flex-1"><Loader /></div>;
@@ -101,7 +150,7 @@ const Submissions = () => {
             {/* ══════════════════════════════════════
                 TOP BAR
             ══════════════════════════════════════ */}
-            <div className="sticky top-0 z-[30] mb-4 sm:mb-8 px-3 sm:px-4 sm:px-6 py-3 sm:py-4 bg-white/88 backdrop-blur-[20px] border-b border-[#6366F1]/12 shadow-[0_2px_32px_rgba(15,20,60,0.07)]">
+            <div className="sticky top-0 z-[30] mb-4 sm:mb-8 px-3 sm:px-4 sm:px-6 py-3 sm:py-4 bg-white/88  backdrop-blur-[20px] border-b border-[#6366F1]/12 shadow-[0_2px_32px_rgba(15,20,60,0.07)] ">
 
               {/* Rainbow accent line */}
               <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-[linear-gradient(90deg,#6366F1_0%,#8B5CF6_40%,#EC4899_80%,#F59E0B_100%)]" />
@@ -141,7 +190,7 @@ const Submissions = () => {
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                   <button
                     onClick={togglebell}
-                    className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
+                    className="hidden relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
                   >
                     <img src={IMAGES.Notification} alt="" className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] block" />
                     <span className="absolute top-1 right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#EF4444] rounded-full border border-white" />
@@ -194,7 +243,7 @@ const Submissions = () => {
                     </div>
                   </div>
                   <div className="flex sm:flex-col items-center sm:items-start gap-1">
-                    <div className="text-[26px] sm:text-[30px] font-bold text-white leading-none font-['Syne',sans-serif]">
+                    <div className="text-[26px] sm:text-[30px]  text-white leading-none font-['Syne',sans-serif]">
                       {totalCount}
                     </div>
                     <div className="text-[12px] sm:text-[13px] text-white/70 font-medium sm:mt-1">Students enrolled</div>
@@ -218,7 +267,7 @@ const Submissions = () => {
                     </div>
                   </div>
                   <div className="flex sm:flex-col items-center sm:items-start gap-1 w-full">
-                    <div className="text-[26px] sm:text-[36px] font-bold text-white leading-none font-['Syne',sans-serif]">
+                    <div className="text-[26px] sm:text-[36px]  text-white leading-none font-['Syne',sans-serif]">
                       {submittedCount}
                     </div>
                     <div className="text-[12px] sm:text-[13px] text-white/70 font-medium sm:mt-1 sm:mb-2">{progressPercent}% completion</div>
@@ -248,7 +297,7 @@ const Submissions = () => {
                     </div>
                   </div>
                   <div className="flex sm:flex-col items-center sm:items-start gap-1">
-                    <div className="text-[26px] sm:text-[36px] font-bold text-white leading-none font-['Syne',sans-serif]">
+                    <div className=" zero0 text-[26px] sm:text-[36px]  text-white leading-none font-['Syne',sans-serif]">
                       {totalCount - submittedCount}
                     </div>
                     <div className="text-[12px] sm:text-[13px] text-white/70 font-medium sm:mt-1">Awaiting submission</div>

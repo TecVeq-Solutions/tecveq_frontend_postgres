@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     IoChevronBack,
     IoChevronForward,
-    IoTimeOutline,
     IoPersonOutline,
     IoFilterOutline,
     IoCalendarOutline,
@@ -13,23 +12,16 @@ import {
 } from 'react-icons/io5';
 import ViewEventDetailsModal from './ViewEventDetailsModal';
 import FilterClassesModal from './FilterClassesModal';
-import { formatTimeInPKT } from "../../../utils/timeUtils";
+import { formatTimeInPKT } from '../../../utils/timeUtils';
 
-/* ─── Unique color palette per subject index ─── */
+/* ─── Admin timetable same palette/style ─── */
 const CLASS_PALETTES = [
     {
-        grad: 'from-rose-500 to-pink-600',
-        soft: 'bg-rose-50',
-        text: 'text-rose-700',
-        border: 'border-rose-200',
-        shadow: 'shadow-rose-500/20'
-    },
-    {
-        grad: 'from-violet-500 to-purple-600',
-        soft: 'bg-violet-50',
-        text: 'text-violet-700',
-        border: 'border-violet-200',
-        shadow: 'shadow-violet-500/20'
+        grad: 'from-[#0B1053] to-[#1e267e]',
+        soft: 'bg-blue-50',
+        text: 'text-[#0B1053]',
+        border: 'border-blue-200',
+        shadow: 'shadow-blue-500/20'
     },
     {
         grad: 'from-sky-500 to-blue-600',
@@ -37,46 +29,34 @@ const CLASS_PALETTES = [
         text: 'text-sky-700',
         border: 'border-sky-200',
         shadow: 'shadow-sky-500/20'
-    },
-    {
-        grad: 'from-amber-500 to-orange-500',
-        soft: 'bg-amber-50',
-        text: 'text-amber-700',
-        border: 'border-amber-200',
-        shadow: 'shadow-amber-500/20'
-    },
-    {
-        grad: 'from-emerald-500 to-teal-600',
-        soft: 'bg-emerald-50',
-        text: 'text-emerald-700',
-        border: 'border-emerald-200',
-        shadow: 'shadow-emerald-500/20'
-    },
-    {
-        grad: 'from-fuchsia-500 to-pink-600',
-        soft: 'bg-fuchsia-50',
-        text: 'text-fuchsia-700',
-        border: 'border-fuchsia-200',
-        shadow: 'shadow-fuchsia-500/20'
-    },
+    }
 ];
 
 const getPalette = (idx) => CLASS_PALETTES[idx % CLASS_PALETTES.length];
 
-/* ─── Skeleton Card ─── */
+const IconButton = ({ children, onClick, className = '', label }) => (
+    <motion.button
+        type="button"
+        aria-label={label}
+        whileTap={{ scale: 0.9 }}
+        onClick={onClick}
+        className={`grid place-items-center rounded-2xl bg-white/85 text-slate-500 shadow-sm shadow-blue-100/70 ring-1 ring-blue-100/80 backdrop-blur-xl transition-all duration-200 hover:bg-white hover:text-[#0B1053] hover:shadow-md ${className}`}
+    >
+        {children}
+    </motion.button>
+);
+
 const SkeletonCard = () => (
-    <div className="flex gap-3 mb-4">
-        <div className="w-16 shrink-0 flex flex-col items-center gap-2">
-            <div className="w-11 h-11 rounded-2xl bg-slate-100 animate-pulse" />
-            <div className="w-10 h-9 rounded-lg bg-slate-50 animate-pulse" />
+    <div className="relative flex gap-3 overflow-hidden rounded-[30px] border border-white/70 bg-white/70 p-3 shadow-sm shadow-blue-100/60 backdrop-blur-xl">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-100 via-sky-100 to-indigo-100" />
+        <div className="flex w-14 shrink-0 flex-col items-center gap-2">
+            <div className="h-11 w-11 animate-pulse rounded-2xl bg-blue-50" />
+            <div className="h-9 w-10 animate-pulse rounded-xl bg-slate-50" />
         </div>
-        <div className="flex-1 rounded-[24px] bg-white border border-slate-100 overflow-hidden shadow-sm">
-            <div className="h-[3px] bg-slate-50" />
-            <div className="p-4 flex flex-col gap-2.5">
-                <div className="w-14 h-4 rounded-lg bg-slate-50 animate-pulse" />
-                <div className="w-4/5 h-3.5 rounded-md bg-slate-50 animate-pulse" />
-                <div className="w-1/2 h-3 rounded-md bg-slate-50 animate-pulse" />
-            </div>
+        <div className="flex flex-1 flex-col gap-3 py-1">
+            <div className="h-4 w-20 animate-pulse rounded-full bg-blue-50" />
+            <div className="h-4 w-4/5 animate-pulse rounded-full bg-slate-50" />
+            <div className="h-3 w-1/2 animate-pulse rounded-full bg-slate-50" />
         </div>
     </div>
 );
@@ -91,28 +71,28 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
 
     const filteredEvents = useMemo(() => {
         if (!data) return [];
-        return data.filter(event =>
-            moment(event.startTime).isSame(selectedDate, 'day')
-        ).sort((a, b) => moment(a.startTime).diff(moment(b.startTime)));
+        return data
+            .filter((event) => moment(event.startTime).isSame(selectedDate, 'day'))
+            .sort((a, b) => moment(a.startTime).diff(moment(b.startTime)));
     }, [data, selectedDate]);
 
     const weekDays = useMemo(() => {
-        const days = [];
         const start = currentWeekStart.clone();
-        for (let i = 0; i < 7; i++) {
-            days.push(start.clone().add(i, 'days'));
-        }
-        return days;
+        return Array.from({ length: 7 }, (_, i) => start.clone().add(i, 'days'));
     }, [currentWeekStart]);
+
+    const selectedDateLabel = selectedDate.isSame(moment(), 'day')
+        ? "Today's Classes"
+        : selectedDate.format('dddd, D MMM');
 
     const handleNextWeek = () => {
         setDirection(1);
-        setCurrentWeekStart(prev => prev.clone().add(1, 'week'));
+        setCurrentWeekStart((prev) => prev.clone().add(1, 'week'));
     };
 
     const handlePrevWeek = () => {
         setDirection(-1);
-        setCurrentWeekStart(prev => prev.clone().subtract(1, 'week'));
+        setCurrentWeekStart((prev) => prev.clone().subtract(1, 'week'));
     };
 
     const handleEventClick = (event) => {
@@ -121,258 +101,344 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
     };
 
     useEffect(() => {
-        if (!selectedDate.isBetween(currentWeekStart.clone().subtract(1, 'day'), currentWeekStart.clone().add(7, 'days'))) {
+        const isInsideWeek = selectedDate.isBetween(
+            currentWeekStart.clone().subtract(1, 'day'),
+            currentWeekStart.clone().add(7, 'days')
+        );
+
+        if (!isInsideWeek) {
             setSelectedDate(currentWeekStart.clone());
         }
-    }, [currentWeekStart]);
+    }, [currentWeekStart, selectedDate]);
 
     return (
-        <div className="flex flex-col w-full min-h-screen pt-4 pb-10 bg-gradient-to-br from-[#f8f7ff] via-[#f0f4ff] to-[#faf5ff] font-['DM_Sans','Helvetica_Neue',sans-serif]">
-            {/* HEADER */}
-            <header className="sticky top-0 z-10 px-3 sm:px-5 pb-4 bg-[#f8f7ff]/80 backdrop-blur-xl border-b border-indigo-500/5">
-                <div className="flex items-center justify-between mb-5">
-                    <div className="flex flex-col">
-                        <h1 className="text-[20px] font-black text-slate-900 tracking-tight leading-none">
-                            My Time Table
-                        </h1>
-                        <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-[0.1em]">
-                            View your weekly schedule
-                        </p>
+        <div className="relative flex min-h-screen w-full min-w-[320px] flex-col overflow-x-hidden bg-gradient-to-br from-[#f0f4ff] via-[#eef4ff] to-[#f0f9ff] pb-10 font-['DM_Sans','Helvetica_Neue',sans-serif] selection:bg-blue-100">
+            <div className="pointer-events-none fixed -left-28 top-20 h-72 w-72 rounded-full bg-blue-400/25 blur-3xl" />
+            <div className="pointer-events-none fixed -right-32 top-52 h-80 w-80 rounded-full bg-sky-300/25 blur-3xl" />
+            <div className="pointer-events-none fixed bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-200/30 blur-3xl" />
+
+            {/* ══════════════════════════════ HEADER ══════════════════════════════ */}
+            <header className="sticky top-2 sm:top-16 z-10 border-b border-white/70 bg-slate-50/90 px-2 pt-4 pb-3 shadow-sm shadow-blue-100/60 backdrop-blur-3xl min-[375px]:px-1 sm:top-20 sm:px-5">
+                <div className="relative overflow-hidden rounded-[28px] border border-white/80 bg-[#0B1053] p-1 shadow-2xl shadow-[#0B1053]/35 ring-1 ring-blue-100/50 backdrop-blur-2xl min-[375px]:rounded-[34px] min-[375px]:p-3 sm:p-2">
+                    <div className="pointer-events-none absolute -right-16 -top-20 h-40 w-40 rounded-full bg-blue-400/20 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-16 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl" />
+                    <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent" />
+
+                    <div className="relative mb-3 rounded-[24px] border border-blue-100/80 bg-gradient-to-br from-white/95 via-blue-50/95 to-sky-50/85 p-2.5 shadow-lg shadow-blue-100/60 min-[375px]:mb-4 min-[375px]:rounded-[28px] min-[375px]:p-3">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-blue-200/70 bg-[#0B1053] 
+ px-2.5 py-1.5 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-sm shadow-blue-100/80 min-[375px]:px-3 min-[375px]:text-[9px]">
+                                    <IoSparklesOutline size={13} />
+                                    Student Mobview
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-[16px] bg-[#0B1053] text-white shadow-xl shadow-[#0B1053]/30 ring-1 ring-white/40 min-[375px]:h-11 min-[375px]:w-11 min-[375px]:rounded-[18px]">
+                                        <IoCalendarOutline size={21} />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h1 className="truncate text-[19px] font-black leading-none tracking-[-0.05em] text-slate-950 min-[375px]:text-[22px] sm:text-[27px]">
+                                            My Time Table
+                                        </h1>
+                                        <p className="mt-1 truncate text-[8.5px] font-black uppercase tracking-[0.12em] text-slate-400 min-[375px]:text-[10px] min-[375px]:tracking-[0.16em]">
+                                            {currentWeekStart.format('D MMM')} - {currentWeekStart.clone().add(6, 'days').format('D MMM, YYYY')}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="shrink-0 rounded-2xl border border-blue-100 bg-white/80 px-2.5 py-2 text-center shadow-sm shadow-blue-100/70 min-[375px]:px-3">
+                                <div className="text-[17px] font-black leading-none tracking-[-0.04em]  text-[#0B1053]">
+                                    {filteredEvents.length}
+                                </div>
+                                <div className="mt-1 text-[8px] font-black uppercase tracking-[0.15em] text-slate-400">
+                                    Classes
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 gap-1.5 min-[375px]:mt-4 min-[375px]:gap-2">
+                            <motion.button
+                                type="button"
+                                whileTap={{ scale: 0.94 }}
+                                onClick={() => setFilterModalOpen(true)}
+                                className="flex h-10 items-center justify-center gap-1 rounded-2xl border border-blue-200 bg-white/90 px-1.5 text-[9px] font-black uppercase tracking-[0.08em] text-[#0B1053] shadow-sm shadow-blue-100/80 transition-all duration-200 hover:bg-blue-50 min-[375px]:h-11 min-[375px]:gap-1.5 min-[375px]:px-2 min-[375px]:text-[10px]"
+                            >
+                                <IoFilterOutline size={16} />
+                                Filter Classes
+                            </motion.button>
+                        </div>
+                    </div>
+
+                    <div className="relative mb-3 overflow-hidden rounded-[24px] border border-blue-100/80 bg-white/80 p-1.5 shadow-inner shadow-blue-50 min-[375px]:mb-4 min-[375px]:rounded-[28px] min-[375px]:p-2">
+                        <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-blue-200 to-transparent" />
+                        <div className="flex items-center justify-between gap-3">
+                            <IconButton
+                                label="Previous week"
+                                onClick={handlePrevWeek}
+                                className="h-10 w-10 shrink-0 rounded-[16px] min-[375px]:h-11 min-[375px]:w-11 min-[375px]:rounded-[18px]"
+                            >
+                                <IoChevronBack size={21} />
+                            </IconButton>
+
+                            <div className="min-w-0 flex-1 text-center">
+                                <div className="mx-auto mb-1 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.16em] text-[#0B1053] 
+ ring-1 ring-blue-100">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-[#0B1053] " />
+                                    Selected Day
+                                </div>
+                                <h2 className="truncate text-[15px] font-black tracking-[-0.04em] text-slate-950 min-[375px]:text-[17px]">
+                                    {selectedDate.format('D MMM, YYYY')}
+                                </h2>
+                                <p className="mt-0.5 text-[9px] font-bold text-slate-400">
+                                    {selectedDate.format('dddd')} schedule overview
+                                </p>
+                            </div>
+
+                            <IconButton
+                                label="Next week"
+                                onClick={handleNextWeek}
+                                className="h-10 w-10 shrink-0 rounded-[16px] min-[375px]:h-11 min-[375px]:w-11 min-[375px]:rounded-[18px]"
+                            >
+                                <IoChevronForward size={21} />
+                            </IconButton>
+                        </div>
+                    </div>
+
+                    {/* ─── Date Picker ─── */}
+                    <div className="relative overflow-hidden rounded-[24px] border border-blue-100/70 bg-gradient-to-r from-indigo-50/80 via-white/90 to-sky-50/80 p-1 shadow-sm shadow-blue-100/60 min-[375px]:rounded-[28px] min-[375px]:p-1.5">
+                        <AnimatePresence mode="wait" custom={direction}>
+                            <motion.div
+                                key={currentWeekStart.format('YYYY-WW')}
+                                custom={direction}
+                                variants={{
+                                    enter: (d) => ({ x: d > 0 ? '45%' : '-45%', opacity: 0 }),
+                                    center: { x: 0, opacity: 1 },
+                                    exit: (d) => ({ x: d < 0 ? '45%' : '-45%', opacity: 0 })
+                                }}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ type: 'spring', damping: 25, stiffness: 230 }}
+                                className="flex gap-1 min-[375px]:gap-1.5"
+                            >
+                                {weekDays.map((date, idx) => {
+                                    const isSelected = date.isSame(selectedDate, 'day');
+                                    const isToday = date.isSame(moment(), 'day');
+
+                                    return (
+                                        <motion.button
+                                            type="button"
+                                            key={idx}
+                                            whileTap={{ scale: 0.94 }}
+                                            onClick={() => setSelectedDate(date)}
+                                            className={`relative flex h-[64px] min-w-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-[17px] outline-none transition-all duration-300 min-[375px]:h-[74px] min-[375px]:rounded-[21px] ${isSelected
+                                                ? 'bg-[#0B1053] text-white shadow-xl shadow-[#0B1053]/35 ring-1 ring-white/40'
+                                                : isToday
+                                                    ? 'border border-blue-200 bg-white text-[#0B1053] shadow-sm shadow-blue-100/80'
+                                                    : 'border border-white/80 bg-white/70 text-slate-500 shadow-sm shadow-blue-50/70 hover:bg-white'
+                                                }`}
+                                        >
+                                            {isSelected && (
+                                                <>
+                                                    <div className="absolute -right-5 -top-5 h-14 w-14 rounded-full bg-white/20 blur-sm" />
+                                                    <div className="absolute -bottom-6 left-1/2 h-12 w-12 -translate-x-1/2 rounded-full bg-white/10" />
+                                                </>
+                                            )}
+                                            <span className={`text-[8.5px] font-black uppercase tracking-[0.10em] min-[375px]:text-[10px] min-[375px]:tracking-[0.16em] ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
+                                                {date.format('ddd')}
+                                            </span>
+                                            <span className="mt-1 text-[17px] font-black leading-none tracking-[-0.05em] min-[375px]:text-[20px]">
+                                                {date.format('D')}
+                                            </span>
+                                            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-white' : isToday ? 'bg-[#0B1053]' : 'bg-transparent'}`} />
+                                        </motion.button>
+                                    );
+                                })}
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 </div>
+            </header>
 
-                {/* Week Navigation */}
-                <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-1">
-                        <motion.button
-                            whileTap={{ scale: 0.8 }}
-                            onClick={handlePrevWeek}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 bg-white shadow-sm border border-slate-100"
-                        >
-                            <IoChevronBack size={20} />
-                        </motion.button>
-                        <div className="text-center min-w-[120px]">
-                            <h2 className="text-[15px] font-black text-slate-900 tracking-tight leading-none">
-                                {selectedDate.format('D MMM, YYYY')}
-                            </h2>
-                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.12em] mt-1">
-                                Week of {currentWeekStart.format('D MMM')}
-                            </p>
+            {/* ══════════════════════════════ MAIN CONTENT ══════════════════════════════ */}
+            <main className="relative z-10 mt-3 flex-1 px-2 sm:px-3">
+                <div className="mb-3 flex items-center justify-between gap-1.5 px-0.5 min-[375px]:gap-2 min-[375px]:px-1.5">
+                    <div className="min-w-0">
+                        <div className="mb-1 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.22em] text-[#0B1053]">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#0B1053] " />
+                            Timeline
                         </div>
-                        <motion.button
-                            whileTap={{ scale: 0.8 }}
-                            onClick={handleNextWeek}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 bg-white shadow-sm border border-slate-100"
-                        >
-                            <IoChevronForward size={20} />
-                        </motion.button>
+                        <h3 className="truncate text-[16px] font-black leading-none tracking-[-0.04em] text-slate-950 min-[375px]:text-[18px] sm:text-[21px]">
+                            {selectedDateLabel}
+                        </h3>
                     </div>
+
                     <motion.button
-                        whileTap={{ scale: 0.95 }}
+                        type="button"
+                        whileTap={{ scale: 0.94 }}
                         onClick={() => setFilterModalOpen(true)}
-                        className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold shadow-sm"
+                        className="flex shrink-0 items-center gap-1 rounded-2xl border border-blue-200 bg-white/90 px-2.5 py-2 text-[9.5px] font-black text-[#0B1053] shadow-sm shadow-blue-100/70 transition-all duration-200 hover:bg-blue-50 hover:shadow-md min-[375px]:gap-1.5 min-[375px]:px-3.5 min-[375px]:py-2.5 min-[375px]:text-[11px]"
                     >
                         <IoFilterOutline size={15} />
                         Filter
                     </motion.button>
                 </div>
 
-                {/* Date Picker */}
-                <div className="relative overflow-hidden">
+                {isPending ? (
+                    <div className="flex flex-col gap-2.5 px-0.5 min-[375px]:gap-3 min-[375px]:px-1.5">
+                        {[1, 2, 3].map((i) => (
+                            <SkeletonCard key={i} />
+                        ))}
+                    </div>
+                ) : filteredEvents.length > 0 ? (
                     <AnimatePresence mode="wait" custom={direction}>
                         <motion.div
-                            key={currentWeekStart.format('YYYY-WW')}
+                            key={selectedDate.format('YYYY-MM-DD')}
                             custom={direction}
                             variants={{
-                                enter: (d) => ({ x: d > 0 ? '50%' : '-50%', opacity: 0 }),
+                                enter: (d) => ({ x: d > 0 ? 42 : -42, opacity: 0 }),
                                 center: { x: 0, opacity: 1 },
-                                exit: (d) => ({ x: d < 0 ? '50%' : '-50%', opacity: 0 })
+                                exit: (d) => ({ x: d < 0 ? 42 : -42, opacity: 0 })
                             }}
                             initial="enter"
                             animate="center"
                             exit="exit"
-                            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                            className="flex gap-1.5 py-1"
+                            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                            className="pb-12"
                         >
-                            {weekDays.map((date, idx) => {
-                                const isSelected = date.isSame(selectedDate, 'day');
-                                const isToday = date.isSame(moment(), 'day');
-
-                                return (
-                                    <motion.button
-                                        key={idx}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => setSelectedDate(date)}
-                                        className={`flex-1 flex flex-col items-center justify-center h-16 rounded-[14px] transition-all duration-300 relative overflow-hidden outline-none ${isSelected
-                                            ? 'bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 text-white shadow-lg shadow-indigo-500/30 scale-105 z-10'
-                                            : isToday
-                                                ? 'bg-indigo-50 border border-indigo-200 text-indigo-600'
-                                                : 'bg-white border border-slate-100 text-slate-500 shadow-sm'
-                                            }`}
-                                    >
-                                        <span className={`text-[10px] font-black uppercase tracking-[0.1em] mb-1 leading-none ${isSelected ? 'opacity-100' : 'opacity-60'}`}>
-                                            {date.format('ddd')}
+                            <div className="mb-2 mt-8 flex items-center justify-between rounded-[14px] border border-blue-200 bg-gradient-to-r from-blue-50/90 via-white/90 to-sky-50/80 px-2.5 py-2.5 shadow-sm shadow-blue-100/70 sm:rounded-[18px] sm:px-4">
+                                <div className="flex min-w-0 items-center gap-3">
+                                    <div className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-xl bg-blue-100 text-[#0B1053] ring-1 ring-blue-200/80 min-[375px]:h-[42px] min-[375px]:w-[42px]">
+                                        <span className="text-[8px] font-black uppercase leading-none tracking-[0.12em]">
+                                            {selectedDate.format('ddd')}
                                         </span>
-                                        <span className="text-[18px] font-black tracking-tighter leading-none">
-                                            {date.format('D')}
+                                        <span className="text-[18px] font-black leading-none tracking-[-0.04em]">
+                                            {selectedDate.format('DD')}
                                         </span>
-                                        {(isSelected || isToday) && (
-                                            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${isSelected ? 'bg-white' : 'bg-indigo-500'}`} />
-                                        )}
-                                    </motion.button>
-                                );
-                            })}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </header>
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h4 className="truncate text-[12px] font-black leading-tight text-slate-900 min-[375px]:text-[13px] sm:text-[15px]">
+                                            {selectedDate.format('dddd')}
+                                        </h4>
+                                        <p className="mt-0.5 text-[9px] font-bold text-blue-500 min-[375px]:text-[10px]">
+                                            {selectedDate.format('MMMM DD, YYYY')}
+                                        </p>
+                                    </div>
+                                </div>
 
-            {/* MAIN CONTENT */}
-            <main className="px-3 sm:px-5 mt-6 flex-1">
-                <div className="flex items-end justify-between mb-5">
-                    <div>
-                        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-1">
-                            Timeline
-                        </div>
-                        <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none">
-                            {selectedDate.isSame(moment(), 'day') ? "Today's Classes" : selectedDate.format("dddd, D MMM")}
-                        </h3>
-                    </div>
-                    {filteredEvents.length > 0 && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 shadow-sm">
-                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-indigo-700 uppercase tracking-wider">
-                                {filteredEvents.length} {filteredEvents.length === 1 ? 'Class' : 'Classes'}
-                            </span>
-                        </div>
-                    )}
-                </div>
+                                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-100 px-2.5 py-1.5 text-[9px] font-black text-[#0B1053] shadow-sm shadow-blue-100 min-[375px]:px-3 min-[375px]:text-[10px]">
+                                    {filteredEvents.length} {filteredEvents.length === 1 ? 'class' : 'classes'}
+                                </span>
+                            </div>
 
-                {isPending ? (
-                    <div className="flex flex-col gap-3">
-                        {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
-                    </div>
-                ) : filteredEvents.length > 0 ? (
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={selectedDate.format('YYYY-MM-DD')}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="pb-20"
-                        >
-                            {filteredEvents.map((event, idx) => {
-                                const palette = getPalette(idx);
-                                const isLast = idx === filteredEvents.length - 1;
-                                return (
-                                    <React.Fragment key={event.id}>
+                            <div className="space-y-2">
+                                {filteredEvents.map((event, idx) => {
+                                    const palette = getPalette(idx);
+
+                                    return (
                                         <motion.div
-                                            whileTap={{ scale: 0.98 }}
+                                            key={event.id || `${event.startTime}-${idx}`}
+                                            whileTap={{ scale: 0.992 }}
                                             onClick={() => handleEventClick(event)}
-                                            className="flex gap-1 sm:gap-3 cursor-pointer mb-2"
+                                            className="group relative flex min-h-[86px] cursor-pointer overflow-hidden rounded-[14px] border border-slate-200/90 bg-white shadow-sm shadow-slate-100 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md hover:shadow-blue-100/70 sm:min-h-[96px] sm:rounded-[18px]"
                                         >
-                                            {/* Time Column */}
-                                            <div className="flex flex-col items-center shrink-0 w-12">
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${palette.grad} shadow-md ${palette.shadow}`}>
-                                                    <IoTimeOutline size={18} className="text-white" />
-                                                </div>
-                                                <div className="mt-2 flex flex-col items-center">
-                                                    <span className="text-[11px] font-black text-slate-800 leading-none">
-                                                        {formatTimeInPKT(event.startTime, "h:mm")}
-                                                    </span>
-                                                    <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5 mb-1">
-                                                        {formatTimeInPKT(event.startTime, "A")}
-                                                    </span>
-                                                    
-                                                    <span className="text-[7px] font-bold text-slate-300 uppercase tracking-widest mb-1">
-                                                        TO
-                                                    </span>
-                                                    
-                                                    <span className="text-[11px] font-black text-slate-800 leading-none">
-                                                        {formatTimeInPKT(event.endTime, "h:mm")}
-                                                    </span>
-                                                    <span className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">
-                                                        {formatTimeInPKT(event.endTime, "A")}
-                                                    </span>
-                                                </div>
+                                            <div className={`w-1.5 shrink-0 bg-gradient-to-b ${palette.grad}`} />
+
+                                            <div className={`${palette.soft} flex w-[56px] shrink-0 flex-col items-center justify-center border-r border-slate-100 px-1 text-center min-[375px]:w-[74px] sm:w-[82px]`}>
+                                                <span className={`text-[12px] font-black leading-none ${palette.text}`}>
+                                                    {formatTimeInPKT(event.startTime, 'hh:mm')}
+                                                </span>
+                                                <span className={`mt-0.5 text-[8px] font-black uppercase leading-none ${palette.text} opacity-80`}>
+                                                    {formatTimeInPKT(event.startTime, 'A')}
+                                                </span>
+                                                <IoChevronForward size={13} className="my-1 rotate-90 text-slate-300" />
+                                                <span className="text-[12px] font-black leading-none text-slate-600">
+                                                    {formatTimeInPKT(event.endTime, 'hh:mm')}
+                                                </span>
+                                                <span className="mt-0.5 text-[8px] font-black uppercase leading-none text-slate-400">
+                                                    {formatTimeInPKT(event.endTime, 'A')}
+                                                </span>
                                             </div>
 
-                                            {/* Event Card */}
-                                            <div className="flex-1 rounded-[22px] bg-white border border-slate-100 shadow-sm overflow-hidden mb-1">
-                                                <div className={`h-[3px] w-full bg-gradient-to-r ${palette.grad}`} />
-                                                <div className="p-4">
-                                                    <div className="flex flex-wrap gap-1.5 mb-2.5">
-                                                        <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg ${palette.soft} ${palette.text} border ${palette.border}`}>
-                                                            {event.subject?.name || "Subject"}
+                                            <div className="flex min-w-0 flex-1 items-center justify-between gap-1 px-2.5 py-3 min-[375px]:gap-3 min-[375px]:px-3 sm:gap-2 sm:px-4">
+                                                <div className="min-w-0 flex-1">
+                                                    <h4 className="truncate text-[13px] font-black tracking-[-0.02em] text-slate-950 min-[375px]:text-[14px] sm:text-[16px]">
+                                                        {event.title || 'Untitled Session'}
+                                                    </h4>
+
+                                                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                                        <span className={`inline-flex max-w-[112px] items-center gap-1 truncate rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] min-[375px]:max-w-[150px] ${palette.soft} ${palette.text} ${palette.border}`}>
+                                                            {event.subject?.name || 'Subject'}
                                                         </span>
                                                         {event.meetingUrl && (
-                                                            <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                                Live
+                                                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-emerald-600">
+                                                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                                                                Live Class
                                                             </span>
                                                         )}
                                                     </div>
 
-                                                    <div className="text-[15px] font-black text-slate-900 mb-3 tracking-tight leading-snug">
-                                                        {event.title || "Untitled Session"}
+                                                    <div className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-slate-400 sm:hidden">
+                                                        <IoCalendarOutline size={12} />
+                                                        <span className="truncate">{event.classroom?.name || 'N/A'}</span>
                                                     </div>
+                                                </div>
 
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center">
-                                                                    <IoPersonOutline size={12} className="text-slate-400" />
-                                                                </div>
-                                                                <span className="text-[10px] font-bold text-slate-500">
-                                                                    {event.teacher?.name || "N/A"}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center">
-                                                                    <IoCalendarOutline size={12} className="text-slate-400" />
-                                                                </div>
-                                                                <span className="text-[10px] font-bold text-slate-500">
-                                                                    {event.classroom?.name || "N/A"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                <div className="hidden h-16 w-px shrink-0 bg-slate-200 sm:block" />
+
+                                                <div className="flex w-[56px] shrink-0 flex-col items-center justify-center text-center min-[375px]:w-[74px] sm:w-[86px]">
+                                                    <div className={`mb-1 grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br ${palette.grad} text-[11px] font-black uppercase text-white shadow-lg ${palette.shadow}`}>
+                                                        {(event.teacher?.name || 'U').charAt(0)}
                                                     </div>
+                                                    <div className="flex items-center gap-1 text-slate-400">
+                                                        <IoPersonOutline size={10} />
+                                                        <p className="max-w-[54px] truncate text-[10px] font-black leading-tight text-slate-700 min-[375px]:max-w-[76px] min-[375px]:text-[11px]">
+                                                            {event.teacher?.name || 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                    <p className="mt-0.5 text-[9px] font-bold text-slate-400">
+                                                        Teacher
+                                                    </p>
                                                 </div>
                                             </div>
                                         </motion.div>
-                                        {!isLast && (
-                                            <div className="flex gap-3 h-4 mb-2">
-                                                <div className="w-12 flex justify-center">
-                                                    <div className="w-px h-full bg-slate-200" />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </motion.div>
                     </AnimatePresence>
                 ) : (
-                    /* Empty State */
-                    <div className="flex flex-col items-center justify-center pt-20 pb-20 px-6 text-center">
-                        <div className="relative mb-6">
-                            <div className="w-24 h-24 rounded-[30px] bg-indigo-50 flex items-center justify-center">
-                                <IoCalendarOutline size={40} className="text-indigo-500/40" />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ duration: 0.35 }}
+                        className="mx-auto flex max-w-sm flex-col items-center justify-center rounded-[40px] border border-white/80 bg-white/70 px-6 pt-14 pb-12 text-center shadow-xl shadow-blue-100/70 backdrop-blur-xl"
+                    >
+                        <div className="relative mb-7">
+                            <div className="grid h-[128px] w-[128px] place-items-center rounded-[42px] bg-gradient-to-br from-blue-100 via-sky-100 to-indigo-100 shadow-xl shadow-[#0B1053]/10 ring-1 ring-white/80">
+                                <IoCalendarOutline size={54} className="text-[#0B1053]/70" />
                             </div>
-                            <div className="absolute -top-1 -right-1 w-8 h-8 rounded-xl bg-white shadow-lg flex items-center justify-center">
-                                <IoRocketOutline size={16} className="text-indigo-500" />
+                            <div className="absolute -right-3 -top-3 grid h-11 w-11 animate-bounce place-items-center rounded-2xl border border-white bg-white shadow-lg shadow-blue-100">
+                                <IoRocketOutline size={19} className="text-[#0B1053]" />
+                            </div>
+                            <div className="absolute -bottom-3 -left-3 grid h-10 w-10 place-items-center rounded-2xl border border-white bg-white shadow-lg shadow-blue-100">
+                                <IoSparklesOutline size={16} className="text-blue-500" />
                             </div>
                         </div>
-                        <h5 className="text-[20px] font-black text-slate-900 mb-2">No Classes Today</h5>
-                        <p className="text-slate-400 text-[13px] max-w-[200px] font-medium mx-auto">
+
+                        <h5 className="mb-2 text-[24px] font-black tracking-[-0.05em] text-slate-950">
+                            No Classes Today
+                        </h5>
+                        <p className="mx-auto max-w-[230px] text-[13px] font-semibold leading-relaxed text-slate-400">
                             It looks like you have a free day! Enjoy your time.
                         </p>
-                    </div>
+                    </motion.div>
                 )}
             </main>
 
-            {/* Modals */}
+            {/* ══════════════════════════════ MODALS ══════════════════════════════ */}
             <AnimatePresence>
                 {detailsModalOpen && (
                     <ViewEventDetailsModal
@@ -383,15 +449,25 @@ const StudentTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
                 )}
             </AnimatePresence>
 
-            {filterModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <FilterClassesModal
-                        setAddModalOpen={setFilterModalOpen}
-                        classData={data}
-                        isPending={isPending}
-                    />
-                </div>
-            )}
+            <AnimatePresence>
+                {filterModalOpen && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0f0a28]/45 p-0 backdrop-blur-xl sm:p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className="max-h-[92vh] w-full max-w-sm overflow-hidden rounded-sm sm:rounded-[38px] bg-white shadow-2xl shadow-black/20 ring-1 ring-white/60"
+                        >
+                            <FilterClassesModal
+                                setAddModalOpen={setFilterModalOpen}
+                                classData={data}
+                                isPending={isPending}
+                            />
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

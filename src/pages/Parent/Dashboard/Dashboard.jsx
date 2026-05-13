@@ -3,7 +3,7 @@ import Navbar from "../../../components/Parent/Dashboard/Navbar";
 import Attendance from "../../../components/Parent/Dashboard/Attendance";
 import SubjectsEnrolled from "../../../components/Parent/Dashboard/SubjectsEnrolled";
 import LastDeliverables from "../../../components/Parent/Dashboard/LastDeliverables";
-import ScheduledClasses from "../../../components/Student/Dashboard/SchedualedClasses";
+import ScheduledClasses from "../../../components/Parent/Dashboard/SchedualedClasses";
 import { Link } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
 
@@ -27,7 +27,7 @@ const Dashboard = () => {
 
       <div className="flex flex-1 gap-4 relative z-10">
         {/* px-2 on mobile, px-5 on sm+, lg:ml-80 for sidebar offset */}
-        <div className="flex flex-col flex-1 px-2 sm:px-5 ml-0 lg:ml-72 xl:ml-80">
+        <div className="flex flex-col flex-1 px-0 sm:px-5 ml-0 lg:ml-72 xl:ml-80">
           <div className="flex h-16 sm:h-20">
             <Navbar />
           </div>
@@ -62,9 +62,9 @@ const Dashboard = () => {
                 </div>
                 <Link
                   to="/parent/timetable"
-                  className="group flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-800 transition-all duration-300"
+                  className="group flex items-center gap-1 sm:gap-2 text-sm font-semibold text-violet-600 hover:text-violet-800 transition-all duration-300"
                 >
-                  <span>Full Timetable</span>
+                  <span className="">Full Timetable</span>
                   <FiArrowRight className="group-hover:translate-x-1.5 transition-transform duration-300" />
                 </Link>
               </div>

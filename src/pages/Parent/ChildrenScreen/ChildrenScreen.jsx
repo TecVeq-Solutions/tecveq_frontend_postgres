@@ -11,13 +11,14 @@ import { getAllChildren } from '../../../api/Parent/ParentApi';
 const ChildrenScreen = () => {
     const [selectedId, setSelectedId] = useState(null);
     const navigate = useNavigate();
-    const { parentLogedIn, setSelectedChild } = useParent();
+    const { parentLogedIn, setSelectedChild, setParentLogedIn } = useParent();
     const { userData } = useUser();
 
     const handleChildClick = (child) => {
         setSelectedChild(child);
         setSelectedId(child._id);
         localStorage.setItem("selectedChild", JSON.stringify(child));
+        setParentLogedIn(true);
         navigate("/parent/dashboard");
     };
 

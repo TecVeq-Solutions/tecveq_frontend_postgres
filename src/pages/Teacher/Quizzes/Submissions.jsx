@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useBlur } from "../../../context/BlurContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import { getMultipleQuizesForGrading, checkQuizPlagiarism } from "../../../api/Teacher/Quiz";
+import { getMultipleQuizesForGrading, checkQuizPlagiarism, checkSingleQuizSubmission } from "../../../api/Teacher/Quiz";
 import Loader from "../../../utils/Loader";
 import { useUser } from "../../../context/UserContext";
 import PlagiarismReportModal from "../../../components/Teacher/QuizAssignment/PlagiarismReportModal";
@@ -54,13 +54,62 @@ const Submissions = () => {
   });
 
   const handleGlobalPlagiarismCheck = async () => {
+    const quizId = location.state?.id;
+    if (!quizId) {
+      toast.error("Quiz ID not found. Please refresh and try again.");
+      return;
+    }
+
+    if (submittedCount === 0) {
+      toast.info("No student submissions found to analyze yet.");
+      return;
+    }
+
     setIsGlobalAnalyzing(true);
+    const toastId = toast.loading(
+      submittedCount === 1
+        ? "Analyzing submission for AI & Web plagiarism..."
+        : "Analyzing class-wide plagiarism... This may take a moment."
+    );
+
     try {
-      const response = await checkQuizPlagiarism(location.state.id);
-      if (response) { setGlobalReportData(response); setIsGlobalModalOpen(true); }
-      else { toast.error("Failed to run global plagiarism scan."); }
-    } catch (error) { console.error("Global analysis error:", error); }
-    finally { setIsGlobalAnalyzing(false); }
+      let response;
+      if (submittedCount === 1) {
+        // Smart fallback: Check the single student individually
+        const singleSub = data?.submissions?.find(s => s.submission);
+        if (singleSub?.studentID?.id) {
+          response = await checkSingleQuizSubmission(quizId, singleSub.studentID.id);
+        } else {
+          throw new Error("Could not identify the submitted student.");
+        }
+      } else {
+        // Normal Global Check: Class-wide comparison
+        response = await checkQuizPlagiarism(quizId);
+      }
+
+      if (response) {
+        setGlobalReportData(response);
+        setIsGlobalModalOpen(true);
+        toast.update(toastId, {
+          render: submittedCount === 1 ? "Individual analysis complete!" : "Global analysis complete!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000
+        });
+      } else {
+        toast.update(toastId, { render: "No analysis data returned from server.", type: "warning", isLoading: false, autoClose: 3000 });
+      }
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.update(toastId, {
+        render: error?.response?.data?.message || "Failed to run plagiarism scan.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000
+      });
+    } finally {
+      setIsGlobalAnalyzing(false);
+    }
   };
 
   const handleDownloadAll = () => {
@@ -84,7 +133,7 @@ const Submissions = () => {
   };
 
   const submittedCount = data?.submissions?.filter(s => s.submission)?.length || 0;
-  const totalCount = data?.submissions?.length || 0;
+  const totalCount = location.state?.classroomID?.students?.length || data?.submissions?.length || 0;
   const progressPercent = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0;
 
   if (isPending || isRefetching) return <div className="flex flex-1"><Loader /></div>;
@@ -139,7 +188,7 @@ const Submissions = () => {
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                   <button
                     onClick={togglebell}
-                    className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
+                    className="hidden relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
                   >
                     <img src={IMAGES.Notification} alt="" className="w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] block" />
                     <span className="absolute top-1 right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#EF4444] rounded-full border border-white" />

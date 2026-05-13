@@ -4,7 +4,7 @@ import IMAGES from "../../../assets/images";
 import Navbar from "../../../components/Admin/Navbar";
 import DataRows from "../../../components/Admin/Teachers/DataRows";
 
-import { IoSearch } from "react-icons/io5";
+import { IoSearch, IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useBlur } from "../../../context/BlurContext";
@@ -15,8 +15,13 @@ const Teachers = () => {
   const navigate = useNavigate();
   const { isBlurred } = useBlur();
   const { adminUsersDataPending } = useAdmin();
+
   const [searchText, setSearchText] = useState("");
   const [teacherData, setTeacherData] = useState([]);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(2);
 
   const handleFunctionClick = (thr) => {
     return () => {
@@ -28,6 +33,7 @@ const Teachers = () => {
     queryKey: ["teacherDetails"],
     queryFn: getAllTeachers,
   });
+
   console.log("teacher data is : ", teacherQuery?.data);
 
   useEffect(() => {
@@ -40,24 +46,21 @@ const Teachers = () => {
 
   return adminUsersDataPending || teacherQuery.isPending ? (
     <div className="flex flex-1">
-      {" "}
-      <Loader />{" "}
+      <Loader />
     </div>
   ) : (
     <>
       <div className="flex flex-1 bg-[#F9F9F9] font-poppins overflow-x-hidden w-full">
         <div className="flex flex-1 w-full max-w-full">
-          <div
-            className={`sm:w-full w-screen h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80`}
-          >
+          <div className={`sm:w-full w-screen h-[100vh] lg:px-10 sm:px-10 px-3 flex-grow lg:ml-80`}>
             <div className="min-h-full">
               <Navbar heading={"Teachers"} />
+
               <div className={`${isBlurred ? "blur" : ""}`}>
-                <div className="flex flex-row-reverse my-6">
+                <div className="flex sm:flex-row-reverse my-6 ">
                   <div className="flex items-center gap-4">
                     {/* Main Container with Glass Effect */}
                     <div className="group flex items-center gap-3 bg-white/80 backdrop-blur-md border border-gray-100 px-5 py-2.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:shadow-[0_8px_30px_rgb(59,130,246,0.1)] focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-50 transition-all duration-300 w-full md:w-80">
-
                       {/* Search Icon with Animation */}
                       <IoSearch
                         className="text-gray-400 group-focus-within:text-blue-500 group-hover:scale-110 transition-all duration-300 cursor-pointer"
@@ -70,13 +73,19 @@ const Teachers = () => {
                         value={searchText}
                         placeholder="Search Teacher..."
                         className="bg-transparent outline-none w-full text-sm font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal"
-                        onChange={(e) => setSearchText(e.target.value)}
+                        onChange={(e) => {
+                          setSearchText(e.target.value);
+                          setCurrentPage(1);
+                        }}
                       />
 
-                      {/* Optional: Clear Button (Sirf tab dikhega jab text ho) */}
+                      {/* Optional: Clear Button */}
                       {searchText && (
                         <button
-                          onClick={() => setSearchText("")}
+                          onClick={() => {
+                            setSearchText("");
+                            setCurrentPage(1);
+                          }}
                           className="text-gray-300 hover:text-red-400 transition-colors"
                         >
                           <span className="text-xs">✕</span>
@@ -85,7 +94,8 @@ const Teachers = () => {
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 min-h-[400px] w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+                <div className="teacher mt-4 min-h-[400px] w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                   <div className="w-full overflow-x-auto">
                     <DataRows
                       index={"Sr No."}
@@ -99,49 +109,206 @@ const Teachers = () => {
                       header={true}
                     />
 
-                  {/* When search filter is not applied */}
                     {(() => {
                       const allTeachersList = teacherData.flat();
+
                       const filteredTeachers = allTeachersList.filter((item) => {
                         if (!searchText) return true;
-                        return item?.teacher?.name.toLowerCase().includes(searchText.toLowerCase());
+
+                        return item?.teacher?.name
+                          ?.toLowerCase()
+                          .includes(searchText.toLowerCase());
                       });
 
                       if (filteredTeachers.length === 0) {
                         return (
                           <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100 mt-4">
                             <div className="text-gray-300 mb-2">
-                              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              <svg
+                                className="w-12 h-12"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1}
+                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                />
                               </svg>
                             </div>
-                            <p className="text-lg font-medium text-gray-500">No teachers found matching your criteria</p>
+
+                            <p className="text-lg font-medium text-gray-500">
+                              No teachers found matching your criteria
+                            </p>
                           </div>
                         );
                       }
 
-                      return filteredTeachers.map((item, index) => {
-                        const attendance = item?.attendence?.classData?.length === 0
-                          ? 0
-                          : (item.attendence.attendnececount.presents / item.attendence.classData.length) * 100;
+                      const totalPages = Math.ceil(filteredTeachers.length / rowsPerPage);
+                      const startIndex = (currentPage - 1) * rowsPerPage;
 
-                        return (
-                          <DataRows
-                            key={item.teacher.id + item.subject.id}
-                            header={false}
-                            index={index + 1}
-                            bgColor={"#FFFFFF"}
-                            attendance={attendance}
-                            classAvg={item?.classAvg}
-                            subject={item?.subject?.name}
-                            teacherProfile={item?.teacher?.profilePic || IMAGES?.Profile}
-                            teacherName={item?.teacher?.name}
-                            teacherId={item?.teacher?.referenceNo || item?.teacher?.id.slice(0, 6).toUpperCase()}
-                            onClickFunction={handleFunctionClick(item)}
-                          />
-                        );
-                      });
-                    })()}
+                      const paginatedTeachers = filteredTeachers.slice(
+                        startIndex,
+                        startIndex + rowsPerPage
+                      );
+
+                      return (
+                        <>
+                          {paginatedTeachers.map((item, index) => {
+                            const attendance =
+                              item?.attendence?.classData?.length === 0
+                                ? 0
+                                : (item.attendence.attendnececount.presents /
+                                  item.attendence.classData.length) *
+                                100;
+
+                            return (
+                              <DataRows
+                                key={item.teacher.id + item.subject.id}
+                                header={false}
+                                index={startIndex + index + 1}
+                                bgColor={"#FFFFFF"}
+                                attendance={attendance}
+                                classAvg={item?.classAvg}
+                                subject={item?.subject?.name}
+                                teacherProfile={
+                                  item?.teacher?.profilePic || IMAGES?.Profile
+                                }
+                                teacherName={item?.teacher?.name}
+                                teacherId={
+                                  item?.teacher?.referenceNo ||
+                                  item?.teacher?.id.slice(0, 6).toUpperCase()
+                                }
+                                onClickFunction={handleFunctionClick(item)}
+                              />
+                            );
+                          })}
+
+                        {/* Attractive Pagination + Selector */}
+                        <div className="mt-4 sm:mt-7 mb-4 mx-3 sm:mx-5 relative overflow-hidden rounded-[15px] sm:rounded-[28px] border border-blue-100 bg-white shadow-[0_12px_35px_rgba(59,130,246,0.10)]">
+                          {/* Soft background glow */}
+                          <div className="absolute -top-16 -left-16 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-60" />
+                          <div className="absolute -bottom-16 -right-16 w-40 h-40 bg-indigo-100 rounded-full blur-3xl opacity-60" />
+
+                          <div className="relative flex lg:flex-row items-center justify-between sm:gap-5 gap-2 px-1 sm:px-6 py-5">
+                            {/* Rows per page selector */}
+                            <div className="flex flex-row items-center gap-1 sm:gap-3 w-full lg:w-auto">
+                              <span className="text-sm font-semibold text-gray-500">
+                                Rows per page
+                              </span>
+
+                              <div className="relative group">
+                                <select
+                                  value={rowsPerPage}
+                                  onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                  }}
+                                  className="appearance-none min-w-[40px] sm:min-w-[92px] cursor-pointer rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white px-2 sm:px-4 py-3 pr-6 sm:pr-10 text-sm font-bold text-blue-600 outline-none shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-md focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+                                >
+                                  <option value={2}>2</option>
+                                  <option value={4}>4</option>
+                                  <option value={6}>6</option>
+                                  <option value={10}>10</option>
+                                </select>
+
+                                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                                  <svg
+                                    className="h-4 w-4 text-blue-600 transition-transform duration-300 group-hover:rotate-180"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Showing text */}
+                            <div className="hidden sm:flex flex-col items-center text-center">
+                              <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 border border-blue-100">
+                                <span className="text-sm font-semibold text-gray-500">
+                                  Showing
+                                </span>
+
+                                <span className="text-sm font-bold text-blue-600">
+                                  {startIndex + 1}
+                                </span>
+
+                                <span className="text-sm text-gray-400">to</span>
+
+                                <span className="text-sm font-bold text-blue-600">
+                                  {Math.min(
+                                    startIndex + rowsPerPage,
+                                    filteredTeachers.length
+                                  )}
+                                </span>
+
+                                <span className="text-sm text-gray-400">of</span>
+
+                                <span className="text-sm font-bold text-blue-600">
+                                  {filteredTeachers.length}
+                                </span>
+                              </div>
+
+                              <p className="mt-1 text-xs font-medium text-gray-400">
+                                Page {currentPage} of {totalPages}
+                              </p>
+                            </div>
+
+                            {/* Pagination buttons */}
+                            <div className="flex items-center justify-center gap-2 w-full lg:w-auto">
+                              <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage((prev) => prev - 1)}
+                                className="group flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-2xl text-sm font-bold border border-blue-100 bg-white text-gray-600 shadow-sm transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-600 active:scale-95"
+                              >
+                                <IoChevronBackOutline className="sm:hidden inline text-lg" />
+                                <span className="hidden sm:inline">Prev</span>
+                              </button>
+
+                              <div className="flex items-center gap-1.5">
+                                {Array.from({ length: totalPages }).map(
+                                  (_, pageIndex) => {
+                                    const pageNumber = pageIndex + 1;
+
+                                    return (
+                                      <button
+                                        key={pageNumber}
+                                        onClick={() => setCurrentPage(pageNumber)}
+                                        className={`w-8 h-8 sm:w-11 sm:h-11 rounded-2xl text-sm font-bold transition-all duration-300 active:scale-95 ${currentPage === pageNumber
+                                          ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-[0_8px_20px_rgba(59,130,246,0.35)]"
+                                          : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
+                                          }`}
+                                      >
+                                        {pageNumber}
+                                      </button>
+                                    );
+                                  }
+                                )}
+                              </div>
+
+                              <button
+                                disabled={currentPage === totalPages}
+                                onClick={() => setCurrentPage((prev) => prev + 1)}
+                                className="group flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 rounded-2xl text-sm font-bold border border-blue-100 bg-white text-gray-600 shadow-sm transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-600 active:scale-95"
+                              >
+                                <span className="hidden sm:inline">Next</span>
+                                <IoChevronForwardOutline className="sm:hidden inline text-lg" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                   </div>
                 </div>
               </div>

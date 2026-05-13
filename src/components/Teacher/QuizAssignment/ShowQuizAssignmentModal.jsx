@@ -49,7 +49,7 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex justify-center items-center"
+            className="fixed inset-0 z-50 flex justify-center items-center pt-[4rem]"
             style={{
                 background: 'rgba(15,23,42,0.6)',
                 backdropFilter: 'blur(8px)',

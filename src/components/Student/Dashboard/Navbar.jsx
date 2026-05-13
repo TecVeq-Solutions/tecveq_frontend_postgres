@@ -28,7 +28,6 @@ const Navbar = ({ heading }) => {
   const toggleMail = () => {
     setMail(!mail);
     setBell(false);
-    toggleBlur();
   };
 
   const toggleBell = () => {
@@ -61,27 +60,27 @@ const Navbar = ({ heading }) => {
   }, [notifyQuery.isSuccess, notifyQuery.data]);
 
   return (
-    <nav className="student-navbar w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
-      {/* Mobile Hamburger Trigger */}
+    <nav className="student-navbar w-full bg-white h-20 flex items-center sticky top-0 z-[100] sm:px-4 md:px-6">
+      {/* Mobile Hamburger Trigger z-[100] border-b border-gray-100  */}
       <div
-        className="absolute left-3 top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
+        className="absolute left-1  sm:left-2  top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
         onClick={() => {
           setIsopen(!isopen);
           setIsSidebarOpen(!isSidebarOpen);
         }}
       >
-        <div className="flex flex-col gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5 shadow-sm active:scale-95 transition-transform">
+        <div className="flex flex-col ml-1 gap-1.5 bg-[#0B1053] border border-white/10 rounded-lg p-2.5 shadow-sm active:scale-95 transition-transform">
           <span className="w-5 bg-white h-0.5 rounded-full block" />
           <span className="w-5 bg-white h-0.5 rounded-full block" />
           <span className="w-3.5 bg-white h-0.5 rounded-full block" />
         </div>
       </div>
 
-      <div className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}>
+      <div className={`flex items-center  justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}>
         {/* Left: Heading */}
         {/* Left: Heading/Greeting */}
         <div className="flex-shrink-0 flex flex-col items-start justify-center pl-2 sm:pl-0">
-          <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate max-w-[150px] sm:max-w-none">
+          <h1 className="text-lg md:text-2xl pl-11 lg:pl-0 font-bold text-[#1e293b] leading-tight truncate max-w-[120px] min-[375px]:max-w-[150px] sm:max-w-none">
             {heading || "Student Dashboard"}
           </h1>
         </div>
@@ -93,7 +92,7 @@ const Navbar = ({ heading }) => {
         </div>
 
         {/* Right Side: Icons */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4 pr-2 sm:pr-0">
           {/* Mobile Search */}
           <div className="lg:hidden">
             <GlobalSearch mobileOnly={true} />
@@ -136,14 +135,10 @@ const Navbar = ({ heading }) => {
 
       {/* Overlays */}
       {mail && (
-        <div className="fixed inset-y-0 right-0 w-full sm:w-96 z-[250]">
-          <RecentMessages dashboard={true} onclose={toggleMail} />
-        </div>
+        <RecentMessages dashboard={true} onclose={toggleMail} />
       )}
       {bell && (
-        <div className="fixed inset-y-0 right-0 w-full sm:w-80 z-[250]">
-          <Notifications data={allNotfications} dashboard={true} onclose={toggleBell} />
-        </div>
+        <Notifications data={allNotfications} dashboard={true} onclose={toggleBell} />
       )}
       {isProfileDetails && <ProfileDetails onclose={toggleProfileDetails} />}
     </nav>

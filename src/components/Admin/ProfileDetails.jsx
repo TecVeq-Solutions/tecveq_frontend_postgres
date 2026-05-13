@@ -198,7 +198,7 @@ const ProfileDetails = ({ onClose }) => {
               {userDataObj.name || "User Name"}
             </h3>
             <div
-              className="mt-2 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-[1.8px]"
+              className="mt-2 inline-flex items-center gap-1 sm:gap-2 px-4 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-[1.8px]"
               style={{
                 background:
                   "linear-gradient(90deg, rgba(20,155,154,0.1), rgba(11,16,83,0.07))",
@@ -280,7 +280,7 @@ const ProfileDetails = ({ onClose }) => {
           <div className="flex-shrink-0 px-6 sm:px-7 py-5 bg-slate-50/80 border-t border-slate-100 flex gap-3">
             <button
               onClick={handleCancel}
-              className="flex-1 py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
+              className="flex-1 py-2 sm:py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
             >
               Cancel
             </button>

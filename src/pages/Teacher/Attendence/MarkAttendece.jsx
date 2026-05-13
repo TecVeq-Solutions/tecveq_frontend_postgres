@@ -24,9 +24,9 @@ const MarkAttendence = () => {
         mutationKey: ["mark-attendence"],
         mutationFn: async () => {
             return await markAttendence(
-                attendeceData, 
-                location?.state?.id, 
-                location?.state?.classroomID, 
+                attendeceData,
+                location?.state?.id,
+                location?.state?.classroomID,
                 location?.state?.startTime
             );
         },
@@ -45,11 +45,11 @@ const MarkAttendence = () => {
         if (location.state) {
             const existingAttendance = location.state.attendance || [];
             const subjectId = location.state?.subject?.id || location.state?.subjectID?.id || location.state?.subjectID;
-            
-            const students = (location.state?.classroom?.students || 
-                              location.state?.classroom?.studentDetails || 
-                              location.state?.classroom?.studentdetails || [])
-                              .filter(student => student.subjects?.includes(subjectId));
+
+            const students = (location.state?.classroom?.students ||
+                location.state?.classroom?.studentDetails ||
+                location.state?.classroom?.studentdetails || [])
+                .filter(student => student.subjects?.includes(subjectId));
 
             const initialData = students.map(student => {
                 const existing = existingAttendance.find(
@@ -70,10 +70,10 @@ const MarkAttendence = () => {
     // Optimized filtering logic
     const filteredStudents = useMemo(() => {
         const subjectId = classData?.subject?.id || classData?.subjectID?.id || classData?.subjectID;
-        const students = (classData?.classroom?.students || 
-                          classData?.classroom?.studentDetails || 
-                          classData?.classroom?.studentdetails || [])
-                          .filter(student => student.subjects?.includes(subjectId));
+        const students = (classData?.classroom?.students ||
+            classData?.classroom?.studentDetails ||
+            classData?.classroom?.studentdetails || [])
+            .filter(student => student.subjects?.includes(subjectId));
 
         if (!searchText) return students;
         return students.filter(s => s.name.toLowerCase().includes(searchText.toLowerCase()));
@@ -82,21 +82,21 @@ const MarkAttendence = () => {
     if (!classData) return <div className="flex justify-center items-center h-screen"><Loader /></div>;
 
     return (
-        <div className="flex min-h-screen bg-[#F3F4F6] font-poppins">
-            <div className="flex-1 lg:ml-72 flex flex-col">
+        <div className="flex min-h-screen bg-[#F3F4F6] min-w-0 font-poppins">
+            <div className="flex-1 ml-0 lg:ml-72 flex  min-w-0 flex-col">
                 <Navbar heading="Mark Attendance" />
 
                 <main className={`flex-1 px-4 md:px-8 lg:px-12 py-6 transition-all duration-300 ${isBlurred ? "blur-sm" : ""}`}>
-                    
+
                     {/* Header Card */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+                    <div className="bg-white rounded-2xl p-3 sm:p-6 shadow-sm border border-gray-100 mb-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
                                 <h2 className="text-xl font-semibold text-gray-800">
                                     {classData?.classroom?.name || "Classroom"}
                                 </h2>
                                 <p className="text-sm text-gray-500 flex items-center gap-1">
-                                    <BiUserCheck className="text-lg" /> 
+                                    <BiUserCheck className="text-lg" />
                                     Total Students: {filteredStudents.length}
                                 </p>
                             </div>
@@ -154,19 +154,18 @@ const MarkAttendence = () => {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="mt-6 flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="mt-6 flex items-center justify-between bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-500">
                             Review the list before {location.state.attendance?.length > 0 ? "updating" : "submitting"}.
                         </div>
-                        
+
                         <button
                             disabled={attendenceMutation.isPending}
                             onClick={() => attendenceMutation.mutate()}
-                            className={`px-10 py-3 rounded-xl font-medium text-white transition-all transform active:scale-95 shadow-lg shadow-blue-900/20 ${
-                                attendenceMutation.isPending 
-                                ? "bg-gray-400 cursor-not-allowed" 
+                            className={`px-4 sm:px-10 py-2 sm:py-3 rounded-xl font-medium text-white transition-all transform active:scale-95 shadow-lg shadow-blue-900/20 ${attendenceMutation.isPending
+                                ? "bg-gray-400 cursor-not-allowed"
                                 : "bg-[#0B1053] hover:bg-[#151b6e]"
-                            }`}
+                                }`}
                         >
                             {attendenceMutation.isPending ? (
                                 <span className="flex items-center gap-2">Processing...</span>

@@ -25,6 +25,7 @@ const iconMap = {
   subjects: MdOutlineSubject,
   classroom: LuLayoutDashboard,
   setting: IoIosSettings,
+  calendar: LuCalendar,
 };
 
 const Custombutton = ({ title, active, onpress, icon }) => {

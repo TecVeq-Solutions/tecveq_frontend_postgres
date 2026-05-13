@@ -53,8 +53,8 @@ const TimeTable = () => {
         <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
           <div className="flex flex-1 gap-4">
             {/* <div className={`flex flex-col flex-1 px-2 sm:px-5 lg:ml-72 h-screen max-h-screen overflow-hidden`}> */}
-            <div className={`flex flex-col flex-1 px-2 sm:px-5 lg:ml-72 xl:ml-80 min-h-full pb-10`}>
-              <header className="sticky top-0 z-40 bg-[#f9f9f9]/90 backdrop-blur-sm flex h-16 sm:h-20 md:px-14 lg:px-0">
+            <div className={`flex flex-col flex-1 px-0 sm:px-5 ml-0 lg:ml-72 xl:ml-80 min-h-full pb-10`}>
+              <header className="sticky top-0 px-2 z-40 bg-[#f9f9f9]/90 backdrop-blur-sm flex h-16 sm:h-20 md:px-14 lg:px-0">
                 <Navbar heading={"Time Table"} />
               </header>
               <div
@@ -71,11 +71,11 @@ const TimeTable = () => {
 
                 {/* Mobile/Tablet view */}
                 <div className="lg:hidden w-full">
-                  <AdminTimeTableMobile 
-                    data={data} 
-                    isPending={isPending} 
-                    refetch={refetch} 
-                    isRefetching={isRefetching} 
+                  <AdminTimeTableMobile
+                    data={data}
+                    isPending={isPending}
+                    refetch={refetch}
+                    isRefetching={isRefetching}
                   />
                 </div>
               </div>

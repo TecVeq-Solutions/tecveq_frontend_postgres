@@ -20,7 +20,6 @@ const Navbar = ({ heading }) => {
   const navigate = useNavigate();
 
   const toggleMail = () => {
-    toggleBlur();
     setmail(!mail);
     setBell(false);
   };
@@ -37,8 +36,8 @@ const Navbar = ({ heading }) => {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center relative px-3 sm:px-4 md:px-6">
-      {/* Mobile Hamburger Trigger */}
+    <nav className="w-full bg-white border-b border-gray-100 h-16 sm:h-20 flex items-center sticky top-0 z-[90] px-0 sm:px-4 md:px-6">
+      {/* Mobile Hamburger Trigger  z-[100]*/}
       <div
         className="absolute left-3 top-0 h-16 flex items-center lg:hidden z-50 cursor-pointer"
         onClick={() => {
@@ -56,8 +55,8 @@ const Navbar = ({ heading }) => {
       <div className={`flex items-center justify-between w-full ${isBlurred ? "blur-[2px]" : ""}`}>
 
         {/* Left: Heading */}
-        <div className="flex-1 min-w-0 flex flex-col items-start justify-center pr-2">
-          <h1 className="text-sm xs:text-base sm:text-lg md:text-2xl pl-11 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate w-full">
+        <div className=" min-w-0 flex flex-col items-start justify-center pr-2">
+          <h1 className="text-sm xs:text-base sm:text-lg md:text-2xl pl-14 sm:pl-10 font-bold text-[#1e293b] leading-tight truncate w-full">
             {heading ? heading : "Teacher Dashboard"}
           </h1>
         </div>
@@ -68,7 +67,7 @@ const Navbar = ({ heading }) => {
         </div>
 
         {/* Right Side: Icons */}
-        <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3 flex-shrink-0">
+        <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3 flex-shrink-0 pr-2 sm:pr-0">
 
           {/* Mobile Search */}
           <div className="lg:hidden">
@@ -101,22 +100,14 @@ const Navbar = ({ heading }) => {
         </div>
       </div>
 
-      {/* Dropdowns Container */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="relative w-full h-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
-          {bell && (
-            <div className="pointer-events-auto fixed left-3 right-3 top-16 sm:top-20 sm:left-auto sm:right-20 sm:w-80 z-[100]">
-              <Notifications dashboard={true} onclose={togglebell} />
-            </div>
-          )}
+      {/* Dropdowns */}
+      {bell && (
+        <Notifications dashboard={true} onclose={togglebell} />
+      )}
 
-          {mail && (
-            <div className="pointer-events-auto fixed inset-y-0 right-0 sm:left-auto sm:right-36 sm:w-96 z-[250]">
-              <RecentMessages dashboard={true} onclose={toggleMail} />
-            </div>
-          )}
-        </div>
-      </div>
+      {mail && (
+        <RecentMessages dashboard={true} onclose={toggleMail} />
+      )}
     </nav>
   );
 };

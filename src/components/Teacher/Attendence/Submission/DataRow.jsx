@@ -73,7 +73,7 @@ const DataRow = (props) => {
         style={{ backgroundColor: props.bgColor }}
         className={`min-w-full border-b flex border-grey items-center`}
       >
-        <div className="submission flex flex-row items-center flex-1 py-[4px] mt-1 md:pl-3 md:pr-5 space-x-5 ">
+        <div className="submission flex flex-row items-center flex-1 px-2 py-[4px] mt-1 md:pl-3 md:pr-5 space-x-5 ">
           <div
             className={`w-full md:flex-[1] flex-[1] md:text-[14px] text-[11px] text-center md:text-left ${props.header ? "font-semibold" : ""
               }`}

@@ -40,18 +40,41 @@ const Sidebar = () => {
     setLoading(false);
   };
 
-  const menuItems = [
-    { key: "dashboard",    title: "Dashboard",     icon: "home",   route: "/superadmin/dashboard"     },
-    { key: "platformFees", title: "Platform Fees", icon: "levels", route: "/superadmin/platform-fees" },
+  const menuGroups = [
+    {
+      label: "Main",
+      items: [
+        { key: "dashboard", title: "Dashboard", icon: "home", route: "/superadmin/dashboard" },
+        { key: "admins", title: "Admin Management", icon: "user", route: "/superadmin/admins" },
+        { key: "packages", title: "Subscription Plans", icon: "levels", route: "/superadmin/packages" },
+        { key: "payments", title: "Payments", icon: "fees", route: "/superadmin/payments" },
+      ]
+    },
+    {
+      label: "Support",
+      items: [
+        { key: "chat", title: "Support Chat", icon: "chat", route: "/superadmin/chat" },
+        { key: "notifications", title: "Notifications", icon: "notification", route: "/superadmin/notifications" },
+      ]
+    },
+    {
+      label: "System",
+      items: [
+        { key: "reports", title: "System Reports", icon: "report", route: "/superadmin/reports" },
+        { key: "blocked", title: "Blocked Accounts", icon: "delete", route: "/superadmin/blocked-accounts" },
+        { key: "settings", title: "System Settings", icon: "settings", route: "/superadmin/settings" },
+        { key: "profile", title: "My Profile", icon: "profile", route: "/superadmin/profile" },
+      ]
+    }
   ];
 
-  const Menubar = () => (
-    <div className="flex flex-col w-64 h-screen bg-[#0B1053] text-white shadow-xl overflow-hidden">
+  const Menubar = ({ isMobile }) => (
+    <div className="admin-sidebar flex flex-col w-full sm:w-[50] lg:w-72 xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-6 pb-5 border-b border-white/[0.08]">
-        <div>
-          <img className="h-7 w-auto" src={logo} alt="TCA Logo" />
-          <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">SuperAdmin Portal</p>
+      <div className="flex items-center justify-between px-[16px] pt-6 pb-5 border-b border-gray-200">
+        <div className="w-full">
+          <img className="h-full w-full" src={logo} alt="TCA Logo" />
+          <p className="text-[10px] text-white/30 uppercase tracking-widest mt-2 text-center">SuperAdmin Portal</p>
         </div>
         <IoClose
           className="w-5 h-5 block lg:hidden text-white/50 hover:text-white cursor-pointer"
@@ -60,16 +83,22 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto custom-scrollbar">
-        <p className="text-[10px] text-white/30 uppercase tracking-widest px-3 pb-2">Control</p>
-        {menuItems.map(({ key, title, icon, route }) => (
-          <Custombutton
-            key={key}
-            icon={icon}
-            title={title}
-            active={activeButton === key}
-            onpress={() => handleButtonClick(key, route)}
-          />
+      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto custom-scrollbar">
+        {menuGroups.map((group, gIdx) => (
+          <div key={gIdx} className="flex flex-col gap-1">
+            <p className="text-[13px] text-white/100 uppercase tracking-widest px-3 mb-2">{group.label}</p>
+            <div className="space-y-1">
+              {group.items.map(({ key, title, icon, route }) => (
+                <Custombutton
+                  key={key}
+                  icon={icon}
+                  title={title}
+                  active={activeButton === key}
+                  onpress={() => handleButtonClick(key, route)}
+                />
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 
@@ -83,7 +112,7 @@ const Sidebar = () => {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-150 group"
           >
             <IoIosLogOut size={17} className="flex-shrink-0" />
-            <span className="text-sm">Logout</span>
+            <span className="text-sm">Sign Out</span>
           </div>
         )}
       </div>
@@ -105,9 +134,9 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile overlay */}
-      <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className={`lg:hidden fixed inset-0 z-[200] transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
-          <Menubar />
+          <Menubar isMobile={true} />
         </div>
         {isSidebarOpen && (
           <div
@@ -119,7 +148,7 @@ const Sidebar = () => {
 
       {/* Desktop */}
       <div className="max-lg:hidden">
-        <Menubar />
+        <Menubar isMobile={false} />
       </div>
     </div>
   );

@@ -9,8 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllNotifications } from "../../api/Admin/NotificationApi";
 
 import { useSidebar } from "../../context/SidebarContext";
+import { useAdmin } from "../../context/AdminContext";
 
 const Navbar = ({ heading }) => {
+  const { unreadSupportCount } = useAdmin();
   const [mail, setMail] = useState(false);
   const [bell, setBell] = useState(false);
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
@@ -88,10 +90,10 @@ const Navbar = ({ heading }) => {
   };
 
   return (
-    <nav className=" admin w-full sm:bg-white border-b border-gray-100 h-20 flex items-center relative sm:px-4 md:px-6">
-      {/* Mobile Hamburger Trigger */}
+    <nav className=" admin w-full sm:bg-white  h-20 flex items-center relative sm:px-4 md:px-6">
+      {/* Mobile Hamburger Trigger  border-b border-gray-100*/}
       <div
-        className="absolute left-3 top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
+        className="absolute left-1 sm:left-2 top-0 h-20 flex items-center lg:hidden z-50 cursor-pointer"
         onClick={() => {
           setIsopen(!isopen);
           setIsSidebarOpen(!isSidebarOpen);
@@ -110,7 +112,7 @@ const Navbar = ({ heading }) => {
       >
         {/* Left: Heading */}
         <div className="flex-shrink-0 max-w-[150px] sm:max-w-none">
-          <h1 className="text-lg md:text-2xl pl-12 sm:pl-0 font-bold text-[#1e293b] leading-tight truncate">
+          <h1 className="text-lg md:text-2xl pl-12 lg:pl-0 font-bold text-[#1e293b] leading-tight truncate">
             {heading}
           </h1>
         </div>
@@ -131,13 +133,18 @@ const Navbar = ({ heading }) => {
           <div className="relative" ref={mailRef}>
             <button
               onClick={toggleMail}
-              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300
+              className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-300 relative
                 ${mail
                   ? "bg-[#0B1053] text-white"
                   : "bg-white border-gray-200 text-gray-500 shadow-sm hover:bg-gray-50"
                 }`}
             >
               <IoMailOutline className="text-xl sm:text-2xl" />
+              {unreadSupportCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 h-5 w-5 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-lg shadow-rose-200">
+                  {unreadSupportCount}
+                </span>
+              )}
             </button>
           </div>
 
@@ -162,36 +169,14 @@ const Navbar = ({ heading }) => {
         </div>
       </div>
 
-      {/* Overlay layer for Dropdowns (Not affected by blur) */}
-      <div className="absolute top-0 right-0 w-full h-full pointer-events-none" ref={overlayRef}>
-        <div className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-6">
-          {mail && (
-            <div className="pointer-events-auto">
-              {/* Mobile: full width */}
-              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
-                <RecentMessages dashboard={true} onclose={closeMail} />
-              </div>
-              {/* Desktop: right-aligned dropdown */}
-              <div className="hidden sm:block absolute right-24 md:right-28 mt-20 w-80 z-[100]">
-                <RecentMessages dashboard={true} onclose={closeMail} />
-              </div>
-            </div>
-          )}
+      {/* Overlays */}
+      {mail && (
+        <RecentMessages dashboard={true} onclose={closeMail} />
+      )}
 
-          {bell && (
-            <div className="pointer-events-auto">
-              {/* Mobile: full width */}
-              <div className="fixed inset-x-4 top-20 sm:hidden z-[100]">
-                <Notifications dashboard={true} onclose={handleBellClick} />
-              </div>
-              {/* Desktop: right-aligned dropdown */}
-              <div className="hidden sm:block absolute right-6 md:right-10 mt-20 w-80 z-[100]">
-                <Notifications dashboard={true} onclose={handleBellClick} />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      {bell && (
+        <Notifications dashboard={true} onclose={handleBellClick} />
+      )}
     </nav>
   );
 };
