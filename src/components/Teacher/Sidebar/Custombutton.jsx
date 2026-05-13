@@ -13,6 +13,7 @@ const iconMap = {
   attendence: LuUsers,
   "attendence-report": VscGraph,
   classroom: LuLayoutDashboard,
+  calendar: LuCalendar,
 };
 
 const Custombutton = ({ title, active, onpress, icon }) => {

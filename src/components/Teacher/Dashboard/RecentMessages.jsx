@@ -31,7 +31,7 @@ const RecentMessages = ({ onclose }) => {
     queryKey: ["teacher-chatrooms"],
     queryFn: getMyChats
   });
-  
+
   const { data: allUsersResponse, isPending: usersIsPending } = useQuery({
     queryKey: ["allUsers"],
     queryFn: getAllUsers
@@ -44,15 +44,15 @@ const RecentMessages = ({ onclose }) => {
 
   // Combine and Filter Users
   const combinedUsers = [...(allUsersResponse || []), ...(adminsResponse || [])];
-  
+
   const filteredUsers = combinedUsers.filter(u => {
     if (u.id === userData.id) return false;
     if (u.userType?.toLowerCase() === 'super_admin') return false;
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
-    return u.name?.toLowerCase().includes(search) || 
-           u.userType?.toLowerCase().includes(search) ||
-           (u.classroomStudents?.[0]?.name || "").toLowerCase().includes(search);
+    return u.name?.toLowerCase().includes(search) ||
+      u.userType?.toLowerCase().includes(search) ||
+      (u.classroomStudents?.[0]?.name || "").toLowerCase().includes(search);
   });
 
   // Group users by role
@@ -134,13 +134,13 @@ const RecentMessages = ({ onclose }) => {
     conn.on("message", (data) => {
       if (!data?.message) return;
       if (data.message.sentBy === userData.id) return;
-      setMsgArray((prev) => [...prev, { 
-        ...data.message, 
-        sentBy: { 
+      setMsgArray((prev) => [...prev, {
+        ...data.message,
+        sentBy: {
           id: data.message.sentBy,
           name: data.message.senderName,
           userType: data.message.senderRole
-        } 
+        }
       }]);
     });
   };
@@ -176,9 +176,9 @@ const RecentMessages = ({ onclose }) => {
     const userRole = !isGroup ? (data?.userType || data?.participants?.find(p => p.id !== userData.id)?.userType) : null;
 
     const className = !isGroup ? (
-      data?.classroomStudents?.[0]?.name || 
-      data?.classroomTeachers?.[0]?.classroom?.name || 
-      data?.students?.[0]?.classroomStudents?.[0]?.name || 
+      data?.classroomStudents?.[0]?.name ||
+      data?.classroomTeachers?.[0]?.classroom?.name ||
+      data?.students?.[0]?.classroomStudents?.[0]?.name ||
       data?.level?.name || ""
     ) : null;
 
@@ -243,7 +243,7 @@ const RecentMessages = ({ onclose }) => {
                       <span className="text-[10px] font-bold text-gray-700">{senderName}</span>
                       <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black tracking-tighter ${senderRole === 'ADMIN' ? 'bg-red-100 text-red-600' : senderRole === 'TEACHER' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>{senderRole}</span>
                     </div>
-                    <div className={`p-3 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
+                    <div className={`p-2 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
                       {m?.message}
                       <p className={`text-[8px] mt-1 text-right ${isMe ? "text-blue-100" : "text-gray-400"}`}>{moment(m.time).format("hh:mm a")}</p>
                     </div>

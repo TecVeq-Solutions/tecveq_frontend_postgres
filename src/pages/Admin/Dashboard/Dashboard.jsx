@@ -10,6 +10,8 @@ import SubscriptionStatus from "../../../components/Admin/Dashboard/Subscription
 import { useBlur } from "../../../context/BlurContext";
 import { useAdmin } from "../../../context/AdminContext";
 import { useSidebar } from "../../../context/SidebarContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { IoAlertCircleOutline } from "react-icons/io5";
 
 
 const Dashboard = () => {
@@ -186,6 +188,34 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        <AnimatePresence>
+          {subscriptionData?.subscription?.totalBalance > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              className="fixed bottom-6 right-6 z-50 w-72 overflow-hidden rounded-3xl bg-white p-5 shadow-2xl ring-1 ring-rose-100"
+            >
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl bg-rose-50 p-3 text-rose-600">
+                  <IoAlertCircleOutline size={24} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Payment Reminder</h3>
+                  <p className="mt-0.5 text-xs font-bold text-rose-500">
+                    Remaining Balance: Rs.{subscriptionData.subscription.totalBalance.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => window.location.href = '/admin/subscription'}
+                className="mt-4 w-full rounded-2xl bg-rose-600 py-3 text-xs font-black text-white shadow-lg shadow-rose-900/20 transition hover:bg-rose-700"
+              >
+                Clear Outstanding Dues
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </>
   );
 };

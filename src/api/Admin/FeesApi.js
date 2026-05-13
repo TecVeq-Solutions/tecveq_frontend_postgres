@@ -19,6 +19,11 @@ export const updateFeeStatus = apiRequest(async (feeID, data) => {
     return await axios.put(url, data);
 });
 
+export const updateFeeDetails = apiRequest(async (feeID, data) => {
+    const url = `${BACKEND_URL}/fees/edit/${feeID}`;
+    return await axios.put(url, data);
+});
+
 export const deleteFee = apiRequest(async (feeID) => {
     const url = `${BACKEND_URL}/fees/${feeID}`;
     return await axios.delete(url);

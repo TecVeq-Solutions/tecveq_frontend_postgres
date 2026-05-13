@@ -84,6 +84,7 @@ const Sidebar = () => {
       items: [
         { key: "home", title: "Dashboard", icon: "home", route: "/teacher/dashboard" },
         { key: "time", title: "Time Table", icon: "time", route: "/teacher/timetable" },
+        { key: "leaves", title: "My Leaves", icon: "calendar", route: "/teacher/leaves" },
         { key: "graph", title: "Student Reports", icon: "graph", route: "/teacher/reports" },
       ]
     },
@@ -95,6 +96,7 @@ const Sidebar = () => {
         { key: "attendence", title: "Attendance", icon: "attendence", route: "/teacher/attendence" },
         { key: "attendence-report", title: "Attendance Report", icon: "attendence-report", route: "/teacher/attendence-report" },
         { key: "classroom", title: "Classroom", icon: "classroom", route: "/teacher/classroom" },
+        { key: "student-leaves", title: "Student Leaves", icon: "calendar", route: "/teacher/student-leaves" },
       ]
     }
   ];
@@ -139,7 +141,7 @@ const Sidebar = () => {
                     <p className="font-medium">My Profile</p>
                   </div>
                   <div
-                    className="flex items-center hover:bg-[#F1F3F5]  gap-3 px-3 py-2 cursor-pointer text-[#334155]  hover:text-black  rounded-lg text-sm transition-colors"
+                    className="hidden flex items-center hover:bg-[#F1F3F5]  gap-3 px-3 py-2 cursor-pointer text-[#334155]  hover:text-black  rounded-lg text-sm transition-colors"
                     onClick={onSettingsClick}
                   >
                     <LuSettings className="text-lg" />

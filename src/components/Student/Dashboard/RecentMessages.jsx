@@ -239,7 +239,7 @@ const RecentMessages = ({ onclose }) => {
                       <span className="text-[10px] font-bold text-gray-700">{senderName}</span>
                       <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black tracking-tighter ${senderRole === 'ADMIN' ? 'bg-red-100 text-red-600' : senderRole === 'TEACHER' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'}`}>{senderRole}</span>
                     </div>
-                    <div className={`p-3 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
+                    <div className={`p-2 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
                       {m?.message}
                       <p className={`text-[8px] mt-1 text-right ${isMe ? "text-blue-100" : "text-gray-400"}`}>{moment(m.time).format("hh:mm a")}</p>
                     </div>

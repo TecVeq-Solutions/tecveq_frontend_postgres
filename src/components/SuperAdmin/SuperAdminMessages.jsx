@@ -217,7 +217,7 @@ const SuperAdminMessages = ({ onclose }) => {
                         {senderRole}
                       </span>
                     </div>
-                    <div className={`p-3 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all
+                    <div className={`p-2 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all
                       ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
                       {m?.message}
                       <p className={`text-[8px] mt-1 text-right ${isMe ? "text-blue-100" : "text-gray-400"}`}>

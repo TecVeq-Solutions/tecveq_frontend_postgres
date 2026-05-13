@@ -43,7 +43,7 @@ const SuperAdminNavbar = ({ heading }) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 lg:left-72 xl:left-80 right-0 bg-white/95 backdrop-blur-sm h-[72px] flex items-center z-[120] px-4 sm:px-6 md:px-8 border-b border-gray-100/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.04)]">
+    <nav className="fixed top-0 left-0 lg:left-72 xl:left-80 right-0 bg-white/95 backdrop-blur-sm h-[72px] flex items-center z-[90] px-3 sm:px-6 md:px-8 border-b border-gray-100/80 shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.04)]">
 
       {/* Mobile Hamburger */}
       <div

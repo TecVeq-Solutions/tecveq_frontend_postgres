@@ -43,9 +43,9 @@ const RecentMessages = ({ onclose }) => {
     if (u.userType?.toLowerCase() === 'super_admin') return false;
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
-    return u.name.toLowerCase().includes(search) || 
-           u.userType.toLowerCase().includes(search) ||
-           (u.classroomStudents?.[0]?.name || "").toLowerCase().includes(search);
+    return u.name.toLowerCase().includes(search) ||
+      u.userType.toLowerCase().includes(search) ||
+      (u.classroomStudents?.[0]?.name || "").toLowerCase().includes(search);
   }) || [];
 
   // Group users by role
@@ -134,13 +134,13 @@ const RecentMessages = ({ onclose }) => {
       if (!data?.message) return;
       if (data.message.sentBy === userData.id) return;
       // Ensure sentBy is an object to match m.sentBy?.id checks in the UI
-      setMsgArray((prev) => [...prev, { 
-        ...data.message, 
-        sentBy: { 
+      setMsgArray((prev) => [...prev, {
+        ...data.message,
+        sentBy: {
           id: data.message.sentBy,
           name: data.message.senderName,
           userType: data.message.senderRole
-        } 
+        }
       }]);
     });
   };
@@ -161,7 +161,7 @@ const RecentMessages = ({ onclose }) => {
           return toast.info("No chat history to delete");
         }
       }
-      
+
       await deleteChatroom(chatId);
       toast.success("Conversation deleted successfully");
       queryClient.invalidateQueries(["chatrooms"]);
@@ -205,10 +205,10 @@ const RecentMessages = ({ onclose }) => {
 
     // Dynamically get classroom name
     const className = !isGroup ? (
-      data?.classroomStudents?.[0]?.name || 
-      data?.classroomTeachers?.[0]?.classroom?.name || 
-      data?.students?.[0]?.classroomStudents?.[0]?.name || 
-      data?.level?.name || 
+      data?.classroomStudents?.[0]?.name ||
+      data?.classroomTeachers?.[0]?.classroom?.name ||
+      data?.students?.[0]?.classroomStudents?.[0]?.name ||
+      data?.level?.name ||
       ""
     ) : null;
 
@@ -236,9 +236,9 @@ const RecentMessages = ({ onclose }) => {
           </div>
           <p className="text-xs text-gray-500 truncate">{lastMsg}</p>
         </div>
-        
+
         {/* Delete Icon */}
-        <button 
+        <button
           onClick={(e) => { e.stopPropagation(); onDelete(data.id, isGroup); }}
           className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
         >
@@ -285,13 +285,13 @@ const RecentMessages = ({ onclose }) => {
                     <div className={`flex items-center gap-1.5 mb-1 px-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                       <span className="text-[10px] font-bold text-gray-700">{senderName}</span>
                       <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black tracking-tighter 
-                        ${senderRole === 'ADMIN' ? 'bg-red-100 text-red-600' : 
-                          senderRole === 'TEACHER' ? 'bg-amber-100 text-amber-600' : 
-                          'bg-emerald-100 text-emerald-600'}`}>
+                        ${senderRole === 'ADMIN' ? 'bg-red-100 text-red-600' :
+                          senderRole === 'TEACHER' ? 'bg-amber-100 text-amber-600' :
+                            'bg-emerald-100 text-emerald-600'}`}>
                         {senderRole}
                       </span>
                     </div>
-                    <div className={`p-3 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all
+                    <div className={`p-2 rounded-2xl max-w-[85%] text-sm shadow-sm transition-all
                       ${isMe ? "bg-blue-600 text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
                       {m?.message}
                       <p className={`text-[8px] mt-1 text-right ${isMe ? "text-blue-100" : "text-gray-400"}`}>
@@ -340,9 +340,9 @@ const RecentMessages = ({ onclose }) => {
           </div>
           {individualActive && (
             <div className="mt-4">
-              <input 
-                type="text" 
-                placeholder="Search by name or class..." 
+              <input
+                type="text"
+                placeholder="Search by name or class..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
@@ -385,15 +385,15 @@ const RecentMessages = ({ onclose }) => {
           )}
         </div>
       </div>
- 
+
       {/* 4. CUSTOM DELETE CONFIRMATION MODAL */}
       {deleteConfirm.show && (
-        <div 
+        <div
           onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
         >
-          <div 
+          <div
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-zoom-in"
@@ -406,13 +406,13 @@ const RecentMessages = ({ onclose }) => {
               <p className="text-sm text-gray-500">This will permanently remove all messages from this conversation.</p>
             </div>
             <div className="flex border-t">
-              <button 
+              <button
                 onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ show: false, id: null, isGroup: false }); }}
                 className="flex-1 px-4 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors border-r"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={(e) => { e.stopPropagation(); confirmDelete(); }}
                 className="flex-1 px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
               >

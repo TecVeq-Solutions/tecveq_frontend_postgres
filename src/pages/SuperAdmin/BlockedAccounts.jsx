@@ -62,7 +62,7 @@ const BlockedAccounts = () => {
         <div className="min-h-screen bg-[#f5f7fb] font-poppins">
             <SuperAdminNavbar heading="Security & Access" />
 
-            <main className="max-w-screen-2xl p-4 sm:p-6 md:p-8">
+            <main className="max-w-screen-2xl p-3 sm:p-6 md:p-8">
                 {/* Header */}
                 {/* <div className="mb-7 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#080f4f] via-[#111a68] to-[#171f78] p-6 shadow-xl shadow-indigo-950/10 sm:p-8">
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -125,7 +125,7 @@ const BlockedAccounts = () => {
                         filteredAdmins.map((admin) => (
                             <div
                                 key={admin.id}
-                                className="group relative overflow-hidden rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/10"
+                                className="group relative overflow-hidden rounded-[2rem] bg-white px-3 py-5 sm:p-6 shadow-sm ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-rose-950/10"
                             >
                                 <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-rose-500 via-orange-400 to-amber-300" />
                                 <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-rose-50 blur-3xl transition group-hover:bg-orange-50" />

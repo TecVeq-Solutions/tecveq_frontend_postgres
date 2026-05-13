@@ -128,7 +128,7 @@ export default function ViewEventDetailsModal({ open, setopen, event, setevents,
 
       <div
         ref={ref}
-        className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-lg  top-14 bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"
       >
         <ConfirmModal
           isOpen={confirmDeleteModalOpen}

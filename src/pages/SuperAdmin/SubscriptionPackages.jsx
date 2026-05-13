@@ -120,57 +120,55 @@ const SubscriptionPackages = () => {
             ? Math.max(...packages.map((pkg) => Number(pkg.monthlyPrice) || 0))
             : 0;
 
-    if (isLoading) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-[#f5f7fb]">
-                <Loader />
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-[#f5f7fb] font-poppins text-slate-900">
             <SuperAdminNavbar heading="Subscription Plans" />
 
             <main className=" max-w-screen-2xl px-4 py-4 sm:px-6">
-                {/* Hero  mx-auto*/}
-                <section className="relative mb-4 overflow-hidden rounded-[2rem] bg-[#090f4f] p-6 text-white ">
-                    <div className="absolute -right-16 -top-20 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
-                    <div className="absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
-                    <div className="absolute right-10 top-10 hidden h-28 w-28 rounded-full border border-white/10 lg:block" />
-                    <div className="absolute right-28 bottom-8 hidden h-16 w-16 rounded-full border border-white/10 lg:block" />
-
-                    <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                        <div>
-                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-100">
-                                <IoSparklesOutline className="text-cyan-300" />
-                                Super Admin Pricing Control
-                            </div>
-
-                            <h1 className="max-w-3xl text-3xl font-black leading-tight sm:text-4xl ">
-                                Manage Subscription Plans
-                            </h1>
-
-                            <p className=" hidden mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-300 sm:text-base">
-                                Create polished LMS packages, define institute limits, and manage
-                                monthly plans for every school from one professional dashboard.
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={() => handleOpenModal()}
-                            className="group inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-sm font-black text-[#090f4f] shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cyan-50 active:scale-95 sm:w-auto"
-                        >
-                            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#090f4f] text-white transition group-hover:rotate-90">
-                                <IoAddOutline size={22} />
-                            </span>
-                            Create New Plan
-                        </button>
+                {isLoading ? (
+                    <div className="flex h-[70vh] items-center justify-center">
+                        <Loader />
                     </div>
-                </section>
+                ) : (
+                    <>
+                        {/* Hero  mx-auto*/}
+                        <section className="relative mb-4 overflow-hidden rounded-[2rem] bg-[#090f4f] p-4 sm:p-6 text-white ">
+                            <div className="absolute -right-16 -top-20 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+                            <div className="absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
+                            <div className="absolute right-10 top-10 hidden h-28 w-28 rounded-full border border-white/10 lg:block" />
+                            <div className="absolute right-28 bottom-8 hidden h-16 w-16 rounded-full border border-white/10 lg:block" />
 
-                {/* Stats */}
-                {/* <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                            <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                                <div>
+                                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-2 py-2 text-xs sm:px-4 sm:text-sm font-black uppercase tracking-[0.2em] text-cyan-100">
+                                        <IoSparklesOutline className="text-cyan-300" />
+                                        Super Admin Pricing Control
+                                    </div>
+
+                                    <h1 className="max-w-3xl text-2xl font-black leading-tight sm:text-4xl ">
+                                        Manage Subscription Plans
+                                    </h1>
+
+                                    <p className=" hidden mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-300 sm:text-base">
+                                        Create polished LMS packages, define institute limits, and manage
+                                        monthly plans for every school from one professional dashboard.
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={() => handleOpenModal()}
+                                    className="group inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-sm font-black text-[#090f4f] shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cyan-50 active:scale-95 sm:w-auto"
+                                >
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#090f4f] text-white transition group-hover:rotate-90">
+                                        <IoAddOutline size={22} />
+                                    </span>
+                                    Create New Plan
+                                </button>
+                            </div>
+                        </section>
+
+                        {/* Stats */}
+                        {/* <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     <div className="rounded-[1.75rem] border border-white bg-white p-5 shadow-sm shadow-slate-200/70">
                         <div className="flex items-center justify-between">
                             <div>
@@ -220,168 +218,170 @@ const SubscriptionPackages = () => {
                     </div>
                 </section> */}
 
-                {/* Section Header */}
-                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between ml-2">
-                    <div>
-                        <h2 className="text-2xl font-black text-slate-900">
-                            Available Packages
-                        </h2>
-                        <p className="mt-1 text-sm font-medium text-slate-500">
-                            Define monthly pricing, institute usage limits, and premium features.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Packages */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {packages.length > 0 ? (
-                        packages.map((pkg, idx) => {
-                            const isPopular = idx === 1 || pkg.status === "active";
-
-                            return (
-                                <motion.div
-                                    key={pkg.id}
-                                    initial={{ opacity: 0, y: 24 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.08 }}
-                                    className="group relative overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm shadow-slate-200/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/10"
-                                >
-                                    <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#090f4f] via-indigo-500 to-cyan-400" />
-
-                                    <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-indigo-100/70 blur-3xl transition group-hover:bg-cyan-100" />
-
-                                    {pkg.status === "active" && (
-                                        <div className="absolute right-5 top-5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-600 ring-1 ring-emerald-100">
-                                            Active
-                                        </div>
-                                    )}
-
-                                    <div className="relative z-10">
-                                        <div className="mb-6 flex items-center gap-4 pr-20">
-                                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#090f4f] text-white shadow-lg shadow-indigo-950/20">
-                                                <IoRocketOutline size={25} />
-                                            </div>
-
-                                            <div className="min-w-0">
-                                                <h3 className="truncate text-xl font-black capitalize text-slate-900">
-                                                    {pkg.name}
-                                                </h3>
-                                                <p className="mt-1 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-500">
-                                                    Monthly Plan
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="mb-7 rounded-[1.5rem] bg-slate-50 p-5">
-                                            <div className="flex items-end gap-1">
-                                                <span className="text-sm font-black text-slate-400">
-                                                    Rs.
-                                                </span>
-                                                <span className="text-4xl font-black tracking-tight text-slate-950">
-                                                    {pkg.monthlyPrice}
-                                                </span>
-                                                <span className="pb-1 text-sm font-bold text-slate-400">
-                                                    /mo
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="mb-7 grid grid-cols-1 gap-3">
-                                            <LimitRow
-                                                icon={<IoPeopleOutline size={18} />}
-                                                label="Student Limit"
-                                                value={pkg.studentLimit === 0 ? "Unlimited" : pkg.studentLimit}
-                                            />
-
-                                            <LimitRow
-                                                icon={<IoSchoolOutline size={18} />}
-                                                label="Teacher Limit"
-                                                value={pkg.teacherLimit === 0 ? "Unlimited" : pkg.teacherLimit}
-                                            />
-
-                                            <LimitRow
-                                                icon={<IoLayersOutline size={18} />}
-                                                label="Class Limit"
-                                                value={pkg.classLimit === 0 ? "Unlimited" : pkg.classLimit}
-                                            />
-                                        </div>
-
-                                        <div className="mb-2 min-h-[96px] space-y-3">
-                                            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
-                                                Included Features
-                                            </p>
-
-                                            {pkg.features && Array.isArray(pkg.features) && pkg.features.length > 0 ? (
-                                                pkg.features.map((feature, fIdx) => (
-                                                    <div key={fIdx} className="flex items-start gap-3">
-                                                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                                                            <IoCheckmarkOutline size={15} />
-                                                        </span>
-                                                        <span className="text-sm font-semibold leading-5 text-slate-600">
-                                                            {feature}
-                                                        </span>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-400">
-                                                    No custom features added yet.
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="flex gap-3 border-t border-slate-100 pt-5">
-                                            <button
-                                                onClick={() => handleOpenModal(pkg)}
-                                                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#090f4f] py-3 text-sm font-black text-white shadow-lg shadow-indigo-950/15 transition hover:bg-indigo-800 active:scale-95"
-                                            >
-                                                <IoCreateOutline size={18} />
-                                                Edit Plan
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleDelete(pkg.id)}
-                                                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 transition hover:bg-rose-500 hover:text-white active:scale-95"
-                                            >
-                                                <IoTrashOutline size={20} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        })
-                    ) : (
-                        <div className="col-span-full rounded-[2rem] border border-dashed border-slate-200 bg-white py-20 text-center shadow-sm">
-                            <div className="flex flex-col items-center px-4">
-                                <div className="flex h-20 w-20 items-center justify-center rounded-[1.7rem] bg-indigo-50 text-indigo-500">
-                                    <IoStarOutline size={42} />
-                                </div>
-
-                                <h3 className="mt-5 text-xl font-black text-slate-900">
-                                    No Packages Defined
-                                </h3>
-
-                                <p className="mt-2 max-w-md text-sm font-medium leading-6 text-slate-500">
-                                    Start by creating your first subscription plan for institutes and
-                                    manage student, teacher, and class limits professionally.
+                        {/* Section Header */}
+                        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between ml-2">
+                            <div>
+                                <h2 className="text-2xl font-black text-slate-900">
+                                    Available Packages
+                                </h2>
+                                <p className="mt-1 text-sm font-medium text-slate-500">
+                                    Define monthly pricing, institute usage limits, and premium features.
                                 </p>
-
-                                <button
-                                    onClick={() => handleOpenModal()}
-                                    className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-[#090f4f] px-8 py-3.5 text-sm font-black text-white shadow-xl shadow-indigo-950/15 transition hover:bg-indigo-800 active:scale-95"
-                                >
-                                    <IoAddOutline size={20} />
-                                    Add First Plan
-                                </button>
                             </div>
                         </div>
-                    )}
-                </div>
+
+                        {/* Packages */}
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                            {packages.length > 0 ? (
+                                packages.map((pkg, idx) => {
+                                    const isPopular = idx === 1 || pkg.status === "active";
+
+                                    return (
+                                        <motion.div
+                                            key={pkg.id}
+                                            initial={{ opacity: 0, y: 24 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.08 }}
+                                            className="group relative overflow-hidden rounded-[2rem] border border-slate-100 bg-white px-2 py-4  sm:p-6 shadow-sm shadow-slate-200/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-950/10 "
+                                        >
+                                            <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#090f4f] via-indigo-500 to-cyan-400" />
+
+                                            <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-indigo-100/70 blur-3xl transition group-hover:bg-cyan-100" />
+
+                                            {pkg.status === "active" && (
+                                                <div className="absolute right-5 top-5 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-600 ring-1 ring-emerald-100">
+                                                    Active
+                                                </div>
+                                            )}
+
+                                            <div className="relative z-10">
+                                                <div className="mb-6 flex items-center gap-2 sm:gap-4 pr-20">
+                                                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#090f4f] text-white shadow-lg shadow-indigo-950/20">
+                                                        <IoRocketOutline size={25} />
+                                                    </div>
+
+                                                    <div className="min-w-0">
+                                                        <h3 className="truncate text-xl font-black capitalize text-slate-900">
+                                                            {pkg.name}
+                                                        </h3>
+                                                        <p className="mt-1 text-[11px] font-black uppercase tracking-[0.18em] text-indigo-500">
+                                                            Monthly Plan
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-7 rounded-[1.5rem] bg-slate-50 p-5">
+                                                    <div className="flex items-end gap-1">
+                                                        <span className="text-sm font-black text-slate-400">
+                                                            Rs.
+                                                        </span>
+                                                        <span className="text-2xl sm:text-4xl font-black tracking-tight text-slate-950">
+                                                            {pkg.monthlyPrice}
+                                                        </span>
+                                                        <span className="pb-1 text-sm font-bold text-slate-400">
+                                                            /mo
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-7 grid grid-cols-1 gap-3">
+                                                    <LimitRow
+                                                        icon={<IoPeopleOutline size={18} />}
+                                                        label="Student Limit"
+                                                        value={pkg.studentLimit === 0 ? "Unlimited" : pkg.studentLimit}
+                                                    />
+
+                                                    <LimitRow
+                                                        icon={<IoSchoolOutline size={18} />}
+                                                        label="Teacher Limit"
+                                                        value={pkg.teacherLimit === 0 ? "Unlimited" : pkg.teacherLimit}
+                                                    />
+
+                                                    <LimitRow
+                                                        icon={<IoLayersOutline size={18} />}
+                                                        label="Class Limit"
+                                                        value={pkg.classLimit === 0 ? "Unlimited" : pkg.classLimit}
+                                                    />
+                                                </div>
+
+                                                <div className="mb-2 min-h-[96px] space-y-3">
+                                                    <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                                                        Included Features
+                                                    </p>
+
+                                                    {pkg.features && Array.isArray(pkg.features) && pkg.features.length > 0 ? (
+                                                        pkg.features.map((feature, fIdx) => (
+                                                            <div key={fIdx} className="flex items-start gap-3">
+                                                                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                                                                    <IoCheckmarkOutline size={15} />
+                                                                </span>
+                                                                <span className="text-sm font-semibold leading-5 text-slate-600">
+                                                                    {feature}
+                                                                </span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-400">
+                                                            No custom features added yet.
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex gap-3 border-t border-slate-100 pt-5">
+                                                    <button
+                                                        onClick={() => handleOpenModal(pkg)}
+                                                        className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#090f4f] py-3 text-sm font-black text-white shadow-lg shadow-indigo-950/15 transition hover:bg-indigo-800 active:scale-95"
+                                                    >
+                                                        <IoCreateOutline size={18} />
+                                                        Edit Plan
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => handleDelete(pkg.id)}
+                                                        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 transition hover:bg-rose-500 hover:text-white active:scale-95"
+                                                    >
+                                                        <IoTrashOutline size={20} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })
+                            ) : (
+                                <div className="col-span-full rounded-[2rem] border border-dashed border-slate-200 bg-white py-20 text-center shadow-sm">
+                                    <div className="flex flex-col items-center px-4">
+                                        <div className="flex h-20 w-20 items-center justify-center rounded-[1.7rem] bg-indigo-50 text-indigo-500">
+                                            <IoStarOutline size={42} />
+                                        </div>
+
+                                        <h3 className="mt-5 text-xl font-black text-slate-900">
+                                            No Packages Defined
+                                        </h3>
+
+                                        <p className="mt-2 max-w-md text-sm font-medium leading-6 text-slate-500">
+                                            Start by creating your first subscription plan for institutes and
+                                            manage student, teacher, and class limits professionally.
+                                        </p>
+
+                                        <button
+                                            onClick={() => handleOpenModal()}
+                                            className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-[#090f4f] px-8 py-3.5 text-sm font-black text-white shadow-xl shadow-indigo-950/15 transition hover:bg-indigo-800 active:scale-95"
+                                        >
+                                            <IoAddOutline size={20} />
+                                            Add First Plan
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
             </main>
 
             {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.94, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -537,7 +537,7 @@ const SubscriptionPackages = () => {
 
 const LimitRow = ({ icon, label, value }) => {
     return (
-        <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+        <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm">
                     {icon}

@@ -93,6 +93,7 @@ const Sidebar = () => {
       items: [
         { key: "assignments", title: "Assignments", icon: "book", route: "/assignments" },
         { key: "quizzes", title: "Quizzes", icon: "quiz", route: "/quizzes" },
+        { key: "leaves", title: "My Leaves", icon: "calendar", route: "/student/leaves" },
         { key: "attendence-report", title: "Attendance Report", icon: "graph", route: "/student/attendence-report" },
       ]
     }
@@ -226,7 +227,7 @@ const Sidebar = () => {
     <div className="flex flex-col">
       {/* Mobile overlay */}
 
-      <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className={`lg:hidden fixed inset-0 z-[200] transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
           <Menubar isMobile={true} />
         </div>

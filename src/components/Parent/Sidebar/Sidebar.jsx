@@ -135,7 +135,7 @@ const Sidebar = () => {
                     <p className="font-medium">My Profile</p>
                   </div>
                   <div
-                    className="flex items-center hover:bg-[#F1F3F5] gap-3 px-3 py-2 cursor-pointer text-[#334155] hover:text-black rounded-lg text-sm transition-colors"
+                    className="hidden flex items-center hover:bg-[#F1F3F5] gap-3 px-3 py-2 cursor-pointer text-[#334155] hover:text-black rounded-lg text-sm transition-colors"
                     onClick={onSettingsClick}
                   >
                     <LuSettings className="text-lg" />

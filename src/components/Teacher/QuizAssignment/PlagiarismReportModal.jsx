@@ -57,7 +57,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
             <div className="flex-1 overflow-y-auto p-2 sm:p-8 space-y-8 scroll-smooth">
               {/* Overall Risk Banner */}
               {analysis?.overallRisk && (
-                <div className={`px-6 py-4 rounded-2xl border flex items-center justify-between ${getRiskColor(analysis.overallRisk)}`}>
+                <div className={`px-3 sm:px-6 py-4 rounded-2xl border flex items-center justify-between ${getRiskColor(analysis.overallRisk)}`}>
                   <div className="flex items-center gap-4">
                     <AiOutlineWarning size={32} className={analysis.overallRisk.toLowerCase() === 'high' ? 'animate-pulse' : ''} />
                     <div>
@@ -71,7 +71,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
               {/* Overview Summary */}
               {(analysis?.summary || data?.aiSummary || data?.message) && (
                 <div className="bg-indigo-50/50 border border-indigo-100 p-3 sm:p-5 rounded-2xl flex gap-4">
-                  <div className="bg-indigo-600 p-2 rounded-lg h-fit mt-1 self-start">
+                  <div className="hidden sm:block bg-indigo-600 p-2 rounded-lg h-fit mt-1 self-start">
                     <AiOutlineInfoCircle className="text-white" size={20} />
                   </div>
                   <div>
@@ -172,7 +172,7 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
               {/* No Suspicious Patterns Found */}
               {((!isGlobal && analysis?.plagiarism?.suspiciousPairs?.length === 0) || (isGlobal && data?.results?.length === 0)) && (
                 <div className="flex items-center gap-4 text-green-700 bg-green-50/50 border border-green-100 p-3 sm:p-6 rounded-2xl font-bold animate-in fade-in slide-in-from-bottom-2 duration-700">
-                  <div className="bg-green-600 p-2 rounded-full text-white shadow-sm shadow-green-200">
+                  <div className="bg-green-600 p-2 rounded-full text-black shadow-sm shadow-green-200">
                     <AiOutlineCheckCircle size={28} />
                   </div>
                   <div>
@@ -184,13 +184,13 @@ const PlagiarismReportModal = ({ isOpen, onClose, data }) => {
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t bg-gray-50/50 flex justify-end gap-4">
+            <div className="p-3 sm:p-6 border-t bg-gray-50/50 flex justify-end gap-4">
               {!isGlobal && data?.fileUrl && (
                 <a
                   href={data.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-3 border-2 border-[#0B1053] text-[#0B1053] font-bold rounded-2xl hover:bg-[#0B1053] hover:text-white transform transition-all duration-200 active:scale-95 text-sm uppercase tracking-wider"
+                  className="px-3 sm:px-8 py-3 border-2 border-[#0B1053] text-[#0B1053] font-bold rounded-2xl hover:bg-[#0B1053] hover:text-white transform transition-all duration-200 active:scale-95 text-sm uppercase tracking-wider"
                 >
                   View Original Submission
                 </a>

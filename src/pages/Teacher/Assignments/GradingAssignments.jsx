@@ -204,7 +204,7 @@ const GradingAssignments = () => {
                 <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                   <button
                     onClick={togglebell}
-                    className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
+                    className="hidden  relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
                   >
                     <img src={IMAGES.Notification} alt="" className="w-4 h-4 sm:w-[18px] sm:h-[18px] block" />
                     <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#EF4444] rounded-full border border-white" />

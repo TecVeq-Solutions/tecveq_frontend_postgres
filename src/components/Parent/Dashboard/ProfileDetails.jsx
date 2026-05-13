@@ -4,7 +4,9 @@ import { FiEdit2, FiCamera, FiPhone, FiMail, FiLock, FiUser, FiSave, FiHash } fr
 import { FaGraduationCap } from "react-icons/fa6";
 import IMAGES from "../../../assets/images";
 import profile from "../../../assets/images/profilepic.png";
-import { useParent } from "../../../context/ParentContext";
+import { useUser } from "../../../context/UserContext";
+import { updateTeacher } from "../../../api/Teacher/TeacherApi";
+import { toast } from "react-toastify";
 import useClickOutside from "../../../hooks/useClickOutlise";
 import { handleProfileImageUpdate } from "../../../utils/Admin/profileImageUtils";
 import Loader from "../../../utils/Loader";
@@ -56,19 +58,19 @@ const CustomInput = ({
 
 /* ─── Main Component ──────────────────────────────────────────────────── */
 const ProfileDetails = ({ onclose }) => {
-  const { selectedChild } = useParent();
+  const { userData, setUserData } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [userDataObj, setUserDataObj] = useState({
-    name: selectedChild?.name || "",
-    email: selectedChild?.email || "",
-    phoneNumber: selectedChild?.phoneNumber || "",
-    guardianName: selectedChild?.guardianName || "",
-    guardianEmail: selectedChild?.guardianEmail || "",
-    guardianPhoneNumber: selectedChild?.guardianPhoneNumber || "",
-    profilePic: selectedChild?.profilePic || "",
-    rollNo: selectedChild?.rollNo || "",
+    name: userData?.name || "",
+    email: userData?.email || "",
+    phoneNumber: userData?.phoneNumber || "",
+    guardianName: userData?.guardianName || "",
+    guardianEmail: userData?.guardianEmail || "",
+    guardianPhoneNumber: userData?.guardianPhoneNumber || "",
+    profilePic: userData?.profilePic || "",
+    rollNo: userData?.rollNo || "",
   });
 
   const modalRef = useRef(null);
@@ -95,9 +97,21 @@ const ProfileDetails = ({ onclose }) => {
     }
   };
 
-  const handleSaveDetails = () => {
-    // Save logic can be added here
-    setIsEditing(false);
+  const handleSaveDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await updateTeacher(userDataObj);
+      if (response) {
+        setUserData({ ...userData, ...response });
+        toast.success("Profile updated successfully!");
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error("Profile update error:", error);
+      toast.error(error?.response?.data?.message || "Failed to update profile details.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -105,7 +119,7 @@ const ProfileDetails = ({ onclose }) => {
     setPreviewUrl(null);
   };
 
-  const initials = (selectedChild?.name || "P").charAt(0).toUpperCase();
+  const initials = (userData?.name || "P").charAt(0).toUpperCase();
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-3 sm:p-4">
@@ -200,7 +214,7 @@ const ProfileDetails = ({ onclose }) => {
 
             {/* Name & role */}
             <h3 className="mt-4 text-[20px] sm:text-[22px] font-bold text-slate-800 tracking-tight text-center">
-              {userDataObj.name || "Child Name"}
+              {userDataObj.name || "Parent Name"}
             </h3>
             <div
               className="mt-2 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-[1.8px]"
@@ -215,7 +229,7 @@ const ProfileDetails = ({ onclose }) => {
                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                 style={{ background: "#149B9A" }}
               />
-              Parent View
+              Parent Account
             </div>
 
             {/* Edit link */}
@@ -249,7 +263,7 @@ const ProfileDetails = ({ onclose }) => {
 
           {/* ── Child Info Fields ── */}
           <div className="px-3 sm:px-7 pt-4 pb-2">
-            <p className="text-[10px] font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-[2px]">Child Info</p>
+            <p className="text-[10px] font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-[2px]">Account Info</p>
             <CustomInput
               label="Full Name"
               name="name"
@@ -292,7 +306,7 @@ const ProfileDetails = ({ onclose }) => {
 
           {/* ── Guardian Info Fields ── */}
           <div className="px-3 sm:px-7 pt-2 pb-4">
-            <p className="text-[10px] font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-[2px]">Guardian Info</p>
+            <p className="text-[10px] font-semibold text-slate-400 mb-3 ml-1 uppercase tracking-[2px]">Contact Details</p>
             <CustomInput
               label="Parent Name"
               name="guardianName"
@@ -328,14 +342,14 @@ const ProfileDetails = ({ onclose }) => {
           <div className="flex-shrink-0 px-6 sm:px-7 py-5 bg-slate-50/80 border-t border-slate-100 flex gap-3">
             <button
               onClick={handleCancel}
-              className="flex-1 py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
+              className="flex-1 py-2 sm:py-3.5 bg-white border-[1.5px] border-slate-200 text-slate-600 rounded-2xl text-[14px] font-semibold hover:bg-slate-100 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveDetails}
               disabled={loading}
-              className={`flex-1 py-3.5 text-white rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-2 transition-all ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}`}
+              className={`flex-1 py-2 sm:py-3.5 text-white rounded-2xl text-[14px] font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-all ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}`}
               style={{
                 background:
                   "linear-gradient(135deg, #0B1053 0%, #149B9A 100%)",

@@ -10,7 +10,7 @@ const ParentLayout = ({ children }) => {
   }, []);
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#F9F9F9]">
-      <div className="fixed top-0 left-0 h-full z-20 flex-shrink-0">
+      <div className="fixed top-0 left-0 h-full z-[1000] flex-shrink-0">
         <Sidebar />
       </div>
       <div className="flex-1 h-full overflow-x-hidden  overflow-y-auto  custom-scrollbar relative">

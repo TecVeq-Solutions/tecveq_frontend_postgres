@@ -78,7 +78,7 @@ const DataRows = ({
           )}
         </div>
 
-        <div className="flex flex-col flex-1 min-w-0 justify-center">
+        <div className="  flex flex-col flex-1 min-w-0 justify-center">
           <span className="text-sm font-medium text-gray-800 truncate">{studentName}</span>
           <div className="flex items-center gap-2 mt-0.5">
             <span

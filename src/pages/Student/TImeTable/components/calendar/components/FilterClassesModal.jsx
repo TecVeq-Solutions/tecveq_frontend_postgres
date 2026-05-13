@@ -8,12 +8,18 @@ import { IoClose } from "react-icons/io5";
 import { Calendar, SlidersHorizontal } from "lucide-react";
 import moment from "moment";
 import { useStudent } from "../../../../../../context/StudentContext";
+import { useParent } from "../../../../../../context/ParentContext";
 import { getAllClasses } from "../../../../../../api/ForAllAPIs";
 import { toast } from "react-toastify";
 import useClickOutside from "../../../../../../hooks/useClickOutlise";
+import { useUser } from "../../../../../../context/UserContext";
 
 const FilterClassesModal = ({ addModalOpen, setaddModalOpen }) => {
-  const { allClasses } = useStudent();
+  const studentContext = useStudent();
+  const parentContext = useParent();
+  const { userData } = useUser();
+  
+  const allClasses = userData?.userType === "parent" ? parentContext?.allClasses : studentContext?.allClasses;
   const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
   const [filteredClasses, setFilteredClasses] = useState([]);
   const [filterEndDate, setFilterEndDate] = useState("");
@@ -58,9 +64,18 @@ const FilterClassesModal = ({ addModalOpen, setaddModalOpen }) => {
 
     setLoading(true);
     try {
+      let studentID = undefined;
+      if (userData?.userType === "parent") {
+        const child = localStorage.getItem("selectedChild");
+        if (child) {
+          studentID = JSON.parse(child)?.id;
+        }
+      }
+
       const response = await getAllClasses({
         startDate: filterStartDate,
-        endDate: filterEndDate
+        endDate: filterEndDate,
+        studentID
       });
 
       if (response) {

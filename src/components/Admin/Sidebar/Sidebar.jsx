@@ -92,6 +92,7 @@ const Sidebar = () => {
     { key: "bulkAssign", title: "Bulk Assign", icon: "subjects", route: "/admin/bulk-subject-assign" },
     { key: "subjects", title: "Subjects", icon: "subjects", route: "/admin/subjects" },
     { key: "classroom", title: "Classroom", icon: "classroom", route: "/admin/classrooms" },
+    { key: "teacher-leaves", title: "Teacher Leaves", icon: "calendar", route: "/admin/teacher-leaves" },
     { key: "fees", title: "Fees", icon: "levels", route: "/admin/fees" },
     { key: "settings", title: "Settings", icon: "setting", route: "/admin/settings" },
     { key: "platformSupport", title: "Platform Support", icon: "announcement", route: "/admin/platform-support" },
@@ -121,7 +122,7 @@ const Sidebar = () => {
     },
     {
       label: "Management",
-      items: menuItems.filter(i => ["teachers", "manageUsers", "classroom"].includes(i.key))
+      items: menuItems.filter(i => ["teachers", "manageUsers", "classroom", "teacher-leaves"].includes(i.key))
     },
     {
       label: "Academics",
@@ -263,6 +264,7 @@ const Sidebar = () => {
       {/* Desktop */}
       <div className="max-lg:hidden">
         <Menubar isMobile={false} />
+
       </div>
 
       {isProfileDetails && <ProfileDetails onClose={toggleProfileDetails} />}

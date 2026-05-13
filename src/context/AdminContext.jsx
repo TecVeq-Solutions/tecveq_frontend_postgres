@@ -226,7 +226,6 @@ export const AdminProvider = ({ children }) => {
     subjectsRefetch: subjectQuery.refetch,
     subjectsIsPending: subjectQuery.isPending,
 
-    allClassrooms,
     classroomsRefetch: classroomQuery.refetch,
     classroomsIsPending: classroomQuery.isPending,
 

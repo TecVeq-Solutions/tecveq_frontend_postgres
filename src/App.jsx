@@ -98,6 +98,10 @@ import StudentProfileDashboard from "./pages/Common/StudentProfileDashboard";
 import APlatformSupport from "./pages/Admin/PlatformSupport/PlatformSupport";
 import ABlocked from "./pages/Admin/Blocked/BlockedAccount";
 import ASubscription from "./pages/Admin/Subscription/MySubscription";
+import StudentLeaves from "./pages/Student/Leaves/Leaves";
+import TeacherMyLeaves from "./pages/Teacher/Leaves/MyLeaves";
+import TeacherStudentLeaves from "./pages/Teacher/Leaves/StudentLeaves";
+import AdminTeacherLeaves from "./pages/Admin/Leaves/TeacherLeaves";
 
 function App() {
 
@@ -300,6 +304,14 @@ function App() {
             }
           />
           <Route
+            path="/admin/teacher-leaves"
+            element={
+              <AdminLayout>
+                <AdminTeacherLeaves />
+              </AdminLayout>
+            }
+          />
+          <Route
             path="/student-profile/:studentId"
             element={
               <AdminLayout>
@@ -465,6 +477,14 @@ function App() {
             }
           />
           <Route
+            path="/student/leaves"
+            element={
+              <StudentLayout>
+                <StudentLeaves />
+              </StudentLayout>
+            }
+          />
+          <Route
             path="/student-profile/:studentId"
             element={
               <StudentLayout>
@@ -521,6 +541,22 @@ function App() {
             element={
               <TeacherLayout>
                 <TSubjectReport />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/leaves"
+            element={
+              <TeacherLayout>
+                <TeacherMyLeaves />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/student-leaves"
+            element={
+              <TeacherLayout>
+                <TeacherStudentLeaves />
               </TeacherLayout>
             }
           />

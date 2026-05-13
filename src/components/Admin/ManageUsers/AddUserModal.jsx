@@ -84,7 +84,7 @@ const LevelSelectable = ({ alllevels, defaultValue }) => (
     Main component
 ───────────────────────────────────────────── */
 const AddUserModal = ({ closeModal, refetch }) => {
-    const { allLevels } = useAdmin();
+    const { allLevels, subscriptionData, adminUsersData } = useAdmin();
     const [role, setRole] = useState(() => {
         const formData = JSON.parse(localStorage.getItem('addUserFormData') || '{}');
         return formData.role || "student";
@@ -110,7 +110,6 @@ const AddUserModal = ({ closeModal, refetch }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { subscriptionData, adminUsersData } = useAdmin();
         const { subscription } = subscriptionData || {};
 
         // Enforcement: Check limits
@@ -179,7 +178,8 @@ const AddUserModal = ({ closeModal, refetch }) => {
                 closeModal();
             } else throw new Error("Failed to register user.");
         } catch (error) {
-            toast.error(error.message || "Cannot add the user!");
+            const backendMsg = error?.response?.data?.message || error?.response?.data;
+            toast.error(typeof backendMsg === 'string' ? backendMsg : error.message || "Cannot add the user!");
         } finally {
             setLoading(false);
         }

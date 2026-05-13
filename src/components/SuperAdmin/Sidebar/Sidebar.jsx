@@ -44,32 +44,32 @@ const Sidebar = () => {
     {
       label: "Main",
       items: [
-        { key: "dashboard",    title: "Dashboard",     icon: "home",   route: "/superadmin/dashboard"     },
-        { key: "admins",       title: "Admin Management", icon: "user", route: "/superadmin/admins"    },
-        { key: "packages",     title: "Subscription Plans", icon: "levels", route: "/superadmin/packages" },
-        { key: "payments",     title: "Payments",      icon: "fees",   route: "/superadmin/payments"      },
+        { key: "dashboard", title: "Dashboard", icon: "home", route: "/superadmin/dashboard" },
+        { key: "admins", title: "Admin Management", icon: "user", route: "/superadmin/admins" },
+        { key: "packages", title: "Subscription Plans", icon: "levels", route: "/superadmin/packages" },
+        { key: "payments", title: "Payments", icon: "fees", route: "/superadmin/payments" },
       ]
     },
     {
       label: "Support",
       items: [
-        { key: "chat",         title: "Support Chat",  icon: "chat",   route: "/superadmin/chat"          },
+        { key: "chat", title: "Support Chat", icon: "chat", route: "/superadmin/chat" },
         { key: "notifications", title: "Notifications", icon: "notification", route: "/superadmin/notifications" },
       ]
     },
     {
       label: "System",
       items: [
-        { key: "reports",      title: "System Reports", icon: "report", route: "/superadmin/reports"      },
-        { key: "blocked",      title: "Blocked Accounts", icon: "delete", route: "/superadmin/blocked-accounts" },
-        { key: "settings",     title: "System Settings", icon: "settings", route: "/superadmin/settings"     },
-        { key: "profile",      title: "My Profile",     icon: "profile", route: "/superadmin/profile"      },
+        { key: "reports", title: "System Reports", icon: "report", route: "/superadmin/reports" },
+        { key: "blocked", title: "Blocked Accounts", icon: "delete", route: "/superadmin/blocked-accounts" },
+        { key: "settings", title: "System Settings", icon: "settings", route: "/superadmin/settings" },
+        { key: "profile", title: "My Profile", icon: "profile", route: "/superadmin/profile" },
       ]
     }
   ];
 
   const Menubar = ({ isMobile }) => (
-    <div className="admin-sidebar flex flex-col w-full sm:w-80 lg:w-72 xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
+    <div className="admin-sidebar flex flex-col w-full sm:w-[50] lg:w-72 xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
       <div className="flex items-center justify-between px-[16px] pt-6 pb-5 border-b border-gray-200">
         <div className="w-full">
@@ -134,7 +134,7 @@ const Sidebar = () => {
       </div>
 
       {/* Mobile overlay */}
-      <div className={`lg:hidden fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className={`lg:hidden fixed inset-0 z-[200] transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
           <Menubar isMobile={true} />
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { BACKEND_URL } from "../../constants/api";
@@ -20,12 +20,19 @@ import {
     IoPeopleOutline,
     IoAlertCircleOutline,
     IoMailUnreadOutline,
+    IoChevronBackOutline,
+    IoChevronForwardOutline,
+    IoChevronDownOutline,
 } from "react-icons/io5";
 import { toast } from "react-toastify";
 
 const Notifications = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const { data: notifications = [], isLoading, refetch } = useQuery({
         queryKey: ["superadmin-notifications"],
@@ -100,6 +107,36 @@ const Notifications = () => {
         }
     };
 
+    const totalNotifications = notifications.length;
+    const broadcastCount = notifications.filter((n) => !n.receiverId).length;
+    const targetedCount = notifications.filter((n) => n.receiverId).length;
+
+    // Pagination logic
+    const totalItems = notifications.length;
+    const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
+
+    const paginatedNotifications = useMemo(() => {
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+
+        return notifications.slice(startIndex, endIndex);
+    }, [notifications, currentPage, rowsPerPage]);
+
+    const startItem = totalItems === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+    const endItem = Math.min(currentPage * rowsPerPage, totalItems);
+
+    const goToPage = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(1);
+        }
+    }, [currentPage, totalPages]);
+
     if (isLoading) {
         return (
             <div className="flex h-screen items-center justify-center bg-[#f5f7fb]">
@@ -108,34 +145,30 @@ const Notifications = () => {
         );
     }
 
-    const totalNotifications = notifications.length;
-    const broadcastCount = notifications.filter((n) => !n.receiverId).length;
-    const targetedCount = notifications.filter((n) => n.receiverId).length;
-
     return (
         <div className="min-h-screen bg-[#f5f7fb] font-poppins text-slate-900">
             <SuperAdminNavbar heading="Broadcast System" />
 
             <main className="max-w-screen-2xl px-4 py-5 sm:px-6 lg:px-8">
                 {/* Hero Section */}
-                <section className="relative mb-8 overflow-hidden rounded-[2rem] bg-[#080f4f] p-6 text-white  ">
+                <section className="relative mb-3 sm:mb-8 overflow-hidden rounded-[2rem] bg-[#080f4f] p-3 sm:p-6 text-white">
                     <div className="absolute -right-20 -top-24 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl" />
                     <div className="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" />
                     <div className="absolute right-12 top-12 hidden h-28 w-28 rounded-full border border-white/10 lg:block" />
                     <div className="absolute right-36 bottom-10 hidden h-14 w-14 rounded-full border border-white/10 lg:block" />
 
-                    <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="relative z-10 flex flex-col gap-3  sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-100">
+                            <div className="mb-2 sm:mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2  text-[9px] font-black uppercase tracking-[0.2em] text-cyan-100">
                                 <IoSparklesOutline className="text-cyan-300" />
                                 Super Admin Broadcast Center
                             </div>
 
-                            <h1 className="max-w-3xl text-3xl font-black leading-tight sm:text-4xl l">
+                            <h1 className="max-w-3xl text-2xl sm:text-3xl font-black leading-tight sm:text-4xl">
                                 System Notifications
                             </h1>
 
-                            <p className=" hidden mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-300 sm:text-base">
+                            <p className="hidden mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-300 sm:text-base">
                                 Send payment reminders, security alerts, system updates and general
                                 announcements to all institutes or selected administrators.
                             </p>
@@ -143,7 +176,7 @@ const Notifications = () => {
 
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="group inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-sm font-black text-[#080f4f] shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cyan-50 active:scale-95 sm:w-auto"
+                            className="group inline-flex w-full items-center   sm:justify-center gap-3 rounded-2xl bg-white px-4 py-2 sm:px-6 sm:py-4 text-sm font-black text-[#080f4f] shadow-xl shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cyan-50 active:scale-95 sm:w-auto"
                         >
                             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#080f4f] text-white transition group-hover:rotate-90">
                                 <IoAddOutline size={22} />
@@ -191,84 +224,177 @@ const Notifications = () => {
                         </div>
                     </div>
 
-                    {/* Notification List */}
-                    <div className="space-y-4">
-                        {notifications.length > 0 ? (
-                            notifications.map((notif, idx) => (
-                                <motion.div
-                                    key={notif.id}
-                                    initial={{ opacity: 0, y: 18 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.06 }}
-                                    className="group relative overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-5 shadow-sm shadow-slate-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-indigo-950/10 sm:p-6"
-                                >
-                                    <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[#080f4f] via-indigo-500 to-cyan-400" />
-                                    <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-indigo-50 blur-3xl transition group-hover:bg-cyan-50" />
+                    {/* Notification List with fixed height + bottom pagination */}
+                    <div className="rounded-[2rem] border border-slate-100 bg-white/70 p-3 shadow-sm shadow-slate-200/70">
+                        <div className="h-[520px] overflow-y-auto pr-2 space-y-4 custom-scrollbar">
+                            {notifications.length > 0 ? (
+                                paginatedNotifications.map((notif, idx) => (
+                                    <motion.div
+                                        key={notif.id}
+                                        initial={{ opacity: 0, y: 18 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.06 }}
+                                        className="group relative overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-5 shadow-sm shadow-slate-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-indigo-950/10 sm:p-6"
+                                    >
+                                        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[#080f4f] via-indigo-500 to-cyan-400" />
+                                        <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-indigo-50 blur-3xl transition group-hover:bg-cyan-50" />
 
-                                    <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-start">
-                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.35rem] bg-slate-50 text-3xl ring-1 ring-slate-100 transition group-hover:scale-105">
-                                            {getTypeIcon(notif.type)}
-                                        </div>
+                                        <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-start">
+                                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.35rem] bg-slate-50 text-3xl ring-1 ring-slate-100 transition group-hover:scale-105">
+                                                {getTypeIcon(notif.type)}
+                                            </div>
 
-                                        <div className="min-w-0 flex-1">
-                                            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                                                <div className="min-w-0">
-                                                    <h3 className="text-lg font-black leading-tight text-slate-900 sm:text-xl">
-                                                        {notif.title}
-                                                    </h3>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                                                    <div className="min-w-0">
+                                                        <h3 className="text-lg font-black leading-tight text-slate-900 sm:text-xl">
+                                                            {notif.title}
+                                                        </h3>
 
-                                                    <p className="mt-2 max-w-4xl text-sm font-medium leading-6 text-slate-500">
-                                                        {notif.message}
-                                                    </p>
+                                                        <p className="mt-2 max-w-4xl text-sm font-medium leading-6 text-slate-500">
+                                                            {notif.message}
+                                                        </p>
+                                                    </div>
+
+                                                    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1.5 text-[10px] sm:text-[12px] font-medium uppercase text-black ring-1 ring-slate-100">
+                                                        <IoTimeOutline />
+                                                        {new Date(notif.createdAt).toLocaleString()}
+                                                    </span>
                                                 </div>
 
-                                                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full  bg-slate-50 px-3 py-1.5 text-[10px] sm:text-[12px] font-medium uppercase  text-black ring-1 ring-slate-100">
-                                                    <IoTimeOutline />
-                                                    {new Date(notif.createdAt).toLocaleString()}
-                                                </span>
-                                            </div>
+                                                <div className="mt-5 flex flex-wrap items-center gap-3">
+                                                    <span
+                                                        className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] ring-1 ${getTypeBadge(
+                                                            notif.type
+                                                        )}`}
+                                                    >
+                                                        {getTypeIcon(notif.type)}
+                                                        {notif.type}
+                                                    </span>
 
-                                            <div className="mt-5 flex flex-wrap items-center gap-3">
-                                                <span
-                                                    className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] ring-1 ${getTypeBadge(
-                                                        notif.type
-                                                    )}`}
-                                                >
-                                                    {getTypeIcon(notif.type)}
-                                                    {notif.type}
-                                                </span>
-
-                                                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700 ring-1 ring-emerald-100">
-                                                    <IoCheckmarkCircleOutline />
-                                                    Delivered to {notif.receiverId ? "Specific Admin" : "All Admins"}
-                                                </span>
+                                                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-emerald-700 ring-1 ring-emerald-100">
+                                                        <IoCheckmarkCircleOutline />
+                                                        Delivered to {notif.receiverId ? "Specific Admin" : "All Admins"}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            ))
-                        ) : (
-                            <div className="rounded-[2rem] border-2 border-dashed border-slate-200 bg-white py-20 text-center shadow-sm">
-                                <div className="flex flex-col items-center px-4">
-                                    <div className="flex h-20 w-20 items-center justify-center rounded-[1.7rem] bg-indigo-50 text-indigo-500">
-                                        <IoMailUnreadOutline size={42} />
-                                    </div>
+                                    </motion.div>
+                                ))
+                            ) : (
+                                <div className="rounded-[2rem] border-2 border-dashed border-slate-200 bg-white py-20 text-center shadow-sm">
+                                    <div className="flex flex-col items-center px-4">
+                                        <div className="flex h-20 w-20 items-center justify-center rounded-[1.7rem] bg-indigo-50 text-indigo-500">
+                                            <IoMailUnreadOutline size={42} />
+                                        </div>
 
-                                    <h3 className="mt-5 text-xl font-black text-slate-900">
-                                        No Notifications Sent
-                                    </h3>
+                                        <h3 className="mt-5 text-xl font-black text-slate-900">
+                                            No Notifications Sent
+                                        </h3>
 
-                                    <p className="mt-2 max-w-md text-sm font-medium leading-6 text-slate-500">
-                                        Create your first broadcast to send payment reminders, updates, or
-                                        important alerts to administrators.
-                                    </p>
+                                        <p className="mt-2 max-w-md text-sm font-medium leading-6 text-slate-500">
+                                            Create your first broadcast to send payment reminders, updates, or
+                                            important alerts to administrators.
+                                        </p>
+
+                                        <button
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-[#080f4f] px-8 py-3.5 text-sm font-black text-white shadow-xl shadow-indigo-950/15 transition hover:bg-indigo-800 active:scale-95"
+                                        >
+                                            <IoAddOutline size={20} />
+                                            Create First Notification
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Bottom Pagination + Selector */}
+                        {totalItems > 0 && (
+                            <div className="mt-4 flex  lg:flex-row items-center justify-between gap-2 sm:gap-4 rounded-[1.6rem] border border-slate-100 bg-gradient-to-r from-white via-indigo-50/50 to-cyan-50/40 px-5 sm:px-6 py-4 shadow-sm">
+                                <div className="flex items-center gap-1 sm:gap-3">
+                                    <span className="text-xs sm:text-sm font-bold text-slate-500">
+                                        Rows per page
+                                    </span>
+
+                                    <div className="relative">
+                                        <select
+                                            value={rowsPerPage}
+                                            onChange={(e) => {
+                                                setRowsPerPage(Number(e.target.value));
+                                                setCurrentPage(1);
+                                            }}
+                                            className="appearance-none rounded-2xl border border-indigo-100 bg-white py-3 pl-3 sm:pl-4   pr-7 sm:pr-10 text-xs sm:text-sm font-black text-[#080f4f] shadow-sm outline-none transition hover:border-indigo-300 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+                                        >
+                                            {[2, 4, 6, 10].map((item) => (
+                                                <option key={item} value={item}>
+                                                    {item}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <IoChevronDownOutline
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-indigo-500"
+                                            size={16}
+                                        />
+                                    </div>
+                                </div>
+
+                                <p className="hidden sm:block text-xs sm:text-sm font-bold text-slate-500 text-center">
+                                    Showing{" "}
+                                    <span className="font-black text-[#080f4f]">{startItem}</span>
+                                    {" - "}
+                                    <span className="font-black text-[#080f4f]">{endItem}</span>
+                                    {" of "}
+                                    <span className="font-black text-[#080f4f]">{totalItems}</span>
+                                    {" "}Notifications
+                                </p>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => goToPage(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="sm:h-10 sm:w-10 h-8 w-8 flex items-center justify-center rounded-2xl border border-indigo-100 bg-white text-indigo-600 shadow-sm transition hover:bg-[#080f4f] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-indigo-600"
+                                    >
+                                        <IoChevronBackOutline size={18} />
+                                    </button>
+
+                                    <div className="flex items-center gap-1">
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                            .filter((page) => {
+                                                return (
+                                                    page === 1 ||
+                                                    page === totalPages ||
+                                                    Math.abs(page - currentPage) <= 1
+                                                );
+                                            })
+                                            .map((page, index, arr) => (
+                                                <React.Fragment key={page}>
+                                                    {index > 0 && page - arr[index - 1] > 1 && (
+                                                        <span className="px-1 text-slate-400 text-sm font-bold">
+                                                            ...
+                                                        </span>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() => goToPage(page)}
+                                                        className={`sm:h-10 sm:w-10 h-8 w-8 rounded-2xl text-xs sm:text-sm font-black transition-all ${currentPage === page
+                                                            ? "bg-[#080f4f] text-white shadow-lg shadow-indigo-900/20 scale-105"
+                                                            : "bg-white border border-indigo-100 text-slate-600 hover:border-indigo-400 hover:text-indigo-600 shadow-sm"
+                                                            }`}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                </React.Fragment>
+                                            ))}
+                                    </div>
 
                                     <button
-                                        onClick={() => setIsModalOpen(true)}
-                                        className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-[#080f4f] px-8 py-3.5 text-sm font-black text-white shadow-xl shadow-indigo-950/15 transition hover:bg-indigo-800 active:scale-95"
+                                        onClick={() => goToPage(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        className="sm:h-10 sm:w-10 h-8 w-8 flex items-center justify-center rounded-2xl border border-indigo-100 bg-white text-indigo-600 shadow-sm transition hover:bg-[#080f4f] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-indigo-600"
                                     >
-                                        <IoAddOutline size={20} />
-                                        Create First Notification
+                                        <IoChevronForwardOutline size={18} />
                                     </button>
                                 </div>
                             </div>
@@ -280,7 +406,7 @@ const Notifications = () => {
             {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4  pt-14 backdrop-blur-md">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 pt-14 backdrop-blur-md">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.94, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
