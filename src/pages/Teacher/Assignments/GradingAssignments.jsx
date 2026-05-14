@@ -13,8 +13,23 @@ import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMultipleAssignmentsForGrading, gradeAssignments } from "../../../api/Teacher/Assignments";
 import Loader from "../../../utils/Loader";
+import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../../../context/UserContext";
 import ProfileDetails from "../../../components/Teacher/ProfileDetails";
+
+const SkeletonRow = () => (
+  <div className="w-full border-b border-gray-100 flex items-center px-4 py-4 bg-white animate-pulse">
+    <div className="w-10 h-4 bg-gray-200 rounded mr-4" />
+    <div className="flex-1 flex items-center gap-3">
+      <div className="w-9 h-9 bg-gray-200 rounded-full" />
+      <div className="w-32 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="hidden sm:block w-[130px] h-4 bg-gray-200 rounded mx-2" />
+    <div className="w-16 h-8 bg-gray-200 rounded mx-2" />
+    <div className="w-14 h-8 bg-gray-200 rounded mx-2" />
+    <div className="w-8 h-8 bg-gray-100 rounded-full" />
+  </div>
+);
 
 const GradingAssignments = () => {
 
@@ -127,7 +142,8 @@ const GradingAssignments = () => {
       let result = await getMultipleAssignmentsForGrading(location.state.id);
       return result;
     },
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -283,30 +299,56 @@ const GradingAssignments = () => {
                   marksObtained={"Marks"}
                   grade={"Grade"}
                 />
-                {filteredData?.map((submission, index) => (
-                  <GradeQuizAssignmentRow
-                    key={submission?.studentID?.id || index}
-                    isQuiz={false}
-                    header={false}
-                    index={index + 1}
-                    bgColor={"#FFFFFF"}
-                    grade={submission?.grade}
-                    marks={submission?.marks}
-                    profileLink={
-                      submission.studentID.profilePic ||
-                      IMAGES.Profile ||
-                      "http://bit.ly/4gcOBHl"
-                    }
-                    setInputField={setInputField}
-                    id={submission?.studentID?.id}
-                    feedback={submission?.feedback}
-                    name={submission?.studentID?.name}
-                    marksObtained={submission?.marksObtained}
-                    submission={
-                      submission?.submission?.submittedAt || "Not Submitted Yet"
-                    }
-                  />
-                ))}
+                <AnimatePresence mode="wait">
+                  {allAssignmentsQuery.isLoading ? (
+                    <motion.div
+                      key="skeleton"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {[1, 2, 3, 4, 5].map((i) => <SkeletonRow key={i} />)}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="content"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ staggerChildren: 0.05 }}
+                    >
+                      {filteredData?.map((submission, index) => (
+                        <motion.div
+                          key={submission?.studentID?.id || index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                        >
+                          <GradeQuizAssignmentRow
+                            isQuiz={false}
+                            header={false}
+                            index={index + 1}
+                            bgColor={"#FFFFFF"}
+                            grade={submission?.grade}
+                            marks={submission?.marks}
+                            profileLink={
+                              submission.studentID.profilePic ||
+                              IMAGES.Profile ||
+                              "http://bit.ly/4gcOBHl"
+                            }
+                            setInputField={setInputField}
+                            id={submission?.studentID?.id}
+                            feedback={submission?.feedback}
+                            name={submission?.studentID?.name}
+                            marksObtained={submission?.marksObtained}
+                            submission={
+                              submission?.submission?.submittedAt || "Not Submitted Yet"
+                            }
+                          />
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 

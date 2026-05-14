@@ -96,15 +96,7 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
   const [addEventModalOpen, setaddEventModalOpen] = useState(false);
 
 
-  const { data: teacherData, isPending: isPendingTeacher, refetch: refetchTeacher } = useQuery({
-    queryKey: teacherID ? ["timetable", teacherID] : ["timetable"],
-    queryFn: () => teacherID ? getAllClasses(teacherID) : Promise.resolve([]), // Avoids unnecessary fetches
-    enabled: !!teacherID, // Ensures teacherID is valid before fetching
-    refetchOnWindowFocus: false, // Stops auto-refetch on window focus
-    refetchOnReconnect: false, // Stops auto-refetch on network reconnect
-    staleTime: 1000 * 60 * 5, // Cache results for 5 minutes
-    cacheTime: 1000 * 60 * 10, // Keeps data in cache for 10 minutes
-  });
+
 
 
 
@@ -142,8 +134,6 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
               onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
             >
               <SchedualClasses
-                data={teacherData}
-                isPending={isPendingTeacher}
                 refetch={refetch}
                 addScheduleModalOpen={addScheduleModalOpen}
                 setAddScheduleModalOpen={setAddScheduleModalOpen}
@@ -155,7 +145,14 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
 
       {!isPending && (
         // overflow-y-auto scrollbar-hide
-        <div className="w-full h-[700px] sm:h-[800px] lg:h-[calc(100vh-200px)] min-h-[500px] overflow-x-auto overflow-y-hidden border border-grey/20 rounded-lg">
+        <div className="w-full h-[700px] sm:h-[800px] lg:h-[calc(100vh-200px)] min-h-[500px] overflow-x-auto overflow-y-hidden border border-grey/20 rounded-lg relative">
+          {isRefetching && (
+            <div className="absolute top-0 left-0 right-0 z-50 flex justify-center">
+              <div className="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-b-lg shadow-md animate-pulse font-bold">
+                Updating Timetable...
+              </div>
+            </div>
+          )}
           <Calendar
             style={{}}
             formats={{ dayRangeHeaderFormat }}

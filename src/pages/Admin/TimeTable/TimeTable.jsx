@@ -48,7 +48,7 @@ const TimeTable = () => {
 
 
   return (
-    isPending || isRefetching ? <div className="flex flex-1 justify-start items-center" > <Loader /> </div> :
+    isPending ? <div className="flex flex-1 justify-start items-center" > <Loader /> </div> :
       <>
         <div className="flex flex-1 bg-[#f9f9f9]/50 font-poppins">
           <div className="flex flex-1 gap-4">

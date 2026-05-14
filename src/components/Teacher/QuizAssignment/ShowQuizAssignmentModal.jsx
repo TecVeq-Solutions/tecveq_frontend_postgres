@@ -3,6 +3,21 @@ import useClickOutside from '../../../hooks/useClickOutlise';
 import { useBlur } from '../../../context/BlurContext';
 import moment from 'moment';
 import { useUser } from '../../../context/UserContext';
+import { 
+    IoCalendarOutline, 
+    IoBarChartOutline, 
+    IoBookmarkOutline, 
+    IoSchoolOutline, 
+    IoReaderOutline, 
+    IoLinkOutline, 
+    IoDocumentTextOutline, 
+    IoPeopleOutline, 
+    IoPersonOutline,
+    IoDownloadOutline,
+    IoClipboardOutline,
+    IoBookOutline,
+    IoCloseOutline
+} from 'react-icons/io5';
 
 const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
     const { toggleBlur } = useBlur();
@@ -83,7 +98,7 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                         <div className="flex-1 min-w-0">
                             {/* type badge */}
                             <span className="inline-flex items-center gap-1.5 bg-white/20 text-white text-[11px] font-semibold uppercase tracking-widest rounded-full px-3 py-1 mb-3">
-                                <span>{isQuiz ? '📝' : '📘'}</span>
+                                {isQuiz ? <IoClipboardOutline className="text-sm" /> : <IoBookOutline className="text-sm" />}
                                 {isQuiz ? 'Quiz' : 'Assignment'}
                             </span>
 
@@ -104,9 +119,9 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                         {/* close button */}
                         <button
                             onClick={handleClose}
-                            className="flex-shrink-0 w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-lg font-bold transition-all duration-200"
+                            className="flex-shrink-0 w-9 h-9 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200"
                         >
-                            ✕
+                            <IoCloseOutline size={22} />
                         </button>
                     </div>
                 </div>
@@ -117,34 +132,46 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                     {/* Info Grid */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-2 sm:p-4 hover:border-blue-200 hover:shadow-sm transition-all duration-200">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
-                                📅 Due Date
-                            </p>
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                                <IoCalendarOutline className="text-slate-400 text-xs" />
+                                <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Due Date
+                                </p>
+                            </div>
                             <p className="text-slate-800 font-semibold text-sm leading-snug">
                                 {dueDate ? moment(dueDate).format('MMM Do YYYY, h:mm A') : '—'}
                             </p>
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 hover:border-amber-200 hover:shadow-sm transition-all duration-200">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
-                                🧮 Total Marks
-                            </p>
+                        <div className="bg-slate-50 border border-slate-100 rounded-2xl p-2 sm:p-4 hover:border-amber-200 hover:shadow-sm transition-all duration-200">
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                                <IoBarChartOutline className="text-slate-400 text-xs" />
+                                <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Total Marks
+                                </p>
+                            </div>
                             <span className="inline-flex items-center bg-amber-100 border border-amber-300 text-amber-800 text-sm font-bold rounded-lg px-3 py-0.5 font-mono">
                                 {totalMarks ?? '—'} pts
                             </span>
                         </div>
 
                         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-2  sm:p-4 hover:border-blue-200 hover:shadow-sm transition-all duration-200">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
-                                📚 Subject
-                            </p>
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                                <IoBookmarkOutline className="text-slate-400 text-xs" />
+                                <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Subject
+                                </p>
+                            </div>
                             <p className="text-slate-800 font-semibold text-sm">{subjectID?.name || '—'}</p>
                         </div>
 
                         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-2 sm:p-4 hover:border-blue-200 hover:shadow-sm transition-all duration-200">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
-                                🏫 Classroom
-                            </p>
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                                <IoSchoolOutline className="text-slate-400 text-xs" />
+                                <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Classroom
+                                </p>
+                            </div>
                             <p className="text-slate-800 font-semibold text-sm">{classroomID?.name || '—'}</p>
                         </div>
                     </div>
@@ -152,9 +179,12 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                     {/* Text / Description */}
                     {text && (
                         <div>
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2">
-                                📌 Description
-                            </p>
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <IoReaderOutline className="text-slate-400 text-xs" />
+                                <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Description
+                                </p>
+                            </div>
                             <div className="bg-amber-50 border border-amber-100 border-l-4 border-l-amber-400 rounded-xl px-2 sm:px-4 py-3 text-sm text-amber-900 leading-relaxed">
                                 {text}
                             </div>
@@ -167,9 +197,12 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                     {/* Attached Files */}
                     <div>
                         <div className="flex items-center gap-2 mb-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-                                📎 Attached Files
-                            </p>
+                            <div className="flex items-center gap-1.5">
+                                <IoLinkOutline className="text-slate-400 text-xs" />
+                                <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Attached Files
+                                </p>
+                            </div>
                             {files?.length > 0 && (
                                 <span className="bg-indigo-600 text-white text-[10px] font-bold rounded-full px-2 py-0.5 leading-none">
                                     {files.length}
@@ -186,7 +219,7 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                                     >
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">
-                                                📄
+                                                <IoDocumentTextOutline className="text-white" />
                                             </div>
                                             <span className="text-sm font-medium text-slate-700 truncate">{file.name}</span>
                                         </div>
@@ -195,9 +228,9 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                                             download
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="ml-3 flex-shrink-0 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 no-underline"
+                                            className="ml-3 flex-shrink-0 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 no-underline flex items-center gap-1"
                                         >
-                                            ↓ Download
+                                            <IoDownloadOutline /> Download
                                         </a>
                                     </div>
                                 ))}
@@ -214,9 +247,12 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
 
                     {/* Assigned Teachers */}
                     <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-3">
-                            👨‍🏫 Assigned Teachers
-                        </p>
+                        <div className="flex items-center gap-1.5 mb-3">
+                            <IoPeopleOutline className="text-slate-400 text-xs" />
+                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                Assigned Teachers
+                            </p>
+                        </div>
                         {isTeacher ? (
                             <div className="flex flex-col gap-2">
                                 {myTeacherEntries.map((t) => (
@@ -225,7 +261,7 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                                         className="flex items-center gap-3 bg-emerald-50 border border-emerald-100 rounded-2xl px-4 py-3"
                                     >
                                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-base flex-shrink-0">
-                                            👤
+                                            <IoPersonOutline className="text-white" />
                                         </div>
                                         <div>
                                             <p className="text-sm font-semibold text-emerald-900">{t.teacher.name}</p>
@@ -247,9 +283,12 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                     {/* Students */}
                     <div>
                         <div className="flex items-center gap-2 mb-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-                                👨‍🎓 Students
-                            </p>
+                            <div className="flex items-center gap-1.5">
+                                <IoSchoolOutline className="text-slate-400 text-xs" />
+                                <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                    Students
+                                </p>
+                            </div>
                             {classroomID?.students?.length > 0 && (
                                 <span className="bg-sky-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 leading-none">
                                     {classroomID.students.length}
@@ -264,7 +303,7 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                                         key={student.id}
                                         className="flex items-center gap-2 bg-sky-50 border border-sky-100 rounded-xl px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100 hover:border-sky-300 hover:-translate-y-0.5 transition-all duration-200"
                                     >
-                                        <span>👤</span>
+                                        <IoPersonOutline className="text-sky-400" />
                                         <span className="truncate">{student.name}</span>
                                     </div>
                                 ))}

@@ -34,16 +34,21 @@ const TeacherMessageDialog = ({ handleFeedback, item }) => {
     const messageMutation = useMutation({
         mutationKey: ["sendquickmessage"],
         mutationFn: handleSendMessage,
+        onMutate: () => {
+            const currentMsg = msgText;
+            setMsgText("");
+            return { currentMsg };
+        },
         onSuccess: (data) => {
             if (data) {
                 queryClient.invalidateQueries({ queryKey: ["chat"] });
                 toast.success("Message sent successfully!");
-                setMsgText("");
                 handleFeedback();
             }
         },
-        onError: (error) => {
+        onError: (error, variables, context) => {
             toast.error(error?.message || "Error sending message.");
+            if (context?.currentMsg) setMsgText(context.currentMsg);
         }
     })
     const handleSendFeedback = async () => {
@@ -57,13 +62,22 @@ const TeacherMessageDialog = ({ handleFeedback, item }) => {
     }
 
     const feedbackMutation = useMutation({
-        mutationKey: ["sendfeedback"], mutationFn: handleSendFeedback, onSettled: (data, error) => {
+        mutationKey: ["sendfeedback"],
+        mutationFn: handleSendFeedback,
+        onMutate: () => {
+            const currentFeedback = feedback;
+            setFeedback("");
+            return { currentFeedback };
+        },
+        onSuccess: (data) => {
             if (data) {
-                console.log("feedback submitted");
                 toast.success("Feedback submitted successfully!");
-            } else {
-                console.log("error while feedback");
+                handleFeedback();
             }
+        },
+        onError: (error, variables, context) => {
+            toast.error(error?.message || "Error submitting feedback.");
+            if (context?.currentFeedback) setFeedback(context.currentFeedback);
         }
     })
 

@@ -8,4 +8,6 @@ export const getPaymentHistory = apiRequest(async () => await axios.get(`${BACKE
 
 export const submitPaymentProof = apiRequest(async (data) => await axios.post(`${BACKEND_URL}/admin-payments/submit-proof`, data));
 
+export const updatePaymentProof = apiRequest(async (id, data) => await axios.put(`${BACKEND_URL}/admin-payments/update-proof/${id}`, data));
+
 export const getSystemSettings = apiRequest(async () => await axios.get(`${BACKEND_URL}/admin-payments/instructions`));

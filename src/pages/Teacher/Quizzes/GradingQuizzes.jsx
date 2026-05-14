@@ -15,6 +15,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMultipleQuizesForGrading, gradeQuizes } from "../../../api/Teacher/Quiz";
 import { useUser } from "../../../context/UserContext";
 import Loader from "../../../utils/Loader";
+import { motion, AnimatePresence } from "framer-motion";
+
+const SkeletonRow = () => (
+  <div className="w-full border-b border-gray-100 flex items-center px-4 py-4 bg-white animate-pulse">
+    <div className="w-10 h-4 bg-gray-200 rounded mr-4" />
+    <div className="flex-1 flex items-center gap-3">
+      <div className="w-9 h-9 bg-gray-200 rounded-full" />
+      <div className="w-32 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="hidden sm:block w-[130px] h-4 bg-gray-200 rounded mx-2" />
+    <div className="w-16 h-8 bg-gray-200 rounded mx-2" />
+    <div className="w-14 h-8 bg-gray-200 rounded mx-2" />
+    <div className="w-8 h-8 bg-gray-100 rounded-full" />
+  </div>
+);
 
 const GradingQuizzes = () => {
   const [mail, setmail] = useState(false);
@@ -126,7 +141,8 @@ const GradingQuizzes = () => {
       let result = await getMultipleQuizesForGrading(location.state.id);
       return result;
     },
-    staleTime: 0
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -210,7 +226,7 @@ const GradingQuizzes = () => {
                 <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 flex-shrink-0">
                   <button
                     onClick={togglebell}
-                    className="relative flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-lg xs:rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
+                    className="hidden relative flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-lg xs:rounded-xl cursor-pointer transition-all duration-200 hover:-translate-y-px bg-gradient-to-br from-[#F5F6FF] to-[#EDEEFF] border border-[#6366F1]/15 shadow-[0_2px_8px_rgba(15,20,60,0.06)] hover:shadow-[0_4px_16px_rgba(99,102,241,0.18)]"
                   >
                     <img src={IMAGES.Notification} alt="" className="w-[15px] h-[15px] xs:w-4 xs:h-4 sm:w-[18px] sm:h-[18px] block" />
                     <span className="absolute top-1 right-1 xs:top-1.5 xs:right-1.5 w-1.5 h-1.5 bg-[#EF4444] rounded-full border border-white" />
@@ -283,24 +299,49 @@ const GradingQuizzes = () => {
                   marksObtained={"Marks"}
                   grade={"Grade"}
                 />
-                {filteredData?.map((submission, index) => (
-                  <GradeQuizAssignmentRow
-                    key={submission?.studentID?.id || index}
-                    isQuiz={true}
-                    header={false}
-                    index={index + 1}
-                    bgColor={"#FFFFFF"}
-                    grade={submission?.grade}
-                    marks={submission?.marks}
-                    profileLink={submission.studentID.profilePic || IMAGES.Profile}
-                    setInputField={setInputField}
-                    id={submission?.studentID?.id}
-                    feedback={submission?.feedback}
-                    name={submission?.studentID?.name}
-                    marksObtained={submission?.marksObtained}
-                    submission={submission?.submission?.submittedAt || "Not Submitted Yet"}
-                  />
-                ))}
+                <AnimatePresence mode="wait">
+                  {allQuizQuery.isLoading ? (
+                    <motion.div
+                      key="skeleton"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {[1, 2, 3, 4, 5].map((i) => <SkeletonRow key={i} />)}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="content"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      {filteredData?.map((submission, index) => (
+                        <motion.div
+                          key={submission?.studentID?.id || index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                        >
+                          <GradeQuizAssignmentRow
+                            isQuiz={true}
+                            header={false}
+                            index={index + 1}
+                            bgColor={"#FFFFFF"}
+                            grade={submission?.grade}
+                            marks={submission?.marks}
+                            profileLink={submission.studentID.profilePic || IMAGES.Profile}
+                            setInputField={setInputField}
+                            id={submission?.studentID?.id}
+                            feedback={submission?.feedback}
+                            name={submission?.studentID?.name}
+                            marksObtained={submission?.marksObtained}
+                            submission={submission?.submission?.submittedAt || "Not Submitted Yet"}
+                          />
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
               </div>
             </div>

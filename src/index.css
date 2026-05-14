@@ -35,6 +35,19 @@
   background-color: #0b105360;
 }
 
+/* Sidebar specific scrollbar behavior */
+.admin-sidebar .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.admin-sidebar:hover .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-sidebar .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
 /* Global scrollbar for all pages */
 ::-webkit-scrollbar {
   width: 8px;

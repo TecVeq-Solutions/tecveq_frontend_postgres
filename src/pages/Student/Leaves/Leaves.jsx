@@ -146,100 +146,97 @@ const StudentLeaves = () => {
                         </div>
                     </div>
 
-                    <AnimatePresence mode="wait">
-                        {(showForm || editingLeave) && (
+                    <AnimatePresence>
+                        {showForm && (
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={(e) => {
-                                    if (e.target === e.currentTarget) {
-                                        setShowForm(false);
-                                        setEditingLeave(null);
-                                    }
-                                }}
-                                className="fixed inset-0 z-[1100] flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm"
+                                initial={{ opacity: 0, y: -24, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -24, scale: 0.98 }}
+                                transition={{ duration: 0.25 }}
+                                className="relative overflow-hidden rounded-[2rem] bg-white/90 backdrop-blur-xl p-3 sm:p-6 md:p-8 shadow-2xl shadow-indigo-900/10 border border-white"
                             >
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                                    className="relative w-full max-w-2xl max-h-[90vh]  overflow-y-auto custom-scrollbar rounded-[1rem] sm:rounded-[2.5rem] bg-white shadow-2xl border border-white"
-                                >
-                                    {showForm && (
-                                        <div className="p-6 md:p-8">
-                                            <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-indigo-200/30 blur-3xl"></div>
-                                            <div className="relative flex items-center justify-between mb-7">
-                                                <div>
-                                                    <p className="text-xs font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">
-                                                        Request Form
-                                                    </p>
-                                                    <h2 className="text-2xl font-black text-slate-900">
-                                                        Apply for Leave
-                                                    </h2>
-                                                </div>
-                                                <button
-                                                    onClick={() => setShowForm(false)}
-                                                    className="h-8 sm:h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition"
-                                                >
-                                                    <IoCloseOutline size={24} />
-                                                </button>
-                                            </div>
-                                            <div className="relative">
-                                                <LeaveRequestForm
-                                                    onSuccess={() => {
-                                                        setShowForm(false);
-                                                        fetchLeaves();
-                                                        setCurrentPage(1);
-                                                    }}
-                                                    onCancel={() => setShowForm(false)}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
+                                <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-indigo-200/30 blur-3xl"></div>
 
-                                    {editingLeave && (
-                                        <div className="p-4 sm:p-6 md:p-8">
-                                            <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-amber-200/30 blur-3xl"></div>
-                                            <div className="relative flex items-center justify-between mb-7">
-                                                <div>
-                                                    <p className="text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-1">
-                                                        Edit Request
-                                                    </p>
-                                                    <h2 className=" text-xl sm:text-2xl font-black text-slate-900">
-                                                        Edit Leave Request
-                                                    </h2>
-                                                    <p className="text-sm text-slate-400 font-medium mt-1">
-                                                        Update the details of your pending leave request.
-                                                    </p>
-                                                </div>
-                                                <button
-                                                    onClick={() => setEditingLeave(null)}
-                                                    className="h-8 sm:h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition"
-                                                >
-                                                    <IoCloseOutline size={24} />
-                                                </button>
-                                            </div>
-                                            <div className="relative">
-                                                <LeaveRequestForm
-                                                    initialData={editingLeave}
-                                                    onSuccess={() => {
-                                                        setEditingLeave(null);
-                                                        fetchLeaves();
-                                                        setCurrentPage(1);
-                                                    }}
-                                                    onCancel={() => setEditingLeave(null)}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                </motion.div>
+                                <div className="relative flex items-center justify-between mb-7">
+                                    <div>
+                                        <p className="text-xs font-black text-indigo-600 uppercase tracking-[0.2em] mb-1">
+                                            Request Form
+                                        </p>
+                                        <h2 className="text-2xl font-black text-slate-900">
+                                            Apply for Leave
+                                        </h2>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setShowForm(false)}
+                                        className="h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition"
+                                    >
+                                        <IoCloseOutline size={24} />
+                                    </button>
+                                </div>
+
+                                <div className="relative">
+                                    <LeaveRequestForm
+                                        onSuccess={() => {
+                                            setShowForm(false);
+                                            fetchLeaves();
+                                            setCurrentPage(1);
+                                        }}
+                                        onCancel={() => setShowForm(false)}
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {editingLeave && (
+                            <motion.div
+                                key={editingLeave.id}
+                                initial={{ opacity: 0, y: -24, scale: 0.98 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -24, scale: 0.98 }}
+                                transition={{ duration: 0.25 }}
+                                className="relative overflow-hidden rounded-[2rem] bg-white/90 backdrop-blur-xl p-6 md:p-8 shadow-2xl shadow-amber-900/10 border border-white"
+                            >
+                                <div className="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-amber-200/30 blur-3xl"></div>
+
+                                <div className="relative flex items-center justify-between mb-7">
+                                    <div>
+                                        <p className="text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-1">
+                                            Edit Request
+                                        </p>
+                                        <h2 className="text-2xl font-black text-slate-900">
+                                            Edit Leave Request
+                                        </h2>
+                                        <p className="text-sm text-slate-400 font-medium mt-1">
+                                            Update the details of your pending leave request.
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setEditingLeave(null)}
+                                        className="h-11 w-11 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition"
+                                    >
+                                        <IoCloseOutline size={24} />
+                                    </button>
+                                </div>
+
+                                <div className="relative">
+                                    <LeaveRequestForm
+                                        initialData={editingLeave}
+                                        onSuccess={() => {
+                                            setEditingLeave(null);
+                                            fetchLeaves();
+                                            setCurrentPage(1);
+                                        }}
+                                        onCancel={() => setEditingLeave(null)}
+                                    />
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
                     {/* Stats Cards (Optional/Hidden in Teacher but Student has them) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div className=" hidden grid grid-cols-1 sm:grid-cols-3 gap-5">
                         <div className="rounded-[1.75rem] bg-white/85 backdrop-blur-xl p-5 border border-white shadow-xl shadow-slate-200/50">
                             <div className="flex items-center justify-between">
                                 <div>

@@ -211,7 +211,7 @@ const FilterClassesModal = ({ addModalOpen, setaddModalOpen }) => {
           day.isBefore(dayjs(filterEndDate));
 
         const hasEvents = classesArray?.some((event) =>
-          dayjs(event.startTime).isSame(day, "day")
+          event.startTime && dayjs(event.startTime).isSame(day, "day")
         );
 
         return (
@@ -244,7 +244,7 @@ const FilterClassesModal = ({ addModalOpen, setaddModalOpen }) => {
             <span>{day.format("D")}</span>
             {hasEvents && (
               <span
-                className={`absolute bottom-0.5 w-1 h-1 rounded-full ${isSelected || isRangeEdge ? "bg-white" : "bg-[#0B1053]"}`}
+                className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${isSelected || isRangeEdge ? "bg-white" : "bg-[#0B1053]"}`}
               />
             )}
           </div>

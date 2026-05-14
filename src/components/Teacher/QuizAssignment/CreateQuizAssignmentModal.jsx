@@ -205,7 +205,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
         className="relative bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"
       >
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isQuiz ? "bg-purple-50" : "bg-blue-50"}`}>
               {isQuiz
@@ -231,7 +231,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
         </div>
 
         {/* ── Body ── */}
-        <div className="flex flex-col gap-5 px-6 py-5 overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col gap-5 px-3 sm:px-6 py-5 overflow-y-auto custom-scrollbar">
 
           {/* Classroom Multi-select */}
           <Field label="Classroom">
@@ -463,7 +463,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
         </div>
 
         {/* ── Footer ── */}
-        <div className="px-6 py-4 border-t border-gray-100 shrink-0 bg-white">
+        <div className="px-3 sm:px-6 py-4 border-t border-gray-100 shrink-0 bg-white">
           {isSubmitting ? (
             <div className="flex justify-center py-1"><Loader /></div>
           ) : (
