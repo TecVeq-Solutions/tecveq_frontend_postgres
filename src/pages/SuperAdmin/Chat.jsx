@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { BACKEND_URL } from '../../constants/api';
 import SuperAdminNavbar from '../../components/SuperAdmin/SuperAdminNavbar';
@@ -43,22 +43,42 @@ const Chat = () => {
         refetchInterval: 5000 // Polling for new messages
     });
 
+    const queryClient = useQueryClient();
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!message.trim() || !selectedAdmin) return;
+        const trimmedMsg = message.trim();
+        if (!trimmedMsg || !selectedAdmin) return;
+
+        const user = JSON.parse(localStorage.getItem('tcauser'));
+        const optimisticMsg = {
+            id: Date.now(), // temporary id
+            senderId: currentUser.id,
+            receiverId: selectedAdmin.id,
+            message: trimmedMsg,
+            createdAt: new Date().toISOString(),
+        };
+
+        // Optimistically update the UI
+        queryClient.setQueryData(['superadmin-messages', selectedAdmin.id], (old = []) => [...old, optimisticMsg]);
+        setMessage('');
 
         try {
-            const user = JSON.parse(localStorage.getItem('tcauser'));
             await axios.post(`${BACKEND_URL}/superadmin/messages`, {
                 receiverId: selectedAdmin.id,
-                message: message.trim()
+                message: trimmedMsg
             }, {
                 headers: { Authorization: `Bearer ${user?.token}` }
             });
-            setMessage('');
+            // Refetch in background to sync with server IDs and timestamps
             refetchMsgs();
         } catch (error) {
             console.error('Error sending message:', error);
+            // Optionally rollback on error
+            queryClient.setQueryData(['superadmin-messages', selectedAdmin.id], (old = []) => 
+                old.filter(m => m.id !== optimisticMsg.id)
+            );
+            setMessage(trimmedMsg); // restore message to input
         }
     };
 

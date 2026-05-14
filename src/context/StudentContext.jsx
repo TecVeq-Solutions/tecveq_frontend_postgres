@@ -61,6 +61,12 @@ export const StudentProvider = ({ children }) => {
     }, [quizQuery.isSuccess, quizQuery.data]);
 
     useEffect(() => {
+        if (classesQuery.isSuccess) {
+            setAllClasses(classesQuery.data);
+        }
+    }, [classesQuery.isSuccess, classesQuery.data]);
+
+    useEffect(() => {
         if (allClasses.length === 0) return;
 
         const checkCurrentClass = () => {

@@ -71,7 +71,7 @@ const SkeletonCard = () => (
     </div>
 );
 
-const AdminTimeTableMobile = ({ data, isPending, refetch }) => {
+const AdminTimeTableMobile = ({ data, isPending, refetch, isRefetching }) => {
     const [selectedDate, setSelectedDate] = useState(moment());
     const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('week'));
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -132,6 +132,13 @@ const AdminTimeTableMobile = ({ data, isPending, refetch }) => {
 
     return (
         <div className="relative flex min-h-screen w-full min-w-[320px] flex-col overflow-x-hidden bg-gradient-to-br from-[#f0f4ff] via-[#eef4ff] to-[#f0f9ff] pb-10 font-['DM_Sans','Helvetica_Neue',sans-serif] selection:bg-blue-100">
+            {isRefetching && (
+                <div className="fixed top-0 left-0 right-0 z-[100] flex justify-center">
+                    <div className="bg-[#0B1053] text-white text-[10px] px-4 py-1.5 rounded-b-xl shadow-lg animate-pulse font-black uppercase tracking-widest">
+                        Syncing...
+                    </div>
+                </div>
+            )}
             <div className="pointer-events-none fixed -left-28 top-20 h-72 w-72 rounded-full bg-blue-400/25 blur-3xl" />
             <div className="pointer-events-none fixed -right-32 top-52 h-80 w-80 rounded-full bg-sky-300/25 blur-3xl" />
             <div className="pointer-events-none fixed bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-200/30 blur-3xl" />

@@ -17,7 +17,7 @@ const DeliverableItem = ({ item }) => {
   const urgency = getUrgencyColor(item.dueDate);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center shrink-0 w-full gap-3 px-3.5 py-[11px] border-b border-black/[0.05] last:border-b-0 hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer">
+    <div className="flex flex-col sm:flex-row sm:items-start shrink-0 w-full gap-3 px-3.5 py-[11px] border-b border-black/[0.05] last:border-b-0 hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer">
 
       {/* Type Icon */}
       <div
@@ -40,13 +40,13 @@ const DeliverableItem = ({ item }) => {
         )}
       </div>
 
-      <div className="flex items-start sm:items-center flex-1 w-full gap-3">
+      <div className="flex items-start flex-1 w-full gap-3">
         {/* Urgency dot */}
         <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 sm:mt-0 ${urgency}`} />
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-gray-800 truncate mb-0.5">{item.title}</p>
+        <p className="text-[12px] font-medium text-gray-800 mb-0.5 leading-relaxed">{item.title}</p>
         <p className="text-[11px] text-gray-400 flex items-center gap-1">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2" />

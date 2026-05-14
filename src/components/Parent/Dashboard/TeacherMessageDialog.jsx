@@ -31,16 +31,21 @@ const TeacherMessageDialog = ({ handleFeedback, item }) => {
     const messageMutation = useMutation({
         mutationKey: ["sendquickmessage"],
         mutationFn: handleSendMessage,
+        onMutate: () => {
+            const currentMsg = msgText;
+            setMsgText("");
+            return { currentMsg };
+        },
         onSuccess: (data) => {
             if (data) {
                 queryClient.invalidateQueries({ queryKey: ["chat"] });
                 toast.success("Message sent successfully!");
-                setMsgText("");
                 handleFeedback();
             }
         },
-        onError: (error) => {
+        onError: (error, variables, context) => {
             toast.error(error?.message || "Error sending message.");
+            if (context?.currentMsg) setMsgText(context.currentMsg);
         }
     })
 
@@ -62,15 +67,20 @@ const TeacherMessageDialog = ({ handleFeedback, item }) => {
     const feedbackMutation = useMutation({
         mutationKey: ["sendfeedback"],
         mutationFn: handleSendFeedback,
+        onMutate: () => {
+            const currentFeedback = feedback;
+            setFeedback("");
+            return { currentFeedback };
+        },
         onSuccess: (data) => {
             if (data) {
                 toast.success("Feedback submitted successfully!");
-                setFeedback("");
                 handleFeedback();
             }
         },
-        onError: (error) => {
+        onError: (error, variables, context) => {
             toast.error(error?.message || "Error while submitting feedback.");
+            if (context?.currentFeedback) setFeedback(context.currentFeedback);
         }
     })
 

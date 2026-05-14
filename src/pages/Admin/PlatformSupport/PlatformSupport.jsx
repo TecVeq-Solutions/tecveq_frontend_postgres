@@ -13,7 +13,7 @@ import { useAdmin } from '../../../context/AdminContext';
 import moment from 'moment';
 import axios from 'axios';
 import { BACKEND_URL } from '../../../constants/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const PlatformSupport = () => {
     const { userData } = useUser();
@@ -22,6 +22,7 @@ const PlatformSupport = () => {
     const [msgInput, setMsgInput] = useState('');
     const [notifications, setNotifications] = useState([]);
     const messagesEndRef = useRef(null);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         setUnreadSupportCount(0);
@@ -58,18 +59,36 @@ const PlatformSupport = () => {
     }, [messages]);
 
     const handleSendMessage = async () => {
-        if (!msgInput.trim()) return;
+        const trimmedMsg = msgInput.trim();
+        if (!trimmedMsg) return;
+
+        const user = JSON.parse(localStorage.getItem('tcauser'));
+        const optimisticMsg = {
+            id: Date.now(),
+            senderId: userData?.id,
+            message: trimmedMsg,
+            createdAt: new Date().toISOString(),
+        };
+
+        // Optimistically update the UI
+        queryClient.setQueryData(['admin-support-messages'], (old = []) => [...old, optimisticMsg]);
+        setMsgInput('');
+
         try {
-            const user = JSON.parse(localStorage.getItem('tcauser'));
             await axios.post(`${BACKEND_URL}/superadmin/support/messages`, {
-                message: msgInput.trim()
+                message: trimmedMsg
             }, {
                 headers: { Authorization: `Bearer ${user?.token}` }
             });
-            setMsgInput('');
+            // Sync with server in background
             refetchMsgs();
         } catch (error) {
             console.error('Error sending message:', error);
+            // Rollback on error
+            queryClient.setQueryData(['admin-support-messages'], (old = []) => 
+                old.filter(m => m.id !== optimisticMsg.id)
+            );
+            setMsgInput(trimmedMsg);
         }
     };
 

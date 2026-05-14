@@ -22,11 +22,114 @@ import {
     IoSparklesOutline,
     IoChevronBackOutline,
     IoChevronForwardOutline,
+    IoCreateOutline,
 } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { submitPaymentProof } from '../../../api/Admin/PaymentsApi';
+import { submitPaymentProof, updatePaymentProof } from '../../../api/Admin/PaymentsApi';
 import moment from 'moment';
+
+const getStatusBadge = (status) => {
+    const config = {
+        'Paid': {
+            bg: 'bg-emerald-50',
+            text: 'text-emerald-700',
+            dot: 'bg-emerald-500'
+        },
+        'Partial': {
+            bg: 'bg-orange-50',
+            text: 'text-orange-700',
+            dot: 'bg-orange-500'
+        },
+        'Pending Verification': {
+            bg: 'bg-amber-50',
+            text: 'text-amber-700',
+            dot: 'bg-amber-400'
+        },
+        'Rejected': {
+            bg: 'bg-rose-50',
+            text: 'text-rose-700',
+            dot: 'bg-rose-500'
+        },
+        'Unpaid': {
+            bg: 'bg-slate-100',
+            text: 'text-slate-600',
+            dot: 'bg-slate-400'
+        },
+        'Overdue': {
+            bg: 'bg-rose-50',
+            text: 'text-rose-700',
+            dot: 'bg-rose-500'
+        },
+        'Extension': {
+            bg: 'bg-sky-50',
+            text: 'text-sky-700',
+            dot: 'bg-sky-400'
+        },
+    };
+
+    const c = config[status] || config['Unpaid'];
+
+    return (
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold ${c.bg} ${c.text}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+            {status}
+        </span>
+    );
+};
+
+const UsageCard = ({ label, current, limit, icon: Icon, color }) => {
+    const percentage = limit > 0 ? Math.min((current / limit) * 100, 100) : 0;
+    const isNearLimit = percentage >= 80;
+
+    return (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all duration-200 group">
+            <div className="flex items-start justify-between mb-5">
+                <div className={`h-11 w-11 rounded-xl ${color.iconBg} flex items-center justify-center`}>
+                    <Icon size={22} className={color.iconText} />
+                </div>
+
+                <div className="text-right">
+                    <p className="text-3xl font-bold text-slate-800 leading-none">
+                        {current}
+                    </p>
+
+                    <p className="text-xs text-slate-400 mt-1">
+                        of <span className="font-semibold text-slate-500">{limit === 0 ? '∞' : limit}</span> {label}
+                    </p>
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                        className={`h-full rounded-full transition-all duration-700 ${isNearLimit ? 'bg-rose-400' : color.bar}`}
+                        style={{ width: `${percentage}%` }}
+                    />
+                </div>
+
+                <div className="flex justify-between items-center">
+                    <p className="text-xs text-slate-400 font-medium">
+                        {label}
+                    </p>
+
+                    <p className={`text-xs font-semibold ${isNearLimit ? 'text-rose-500' : 'text-slate-400'}`}>
+                        {percentage.toFixed(0)}%
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const InputField = ({ label, children, required }) => (
+    <div className="space-y-1.5">
+        <label className="text-xs font-semibold text-slate-500 ml-1">
+            {label}{required && <span className="text-rose-400 ml-0.5">*</span>}
+        </label>
+        {children}
+    </div>
+);
 
 const MySubscription = () => {
     const {
@@ -45,6 +148,7 @@ const MySubscription = () => {
 
     const [uploading, setUploading] = useState(false);
     const [preview, setPreview] = useState(null);
+    const [viewImage, setViewImage] = useState(null);
 
     const [formData, setFormData] = useState({
         amount: '',
@@ -135,6 +239,20 @@ const MySubscription = () => {
         reader.readAsDataURL(file);
     };
 
+    const handleEditPayment = (payment) => {
+        setFormData({
+            id: payment.id,
+            amount: payment.amount,
+            method: payment.method,
+            transactionId: payment.transactionId,
+            date: moment(`${payment.year}-${payment.month}-01`).format('YYYY-MM-DD'),
+            notes: payment.notes || '',
+            receiptImage: payment.receiptImage
+        });
+        setPreview(payment.receiptImage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleSubmitProof = async (e) => {
         e.preventDefault();
 
@@ -148,14 +266,22 @@ const MySubscription = () => {
 
             const paymentDate = moment(formData.date);
 
-            await submitPaymentProof({
-                ...formData,
-                month: paymentDate.month() + 1,
-                year: paymentDate.year(),
-                packageId: subscription?.packageId || ""
-            });
-
-            toast.success("Payment proof submitted and pending verification.");
+            if (formData.id) {
+                await updatePaymentProof(formData.id, {
+                    ...formData,
+                    month: paymentDate.month() + 1,
+                    year: paymentDate.year(),
+                });
+                toast.success("Payment proof updated successfully.");
+            } else {
+                await submitPaymentProof({
+                    ...formData,
+                    month: paymentDate.month() + 1,
+                    year: paymentDate.year(),
+                    packageId: subscription?.packageId || ""
+                });
+                toast.success("Payment proof submitted and pending verification.");
+            }
 
             setPreview(null);
 
@@ -177,102 +303,7 @@ const MySubscription = () => {
         }
     };
 
-    const getStatusBadge = (status) => {
-        const config = {
-            'Paid': {
-                bg: 'bg-emerald-50',
-                text: 'text-emerald-700',
-                dot: 'bg-emerald-500'
-            },
-            'Pending Verification': {
-                bg: 'bg-amber-50',
-                text: 'text-amber-700',
-                dot: 'bg-amber-400'
-            },
-            'Rejected': {
-                bg: 'bg-rose-50',
-                text: 'text-rose-700',
-                dot: 'bg-rose-500'
-            },
-            'Unpaid': {
-                bg: 'bg-slate-100',
-                text: 'text-slate-600',
-                dot: 'bg-slate-400'
-            },
-            'Overdue': {
-                bg: 'bg-rose-50',
-                text: 'text-rose-700',
-                dot: 'bg-rose-500'
-            },
-            'Extension': {
-                bg: 'bg-sky-50',
-                text: 'text-sky-700',
-                dot: 'bg-sky-400'
-            },
-        };
 
-        const c = config[status] || config['Unpaid'];
-
-        return (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold ${c.bg} ${c.text}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
-                {status}
-            </span>
-        );
-    };
-
-    const UsageCard = ({ label, current, limit, icon: Icon, color }) => {
-        const percentage = limit > 0 ? Math.min((current / limit) * 100, 100) : 0;
-        const isNearLimit = percentage >= 80;
-
-        return (
-            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all duration-200 group">
-                <div className="flex items-start justify-between mb-5">
-                    <div className={`h-11 w-11 rounded-xl ${color.iconBg} flex items-center justify-center`}>
-                        <Icon size={22} className={color.iconText} />
-                    </div>
-
-                    <div className="text-right">
-                        <p className="text-3xl font-bold text-slate-800 leading-none">
-                            {current}
-                        </p>
-
-                        <p className="text-xs text-slate-400 mt-1">
-                            of <span className="font-semibold text-slate-500">{limit === 0 ? '∞' : limit}</span> {label}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                            className={`h-full rounded-full transition-all duration-700 ${isNearLimit ? 'bg-rose-400' : color.bar}`}
-                            style={{ width: `${percentage}%` }}
-                        />
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                        <p className="text-xs text-slate-400 font-medium">
-                            {label}
-                        </p>
-
-                        <p className={`text-xs font-semibold ${isNearLimit ? 'text-rose-500' : 'text-slate-400'}`}>
-                            {percentage.toFixed(0)}%
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const InputField = ({ label, children, required }) => (
-        <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-500 ml-1">
-                {label}{required && <span className="text-rose-400 ml-0.5">*</span>}
-            </label>
-            {children}
-        </div>
-    );
 
     // Payment History Pagination Data
     const historyData = paymentHistory || [];
@@ -566,6 +597,15 @@ const MySubscription = () => {
                                 />
                             </InputField>
 
+                            <InputField label="Notes / Reason (Optional)">
+                                <textarea
+                                    placeholder="Add a reason if paying a partial amount or any other notes..."
+                                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 placeholder:text-slate-300 transition min-h-[80px] resize-none"
+                                    value={formData.notes}
+                                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                />
+                            </InputField>
+
                             {/* Receipt Upload */}
                             <InputField label="Receipt Screenshot" required>
                                 <label className="block cursor-pointer">
@@ -616,10 +656,29 @@ const MySubscription = () => {
                                     }`}
                             >
                                 {uploading
-                                    ? <><Loader small /> Submitting…</>
-                                    : <><IoCheckmarkDoneOutline size={18} /> Submit Payment Proof</>
+                                    ? <><Loader small /> Processing…</>
+                                    : <><IoCheckmarkDoneOutline size={18} /> {formData.id ? 'Update' : 'Submit'} Payment Proof</>
                                 }
                             </button>
+                            {formData.id && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setFormData({
+                                            amount: '',
+                                            method: 'Bank Transfer',
+                                            transactionId: '',
+                                            date: moment().format('YYYY-MM-DD'),
+                                            notes: '',
+                                            receiptImage: ''
+                                        });
+                                        setPreview(null);
+                                    }}
+                                    className="w-full py-2.5 text-slate-400 text-xs font-semibold hover:text-slate-600 transition-colors"
+                                >
+                                    Cancel Editing
+                                </button>
+                            )}
                         </form>
                     </div>
                 </div>
@@ -652,7 +711,7 @@ const MySubscription = () => {
                         <table className="w-full">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100">
-                                    {['Billing Period', 'Amount', 'Method', 'Transaction ID', 'Status', 'Submitted', 'Receipt'].map(h => (
+                                    {['Billing Period', 'Amount', 'Method', 'Transaction ID', 'Status', 'Submitted', 'Actions'].map(h => (
                                         <th
                                             key={h}
                                             className="px-3 sm:px-5 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap"
@@ -707,16 +766,26 @@ const MySubscription = () => {
                                         </td>
 
                                         <td className="px-5 py-4">
-                                            {payment.receiptImage && (
-                                                <a
-                                                    href={payment.receiptImage}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-500 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-colors"
-                                                >
-                                                    <IoCardOutline size={14} /> View
-                                                </a>
-                                            )}
+                                            <div className="flex items-center gap-2">
+                                                {payment.receiptImage && (
+                                                    <button
+                                                        onClick={() => setViewImage(payment.receiptImage)}
+                                                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-500 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-colors"
+                                                        title="View Receipt"
+                                                    >
+                                                        <IoCardOutline size={14} /> View
+                                                    </button>
+                                                )}
+                                                {(payment.status === "Pending Verification" || payment.status === "Rejected") && (
+                                                    <button
+                                                        onClick={() => handleEditPayment(payment)}
+                                                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-xs font-semibold hover:bg-amber-100 transition-colors"
+                                                        title="Edit Payment"
+                                                    >
+                                                        <IoCreateOutline size={14} /> Edit
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 )) : (
@@ -897,6 +966,32 @@ const MySubscription = () => {
                 </div>
 
             </main>
+            {/* Image Modal */}
+            {viewImage && (
+                <div 
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-10"
+                    onClick={() => setViewImage(null)}
+                >
+                    <div 
+                        className="relative max-w-4xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="absolute top-4 right-4 z-10">
+                            <button 
+                                onClick={() => setViewImage(null)}
+                                className="h-10 w-10 bg-white/20 backdrop-blur-md hover:bg-white/40 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
+                            >
+                                <IoCloseCircleOutline size={28} />
+                            </button>
+                        </div>
+                        <img 
+                            src={viewImage} 
+                            alt="Payment Receipt" 
+                            className="w-full h-auto max-h-[85vh] object-contain"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
