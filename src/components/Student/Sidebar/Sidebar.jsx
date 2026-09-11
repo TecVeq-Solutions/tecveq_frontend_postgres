@@ -91,6 +91,7 @@ const Sidebar = () => {
     {
       label: "Academics",
       items: [
+        { key: "materials", title: "Learning Materials", icon: "book", route: "/student/materials" },
         { key: "assignments", title: "Assignments", icon: "book", route: "/assignments" },
         { key: "quizzes", title: "Quizzes", icon: "quiz", route: "/quizzes" },
         { key: "leaves", title: "My Leaves", icon: "calendar", route: "/student/leaves" },

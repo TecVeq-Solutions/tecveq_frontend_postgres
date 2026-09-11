@@ -103,6 +103,11 @@ import TeacherMyLeaves from "./pages/Teacher/Leaves/MyLeaves";
 import TeacherStudentLeaves from "./pages/Teacher/Leaves/StudentLeaves";
 import AdminTeacherLeaves from "./pages/Admin/Leaves/TeacherLeaves";
 
+import SLearningMaterials from "./pages/Student/LearningMaterials/LearningMaterials";
+
+import TLearningMaterials from "./pages/Teacher/LearningMaterials/LearningMaterials";
+import TPresentationMode from "./pages/Teacher/LearningMaterials/PresentationMode";
+
 function App() {
 
   return (
@@ -429,6 +434,14 @@ function App() {
             }
           />
           <Route
+            path="/student/materials"
+            element={
+              <StudentLayout>
+                <SLearningMaterials />
+              </StudentLayout>
+            }
+          />
+          <Route
             path="/reports/:subject"
             element={
               <StudentLayout>
@@ -494,6 +507,18 @@ function App() {
           />
         </Route>
         <Route element={<ProtectedTeacher />} >
+          <Route
+            path="/teacher/materials"
+            element={
+              <TeacherLayout>
+                <TLearningMaterials />
+              </TeacherLayout>
+            }
+          />
+          <Route
+            path="/teacher/presentation/:id"
+            element={<TPresentationMode />}
+          />
           <Route
             path="/teacher/dashboard"
             element={

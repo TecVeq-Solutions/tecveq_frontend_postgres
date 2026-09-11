@@ -6,7 +6,7 @@ import { getAllQuizes } from "../../../api/Teacher/Quiz";
 import Loader from "../../../utils/Loader";
 import { useSidebar } from "../../../context/SidebarContext";
 
-import { CheckCircle2 } from "lucide-react";
+import { IoCheckmarkCircle } from "react-icons/io5";
 
 const LastDeliverables = () => {
   // Use staleTime: 0 to ensure data is always fetched fresh from the backend
@@ -123,7 +123,7 @@ const LastDeliverables = () => {
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-indigo-50 rounded-xl shadow-sm border border-indigo-100/50">
-              <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+              <IoCheckmarkCircle className="w-5 h-5 text-indigo-600" />
             </div>
             <p className="text-lg font-bold text-[#0B1053] tracking-tight">Last Deliverables</p>
           </div>

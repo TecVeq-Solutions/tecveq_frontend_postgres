@@ -15,6 +15,7 @@ import { createAssignment, editAssignment } from "../../../api/Teacher/Assignmen
 import useClickOutside from "../../../hooks/useClickOutlise";
 import { getTeacherSubjectsOfClassroom } from "../../../api/Teacher/TeacherSubjectApi";
 import { BookOpen, ClipboardList, ChevronDown, X } from "lucide-react";
+import QuestionBuilder from "./QuestionBuilder";
 
 const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch, data }) => {
 
@@ -23,10 +24,33 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
   const ref = useRef(null);
   const { toggleBlur } = useBlur();
 
-  useClickOutside(ref, () => { setopen(false); if (open) toggleBlur(); });
+  const handleClose = () => {
+    const hasData = quizAssignmentDataObj.title || quizAssignmentDataObj.text || questions.length > 0 || selectedFile;
+    if (hasData && !isEditTrue) {
+      const confirm = window.confirm("You have unsaved changes. Are you sure you want to close? Your data will be lost.");
+      if (!confirm) return;
+    }
+    setopen(false);
+    if (open) toggleBlur();
+  };
 
-  const [QADate, setQADate] = useState(isEditTrue && data?.dueDate ? data.dueDate.split("T")[0] : "");
-  const [QATime, setQATime] = useState(isEditTrue && data?.dueDate ? data.dueDate.split("T")[1]?.slice(0, 5) : "");
+  // Removed useClickOutside to prevent accidental data loss when clicking outside the modal
+  // useClickOutside(ref, () => { setopen(false); if (open) toggleBlur(); });
+
+  let initialDate = "";
+  let initialTime = "";
+  if (isEditTrue && data?.dueDate) {
+    try {
+      const dateObj = new Date(data.dueDate);
+      if (!isNaN(dateObj.getTime())) {
+        const iso = dateObj.toISOString();
+        initialDate = iso.split("T")[0];
+        initialTime = iso.split("T")[1].slice(0, 5);
+      }
+    } catch(e) {}
+  }
+  const [QADate, setQADate] = useState(initialDate);
+  const [QATime, setQATime] = useState(initialTime);
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -34,6 +58,15 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
   const [uploadedFileUrl, setUploadedFileUrl] = useState(isEditTrue && data?.files?.[0]?.url ? data.files[0].url : "");
   const [selectedClassroom, setSelectedClassroom] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState("");
+  const [quizType, setQuizType] = useState(isEditTrue && data?.quizType ? data.quizType : "file_upload");
+  const [questions, setQuestions] = useState(isEditTrue && data?.QuizQuestion ? data.QuizQuestion : []);
+
+  useEffect(() => {
+    if (quizType === 'mcq_objective') {
+      const sum = questions.reduce((acc, q) => acc + (parseInt(q.marks) || 0), 0);
+      setQuizAssignmentDataObj((p) => ({ ...p, totalMarks: sum }));
+    }
+  }, [questions, quizType]);
 
   const [quizAssignmentDataObj, setQuizAssignmentDataObj] = useState({
     canSubmitAfterTime: false,
@@ -51,8 +84,20 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
   useEffect(() => {
     if (open) {
       if (isEditTrue && data) {
-        setQADate(data?.dueDate ? data.dueDate.split("T")[0] : "");
-        setQATime(data?.dueDate ? data.dueDate.split("T")[1]?.slice(0, 5) : "");
+        let datePart = "";
+        let timePart = "";
+        if (data?.dueDate) {
+          try {
+            const dateObj = new Date(data.dueDate);
+            if (!isNaN(dateObj.getTime())) {
+              const iso = dateObj.toISOString();
+              datePart = iso.split("T")[0];
+              timePart = iso.split("T")[1].slice(0, 5);
+            }
+          } catch(e) {}
+        }
+        setQADate(datePart);
+        setQATime(timePart);
         setUploadedFileUrl(data?.files?.[0]?.url ? data.files[0].url : "");
         setQuizAssignmentDataObj({
           canSubmitAfterTime: data?.canSubmitAfterTime || false,
@@ -66,6 +111,8 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
         });
         setSelectedClassroom([]);
         setSelectedSubject("");
+        setQuizType(data?.quizType || "file_upload");
+        setQuestions(data?.QuizQuestion || []);
       } else {
         setQADate("");
         setQATime("");
@@ -82,6 +129,8 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
         });
         setSelectedClassroom([]);
         setSelectedSubject("");
+        setQuizType("file_upload");
+        setQuestions([]);
       }
       setSelectedFile(null);
       setPreviewUrl(null);
@@ -179,15 +228,27 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
 
   const handleCreateQuiz = async () => {
     setLoading(true);
-    if (!quizAssignmentDataObj?.text?.trim() && !selectedFile?.name && !uploadedFileUrl) {
+    if (quizType === 'file_upload' && !quizAssignmentDataObj?.text?.trim() && !selectedFile?.name && !uploadedFileUrl) {
       toast.error("Please provide text or a file."); setLoading(false); return;
+    }
+    if (quizType === 'mcq_objective') {
+      if (questions.length === 0) { toast.error("Please add at least one question."); setLoading(false); return; }
+      for (const q of questions) {
+        if (!q.text.trim()) { toast.error("Question text cannot be empty."); setLoading(false); return; }
+        if (q.questionType === 'mcq' && q.options.filter(o => o.isCorrect).length !== 1) {
+          toast.error("MCQ must have exactly 1 correct option."); setLoading(false); return;
+        }
+        if (q.questionType === 'fill_blank' && q.acceptedAnswers.length === 0) {
+          toast.error("Fill-in-blank must have an accepted answer."); setLoading(false); return;
+        }
+      }
     }
     try {
       const filesArr = uploadedFileUrl ? [{ name: selectedFile?.name || data?.files?.[0]?.name || "File", url: uploadedFileUrl }] : [];
       const dueDate = QADate && QATime ? new Date(`${QADate}T${QATime}`).toISOString() : new Date().toISOString();
-      if (isEditTrue) { quizEditMutate.mutate({ ...quizAssignmentDataObj, dueDate, files: filesArr, id: data?.id }); return; }
+      if (isEditTrue) { quizEditMutate.mutate({ ...quizAssignmentDataObj, dueDate, files: filesArr, id: data?.id, quizType, questions }); return; }
       for (const classroom of selectedClassroom) {
-        await createQuiz({ ...quizAssignmentDataObj, classroomID: classroom.id, subjectID: selectedSubject, files: filesArr, dueDate });
+        await createQuiz({ ...quizAssignmentDataObj, classroomID: classroom.id, subjectID: selectedSubject, files: filesArr, dueDate, quizType, questions });
       }
       toast.success("Quizzes created!"); toggleBlur(); setopen(false); await refetch();
     } catch { toast.error("Something went wrong."); } finally { setLoading(false); }
@@ -223,7 +284,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
             </div>
           </div>
           <button
-            onClick={() => { setopen(false); toggleBlur(); }}
+            onClick={handleClose}
             className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
           >
             <IoClose size={18} />
@@ -298,6 +359,23 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
             </div>
           </Field>
 
+          {/* Quiz Type */}
+          {isQuiz && (
+            <Field label="Quiz Type">
+              <div className="relative">
+                <select
+                  value={quizType}
+                  onChange={(e) => setQuizType(e.target.value)}
+                  className={`${inputCls} appearance-none pr-9 cursor-pointer`}
+                >
+                  <option value="file_upload">File Upload (Manual Grade)</option>
+                  <option value="mcq_objective">MCQ / Objective (Auto Grade)</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+            </Field>
+          )}
+
           {/* Subject */}
           <Field label="Subject">
             <div className="relative">
@@ -347,9 +425,13 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
               type="number"
               placeholder="e.g. 100"
               value={quizAssignmentDataObj.totalMarks}
+              disabled={isQuiz && quizType === 'mcq_objective'}
               onChange={(e) => updateObj("totalMarks", e.target.value)}
-              className={inputCls}
+              className={`${inputCls} ${isQuiz && quizType === 'mcq_objective' ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
             />
+            {isQuiz && quizType === 'mcq_objective' && (
+              <p className="text-[10px] text-gray-400 px-0.5 mt-1">Total marks are auto-calculated from questions.</p>
+            )}
           </Field>
 
           {/* Deadline */}
@@ -387,9 +469,10 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
             </Field>
           )}
 
-          {/* File Upload */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Attachment</label>
+          {/* File Upload OR Question Builder */}
+          {(!isQuiz || quizType === 'file_upload') ? (
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Attachment</label>
             <label
               htmlFor="assignmentQuiz"
               className="flex flex-col items-center justify-center gap-3 px-6 py-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:border-purple-300 hover:bg-purple-50/30 transition-all cursor-pointer group"
@@ -450,16 +533,20 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="assignmentQuiz" className="p-1.5 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
-                    <FiEdit size={13} className="text-gray-500" />
+                  <label htmlFor="assignmentQuiz" className="p-1.5 rounded-lg hover:bg-white cursor-pointer transition-colors">
+                    <FiEdit size={13} className="text-purple-500" />
                   </label>
-                  <button onClick={handleRemoveFile} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                  <button onClick={handleRemoveFile} className="p-1.5 rounded-lg hover:bg-white transition-colors">
                     <IoCloseCircle size={15} className="text-red-400" />
                   </button>
                 </div>
               </div>
             )}
           </div>
+          ) : (
+            <QuestionBuilder questions={questions} setQuestions={setQuestions} />
+          )}
+
         </div>
 
         {/* ── Footer ── */}
@@ -469,7 +556,7 @@ const CreateQuizAssignmentModal = ({ open, setopen, isQuiz, isEditTrue, refetch,
           ) : (
             <div className="flex gap-3">
               <button
-                onClick={() => { setopen(false); toggleBlur(); }}
+                onClick={handleClose}
                 className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-all"
               >
                 Cancel

@@ -61,9 +61,9 @@ const Login = () => {
                 email: emailValue,
                 password: passwordValue
             };
-            
+
             const response = await studentLogin(dataBody);
-            
+
             if (response && response !== "error") {
                 setUserData(response);
                 if (response.userType == "admin") {
@@ -279,14 +279,14 @@ const Login = () => {
                                 <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
                                 <div className="relative">
                                     <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
-    ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-black'}`}>
+    ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
 
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                                         </svg>
                                     </div>
                                     <input
-                                        className="w-full p-[13px_16px_13px_42px] bg-[rgba(255,255,255,0.05)] border border-[rgba(37,99,235,0.18)] rounded-xl text-sm font-['Syne',sans-serif] text-[#f3eeff] outline-none transition-all duration-300 cubic-bezier(0.4,0,0.2,1) caret-[#3b82f6] placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(37,99,235,0.75)] focus:bg-[rgba(37,99,235,0.06)] focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14),inset_0_1px_0_rgba(255,255,255,0.04)] max-[420px]:text-[13px] max-[420px]:p-[12px_14px_12px_40px] max-[360px]:text-[12.5px] max-[360px]:p-[11px_12px_11px_38px] max-[360px]:rounded-[10px]" required type="email"
+                                        className="w-full p-[13px_16px_13px_42px] bg-[rgba(255,255,255,0.05)] border border-[rgba(37,99,235,0.18)]  rounded-xl text-sm font-['Syne',sans-serif] text-[#f3eeff] outline-none transition-all duration-300 cubic-bezier(0.4,0,0.2,1) caret-[#3b82f6] placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(37,99,235,0.75)] focus:bg-[rgba(37,99,235,0.06)] focus:shadow-[0_0_0_4px_rgba(37,99,235,0.14),inset_0_1px_0_rgba(255,255,255,0.04)] max-[420px]:text-[13px] max-[420px]:p-[12px_14px_12px_40px] max-[360px]:text-[12.5px] max-[360px]:p-[11px_12px_11px_38px] max-[360px]:rounded-[10px]" required type="email"
                                         placeholder="you@example.com"
                                         onFocus={() => setActiveField('email')}
                                         onBlur={() => setActiveField(null)}
@@ -298,7 +298,7 @@ const Login = () => {
                                 <label className={`block text-[10.5px] sm:text-[14px]  font-bold tracking-[0.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
                                 <div className="relative">
                                     <div className={`absolute left-[14px] top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
-    ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-black'}`}>
+    ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
 
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -342,6 +342,8 @@ const Login = () => {
                                         Sign In <PiArrowRight weight="bold" size={18} />
                                     </button>
                                 )}
+
+
                             </div>
 
                             <div className="flex items-center gap-3.5 mt-6 mb-5 max-[360px]:mt-[18px] max-[360px]:mb-4">
@@ -359,8 +361,10 @@ const Login = () => {
                 </div>
 
             </div>
+
         </>
     );
 };
+
 
 export default Login;

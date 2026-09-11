@@ -296,6 +296,7 @@ const GradingQuizzes = () => {
                   index={"Sr."}
                   name={"Name"}
                   submission={"Submission"}
+                  totalMarks={"Total Marks"}
                   marksObtained={"Marks"}
                   grade={"Grade"}
                 />
@@ -334,8 +335,12 @@ const GradingQuizzes = () => {
                             id={submission?.studentID?.id}
                             feedback={submission?.feedback}
                             name={submission?.studentID?.name}
+                            totalMarks={location.state?.totalMarks}
                             marksObtained={submission?.marksObtained}
                             submission={submission?.submission?.submittedAt || "Not Submitted Yet"}
+                            quizType={allQuizQuery.data?.quizType}
+                            quizData={allQuizQuery.data}
+                            submissionObj={submission?.submission}
                           />
                         </motion.div>
                       ))}

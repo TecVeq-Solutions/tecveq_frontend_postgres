@@ -43,7 +43,9 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
         dueDate,
         files,
         classroomID,
-        subjectID
+        subjectID,
+        quizType,
+        QuizQuestion
     } = data || {};
 
     const isTeacher = classroomID?.teachers?.some(
@@ -194,53 +196,139 @@ const ShowQuizAssignmentModal = ({ data, isQuiz, setIsShow }) => {
                     {/* Divider */}
                     <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-                    {/* Attached Files */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="flex items-center gap-1.5">
-                                <IoLinkOutline className="text-slate-400 text-xs" />
-                                <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-                                    Attached Files
-                                </p>
+                    {/* Attached Files or MCQs */}
+                    {quizType === 'mcq_objective' ? (
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="flex items-center gap-1.5">
+                                    <IoClipboardOutline className="text-slate-400 text-xs" />
+                                    <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                        Questions
+                                    </p>
+                                </div>
+                                {QuizQuestion?.length > 0 && (
+                                    <span className="bg-indigo-600 text-white text-[10px] font-bold rounded-full px-2 py-0.5 leading-none">
+                                        {QuizQuestion.length}
+                                    </span>
+                                )}
                             </div>
-                            {files?.length > 0 && (
-                                <span className="bg-indigo-600 text-white text-[10px] font-bold rounded-full px-2 py-0.5 leading-none">
-                                    {files.length}
-                                </span>
+                            
+                            {QuizQuestion?.length > 0 ? (
+                                <div className="flex flex-col gap-4">
+                                    {QuizQuestion.map((q, idx) => (
+                                        <div key={q.id || idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                            <div className="flex justify-between items-start gap-3 mb-3">
+                                                <h4 className="text-sm font-semibold text-slate-800">
+                                                    <span className="text-indigo-600 mr-1.5">{idx + 1}.</span>
+                                                    {q.text}
+                                                </h4>
+                                                <span className="flex-shrink-0 bg-indigo-50 text-indigo-700 text-xs font-bold px-2 py-1 rounded-md border border-indigo-100">
+                                                    {q.marks} pts
+                                                </span>
+                                            </div>
+
+                                            {q.questionType === 'mcq' && q.options && (
+                                                <div className="flex flex-col gap-2 ml-1">
+                                                    {q.options.map((opt, oIdx) => (
+                                                        <div key={opt.id || oIdx} className="flex items-center gap-2.5">
+                                                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${opt.isCorrect ? 'border-emerald-500 bg-emerald-50' : 'border-slate-300'}`}>
+                                                                {opt.isCorrect && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
+                                                            </div>
+                                                            <span className={`text-sm ${opt.isCorrect ? 'text-emerald-700 font-medium' : 'text-slate-600'}`}>
+                                                                {opt.text}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {q.questionType === 'true_false' && q.acceptedAnswers && (
+                                                <div className="flex flex-col gap-2 ml-1">
+                                                    {['True', 'False'].map((opt, oIdx) => {
+                                                        const isCorrect = q.acceptedAnswers.includes(opt);
+                                                        return (
+                                                            <div key={oIdx} className="flex items-center gap-2.5">
+                                                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isCorrect ? 'border-emerald-500 bg-emerald-50' : 'border-slate-300'}`}>
+                                                                    {isCorrect && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
+                                                                </div>
+                                                                <span className={`text-sm ${isCorrect ? 'text-emerald-700 font-medium' : 'text-slate-600'}`}>
+                                                                    {opt}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+
+                                            {q.questionType === 'fill_blank' && q.acceptedAnswers && (
+                                                <div className="ml-1 mt-1">
+                                                    <p className="text-xs text-slate-500 mb-1">Accepted answers:</p>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {q.acceptedAnswers.map((ans, aIdx) => (
+                                                            <span key={aIdx} className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs px-2 py-0.5 rounded-md font-medium">
+                                                                {ans}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-5 text-sm text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    No questions found.
+                                </div>
                             )}
                         </div>
+                    ) : (
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="flex items-center gap-1.5">
+                                    <IoLinkOutline className="text-slate-400 text-xs" />
+                                    <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+                                        Attached Files
+                                    </p>
+                                </div>
+                                {files?.length > 0 && (
+                                    <span className="bg-indigo-600 text-white text-[10px] font-bold rounded-full px-2 py-0.5 leading-none">
+                                        {files.length}
+                                    </span>
+                                )}
+                            </div>
 
-                        {files?.length > 0 ? (
-                            <div className="flex flex-col gap-2">
-                                {files.map((file) => (
-                                    <div
-                                        key={file.id}
-                                        className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 hover:bg-indigo-50 hover:border-indigo-200 transition-all duration-200"
-                                    >
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">
-                                                <IoDocumentTextOutline className="text-white" />
-                                            </div>
-                                            <span className="text-sm font-medium text-slate-700 truncate">{file.name}</span>
-                                        </div>
-                                        <a
-                                            href={file.url}
-                                            download
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="ml-3 flex-shrink-0 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 no-underline flex items-center gap-1"
+                            {files?.length > 0 ? (
+                                <div className="flex flex-col gap-2">
+                                    {files.map((file) => (
+                                        <div
+                                            key={file.id}
+                                            className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 hover:bg-indigo-50 hover:border-indigo-200 transition-all duration-200"
                                         >
-                                            <IoDownloadOutline /> Download
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-5 text-sm text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                No files attached.
-                            </div>
-                        )}
-                    </div>
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">
+                                                    <IoDocumentTextOutline className="text-white" />
+                                                </div>
+                                                <span className="text-sm font-medium text-slate-700 truncate">{file.name}</span>
+                                            </div>
+                                            <a
+                                                href={file.url}
+                                                download
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="ml-3 flex-shrink-0 text-xs font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-1.5 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 no-underline flex items-center gap-1"
+                                            >
+                                                <IoDownloadOutline /> Download
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-5 text-sm text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    No files attached.
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Divider */}
                     <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />

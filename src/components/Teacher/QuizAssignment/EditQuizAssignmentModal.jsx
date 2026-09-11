@@ -12,6 +12,7 @@ import useClickOutside from "../../../hooks/useClickOutlise";
 import { getTeacherSubjectsOfClassroom } from "../../../api/Teacher/TeacherSubjectApi";
 import IMAGES from "../../../assets/images";
 import { BookOpen, ClipboardList, ChevronDown, Check } from "lucide-react";
+import QuestionBuilder from "./QuestionBuilder";
 
 const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz }) => {
   const { toggleBlur } = useBlur();
@@ -31,17 +32,49 @@ const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz 
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadedFileUrl, setUploadedFileUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [quizType, setQuizType] = useState("file_upload");
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    if (quizType === 'mcq_objective') {
+      const sum = questions.reduce((acc, q) => acc + (parseInt(q.marks) || 0), 0);
+      setFormData((p) => ({ ...p, totalMarks: sum }));
+    }
+  }, [questions, quizType]);
 
   useEffect(() => {
     if (isEditTrue && data) {
-      const { title, text, totalMarks, dueDate, files, canSubmitAfterTime, classroomID, subjectID } = data;
-      const formatted = new Date(dueDate);
-      setFormData({ title, text, totalMarks, dueDate, files: files?.[0] || "", canSubmitAfterTime });
-      setDueDate(formatted.toISOString().split("T")[0]);
-      setDueTime(formatted.toISOString().split("T")[1].slice(0, 5));
+      const { title, text, totalMarks, dueDate, files, canSubmitAfterTime, classroomID, subjectID, quizType, QuizQuestion } = data;
+      let safeDateStr = "";
+      let safeTimeStr = "";
+      if (dueDate) {
+        const formatted = new Date(dueDate);
+        if (!isNaN(formatted.getTime())) {
+          try {
+            safeDateStr = formatted.toISOString().split("T")[0];
+            safeTimeStr = formatted.toISOString().split("T")[1].slice(0, 5);
+          } catch(e) {}
+        }
+      }
+      
+      setFormData({ 
+        title: title || "", 
+        text: text || "", 
+        totalMarks: totalMarks || 0, 
+        dueDate, 
+        files: files?.[0] || "", 
+        canSubmitAfterTime: canSubmitAfterTime || false 
+      });
+      setDueDate(safeDateStr);
+      setDueTime(safeTimeStr);
       setSelectedClassroom(classroomID);
       setSelectedSubject(subjectID?.id || "");
       setUploadedFileUrl(files?.[0]?.url || "");
+      setQuizType(quizType || "file_upload");
+      setQuestions((QuizQuestion || []).map(q => ({
+        ...q,
+        options: q.QuizOption || q.options || []
+      })));
     }
   }, [isEditTrue, data]);
 
@@ -86,6 +119,11 @@ const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz 
         : [];
 
       const payload = { ...formData, subjectID: selectedSubject, classroomID: selectedClassroom.id, files, dueDate: finalDueDate };
+      
+      if (isQuiz) {
+        payload.quizType = quizType;
+        payload.questions = questions;
+      }
 
       isQuiz ? await editQuiz(payload, data?.id) : await editAssignment(payload, data?.id);
       await refetch();
@@ -194,6 +232,23 @@ const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz 
             </div>
           </Field>
 
+          {/* Quiz Type */}
+          {isQuiz && (
+            <Field label="Quiz Type">
+              <div className="relative">
+                <select
+                  value={quizType}
+                  onChange={(e) => setQuizType(e.target.value)}
+                  className={`${inputCls} appearance-none pr-9 cursor-pointer`}
+                >
+                  <option value="file_upload">File Upload (Manual Grade)</option>
+                  <option value="mcq_objective">MCQ / Objective (Auto Grade)</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              </div>
+            </Field>
+          )}
+
           {/* Title */}
           <Field label="Title">
             <input
@@ -222,9 +277,13 @@ const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz 
               type="number"
               placeholder="e.g. 100"
               value={formData.totalMarks}
+              disabled={isQuiz && quizType === 'mcq_objective'}
               onChange={(e) => handleInputChange("totalMarks", e.target.value)}
-              className={inputCls}
+              className={`${inputCls} ${isQuiz && quizType === 'mcq_objective' ? 'bg-gray-100 cursor-not-allowed opacity-70' : ''}`}
             />
+            {isQuiz && quizType === 'mcq_objective' && (
+              <p className="text-[10px] text-gray-400 px-0.5 mt-1">Total marks are auto-calculated from questions.</p>
+            )}
           </Field>
 
           {/* Deadline */}
@@ -252,54 +311,57 @@ const EditQuizAssignmentModal = ({ isEditTrue, refetch, data, setIsEdit, isQuiz 
             </Field>
           )}
 
-          {/* File Upload */}
-          <Field label="Attachment">
-            {!uploadedFileUrl && !selectedFile ? (
-              <label
-                htmlFor="assignmentFile"
-                className="flex flex-col items-center justify-center gap-3 px-6 py-7 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:border-purple-300 hover:bg-purple-50/30 transition-all cursor-pointer group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 group-hover:border-purple-200 flex items-center justify-center shadow-sm transition-colors">
-                  <FiUploadCloud size={18} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium text-gray-600">
-                    <span className="text-purple-600">Click to upload</span> or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">PNG, JPG, Word or PDF</p>
-                </div>
-              </label>
-            ) : (
-              <div className="flex items-center justify-between px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl">
-                <div className="flex items-center gap-3">
-                  {previewUrl || (uploadedFileUrl && /\.(jpeg|jpg|gif|png|webp|avif|svg)(?:\?.*)?$/i.test(uploadedFileUrl)) ? (
-                    <img src={previewUrl || uploadedFileUrl} alt="preview" className="w-10 h-10 object-cover rounded-lg" />
-                  ) : (
-                    <div className="w-10 h-10 bg-white rounded-lg border border-purple-100 flex items-center justify-center">
-                      <img src={IMAGES.pdf} alt="file" className="w-6 h-6" />
+          {(!isQuiz || quizType === 'file_upload') ? (
+            <Field label="Attachment">
+              {!uploadedFileUrl && !selectedFile ? (
+                <label
+                  htmlFor="assignmentFile"
+                  className="flex flex-col items-center justify-center gap-3 px-6 py-7 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:border-purple-300 hover:bg-purple-50/30 transition-all cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 group-hover:border-purple-200 flex items-center justify-center shadow-sm transition-colors">
+                    <FiUploadCloud size={18} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-gray-600">
+                      <span className="text-purple-600">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">PNG, JPG, Word or PDF</p>
+                  </div>
+                </label>
+              ) : (
+                <div className="flex items-center justify-between px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    {previewUrl || (uploadedFileUrl && /\.(jpeg|jpg|gif|png|webp|avif|svg)(?:\?.*)?$/i.test(uploadedFileUrl)) ? (
+                      <img src={previewUrl || uploadedFileUrl} alt="preview" className="w-10 h-10 object-cover rounded-lg" />
+                    ) : (
+                      <div className="w-10 h-10 bg-white rounded-lg border border-purple-100 flex items-center justify-center">
+                        <img src={IMAGES.pdf} alt="file" className="w-6 h-6" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 truncate max-w-[200px]">
+                        {selectedFile?.name || data?.files?.[0]?.name || "Uploaded file"}
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">
+                        {selectedFile ? "Ready to save" : "Existing file"}
+                      </p>
                     </div>
-                  )}
-                  <div>
-                    <p className="text-xs font-medium text-gray-700 truncate max-w-[200px]">
-                      {selectedFile?.name || data?.files?.[0]?.name || "Uploaded file"}
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">
-                      {selectedFile ? "Ready to save" : "Existing file"}
-                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <label htmlFor="assignmentFile" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white cursor-pointer transition-colors">
+                      <FiEdit size={13} className="text-purple-500" />
+                    </label>
+                    <button onClick={handleRemoveFile} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white transition-colors">
+                      <IoCloseCircle size={15} className="text-red-400" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <label htmlFor="assignmentFile" className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white cursor-pointer transition-colors">
-                    <FiEdit size={13} className="text-purple-500" />
-                  </label>
-                  <button onClick={handleRemoveFile} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white transition-colors">
-                    <IoCloseCircle size={15} className="text-red-400" />
-                  </button>
-                </div>
-              </div>
-            )}
-            <input id="assignmentFile" type="file" className="hidden" onChange={handleFileChange} />
-          </Field>
+              )}
+              <input id="assignmentFile" type="file" className="hidden" onChange={handleFileChange} />
+            </Field>
+          ) : (
+            <QuestionBuilder questions={questions} setQuestions={setQuestions} />
+          )}
         </div>
 
         {/* ── Footer ── */}

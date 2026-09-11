@@ -156,6 +156,10 @@ const SubmissionRow = (props) => {
                 <span className="hidden xs:inline">PDF</span>
               </a>
             </>
+          ) : props.isQuiz && props.quizType === 'mcq_objective' && props.submission ? (
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] xs:text-[10px] sm:text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg whitespace-nowrap">
+              Auto-Graded {props.submissionData?.marks !== undefined && props.submissionData?.marks !== null ? `(${props.submissionData.marks} pts)` : ""}
+            </span>
           ) : (
             <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] xs:text-[10px] sm:text-[11px] font-medium text-gray-400 bg-gray-50 border border-gray-100 rounded-lg whitespace-nowrap">
               Pending

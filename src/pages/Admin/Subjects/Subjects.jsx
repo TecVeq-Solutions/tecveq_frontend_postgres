@@ -136,7 +136,7 @@ const LevelGroup = ({ levelName, subjects, onEdit, onDelete, colorIndex }) => {
                 </span>
             </div>
 
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2.5 ">
                 {subjects.map((subject) => (
                     <SubjectCard
                         key={subject.id}

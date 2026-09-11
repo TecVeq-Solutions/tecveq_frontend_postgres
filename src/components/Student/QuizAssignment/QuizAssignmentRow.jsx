@@ -13,9 +13,12 @@ import { useSidebar } from '../../../context/SidebarContext';
 import { useParent } from '../../../context/ParentContext';
 import { FiEdit } from 'react-icons/fi';
 import ConfirmModal from './ConfirmModal';
+import AttemptQuizModal from './AttemptQuizModal';
+import ReviewQuizStudentModal from './ReviewQuizStudentModal';
 import {
-    Download, Upload, CheckCircle2, Clock, AlarmClock, FileText, BookOpen
+    Download, Upload, Clock, AlarmClock, FileText, BookOpen, ClipboardList
 } from 'lucide-react';
+import { IoCheckmarkCircle } from 'react-icons/io5';
 
 const QuizAssignmentRow = (props) => {
     const queryClient = useQueryClient();
@@ -26,6 +29,8 @@ const QuizAssignmentRow = (props) => {
     const [uploadedFileUrl, setUploadedFileUrl] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showAttemptModal, setShowAttemptModal] = useState(false);
+    const [showReviewModal, setShowReviewModal] = useState(false);
     const [copied, setCopied] = useState(false);
     const [textExpanded, setTextExpanded] = useState(false);
     const { isSidebarOpen } = useSidebar();
@@ -98,6 +103,7 @@ const QuizAssignmentRow = (props) => {
             props?.alldata?.submissions?.forEach((item) => {
                 if (item?.studentID === targetStudentId || item?.studentID?.id === targetStudentId) setIsUploadded(true);
             });
+            if (props.alldata?.isSubmitted) setIsUploadded(true);
         }
 
         if (!props.deadline || props.header) return;
@@ -110,7 +116,7 @@ const QuizAssignmentRow = (props) => {
         compareDateAndTime(formattedDateTimeString);
         const intervalId = setInterval(() => compareDateAndTime(formattedDateTimeString), 1000);
         return () => clearInterval(intervalId);
-    }, [props.deadline, targetStudentId]);
+    }, [props.deadline, targetStudentId, props.alldata]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(props.text);
@@ -194,8 +200,15 @@ const QuizAssignmentRow = (props) => {
                         </div>
 
                         {/* Marks */}
-                        <div className="col-span-1 flex justify-center">
-                            <span className="text-sm font-bold text-gray-700">{props.total_marks}<span className="text-xs text-gray-400 font-normal"> pts</span></span>
+                        <div className="col-span-1 flex flex-col justify-center items-center">
+                            {props.alldata?.quizType === 'mcq_objective' && isUploaded ? (
+                                <span className="text-sm font-bold text-green-600">
+                                    {props.alldata?.submissions?.find(item => item?.studentID === targetStudentId || item?.studentID?.id === targetStudentId)?.marks ?? props.total_marks}
+                                    <span className="text-xs text-gray-400 font-normal"> / {props.total_marks} pts</span>
+                                </span>
+                            ) : (
+                                <span className="text-sm font-bold text-gray-700">{props.total_marks}<span className="text-xs text-gray-400 font-normal"> pts</span></span>
+                            )}
                         </div>
 
                         {/* Download */}
@@ -220,9 +233,18 @@ const QuizAssignmentRow = (props) => {
                                     <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full">
                                         Pending
                                     </span>
+                                ) : props.alldata?.quizType === 'mcq_objective' ? (
+                                    <button
+                                        onClick={() => setShowAttemptModal(true)}
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer transition-all hover:opacity-90  hover:shadow-lg active:scale-95"
+                                        style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}
+                                    >
+                                        <ClipboardList size={13} />
+                                        Attempt Quiz
+                                    </button>
                                 ) : (
                                     <label htmlFor={`upload-${props.id}`}
-                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer transition-all hover:opacity-90 hover:shadow-lg active:scale-95"
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2  rounded-xl cursor-pointer transition-all hover:opacity-90 hover:shadow-lg active:scale-95"
                                         style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}>
                                         <Upload size={13} />
                                         Upload
@@ -231,11 +253,21 @@ const QuizAssignmentRow = (props) => {
                                 )
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
-                                        <CheckCircle2 size={12} />
-                                        Submitted
-                                    </span>
-                                    {!isParent && (
+                                    {props.alldata?.quizType === 'mcq_objective' ? (
+                                        <button
+                                            onClick={() => setShowReviewModal(true)}
+                                            className="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-full transition-colors"
+                                        >
+                                            <ClipboardList size={13} />
+                                            Review Answers
+                                        </button>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
+                                            <IoCheckmarkCircle size={12} />
+                                            Submitted
+                                        </span>
+                                    )}
+                                    {!isParent && props.alldata?.quizType !== 'mcq_objective' && (
                                         <label htmlFor={`upload-${props.id}`} className="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer text-purple-500 hover:bg-purple-50 transition-colors">
                                             <FiEdit size={14} />
                                             <input id={`upload-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
@@ -262,9 +294,15 @@ const QuizAssignmentRow = (props) => {
                                     </span>
                                 </div>
                             </div>
-                            <span className="text-xs font-bold text-gray-600 bg-gray-100 rounded-lg px-2 py-1 shrink-0">
-                                {props.total_marks} <span className="text-gray-400 font-normal text-[10px]">pts</span>
-                            </span>
+                            {props.alldata?.quizType === 'mcq_objective' && isUploaded ? (
+                                <span className="text-xs font-bold text-green-600 bg-gray-100 rounded-lg px-2 py-1 shrink-0">
+                                    {props.alldata?.submissions?.find(item => item?.studentID === targetStudentId || item?.studentID?.id === targetStudentId)?.marks ?? props.total_marks} <span className="text-gray-400 font-normal text-[10px]">/ {props.total_marks} pts</span>
+                                </span>
+                            ) : (
+                                <span className="text-xs font-bold text-gray-600 bg-gray-100 rounded-lg px-2 py-1 shrink-0">
+                                    {props.total_marks} <span className="text-gray-400 font-normal text-[10px]">pts</span>
+                                </span>
+                            )}
                         </div>
 
                         {/* Deadline + Timer */}
@@ -280,7 +318,7 @@ const QuizAssignmentRow = (props) => {
                             )}
                             {isUploaded && (
                                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-100 px-2.5 py-1 rounded-full">
-                                    <CheckCircle2 size={11} /> Submitted
+                                    <IoCheckmarkCircle size={11} /> Submitted
                                 </span>
                             )}
                         </div>
@@ -300,21 +338,39 @@ const QuizAssignmentRow = (props) => {
                                     <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full">
                                         Pending
                                     </span>
+                                ) : props.alldata?.quizType === 'mcq_objective' ? (
+                                    <button
+                                        onClick={() => setShowAttemptModal(true)}
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl transition-all hover:opacity-90"
+                                        style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)' }}
+                                    >
+                                        <ClipboardList size={13} />
+                                        Attempt Quiz
+                                    </button>
                                 ) : (
                                     <label htmlFor={`upload-mobile-${props.id}`}
-                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer"
-                                        style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)', boxShadow: '0 4px 14px rgba(106,0,255,0.3)' }}>
+                                        className="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-xl cursor-pointer transition-all hover:opacity-90"
+                                        style={{ background: 'linear-gradient(135deg, #6A00FF, #9B4DFF)' }}>
                                         <Upload size={13} /> Upload
                                         <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
                                     </label>
                                 )
                             ) : (
-                                !isParent && (
-                                    <label htmlFor={`upload-mobile-${props.id}`} className="flex items-center gap-1.5 text-xs font-medium text-purple-600 hover:bg-purple-50 px-2 py-1.5 rounded-lg cursor-pointer transition-colors">
-                                        <FiEdit size={13} /> Re-submit
-                                        <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
-                                    </label>
-                                )
+                                <>
+                                    {props.alldata?.quizType === 'mcq_objective' ? (
+                                        <button
+                                            onClick={() => setShowReviewModal(true)}
+                                            className="flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg transition-colors border border-green-200"
+                                        >
+                                            <ClipboardList size={13} /> Review Answers
+                                        </button>
+                                    ) : !isParent && (
+                                        <label htmlFor={`upload-mobile-${props.id}`} className="flex items-center gap-1.5 text-xs font-medium text-purple-600 hover:bg-purple-50 px-2 py-1.5 rounded-lg cursor-pointer transition-colors">
+                                            <FiEdit size={13} /> Re-submit
+                                            <input id={`upload-mobile-${props.id}`} onChange={handleFileChange} type="file" className="hidden" />
+                                        </label>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
@@ -357,6 +413,18 @@ const QuizAssignmentRow = (props) => {
                 description={`Are you sure you want to submit this ${props.isQuiz ? 'Quiz' : 'Assignment'}? once submitted you can still change it but teacher would see both.`}
                 onConfirm={handleConfirmUpload}
                 onCancel={() => { setShowConfirmModal(false); setSelectedFile(null); }}
+            />
+
+            <AttemptQuizModal
+                open={showAttemptModal}
+                setOpen={setShowAttemptModal}
+                quizId={props.id}
+            />
+
+            <ReviewQuizStudentModal
+                open={showReviewModal}
+                setOpen={setShowReviewModal}
+                quizId={props.id}
             />
         </>
     );

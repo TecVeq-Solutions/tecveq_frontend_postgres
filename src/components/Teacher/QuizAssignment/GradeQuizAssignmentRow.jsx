@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import moment from "moment";
+import ReviewAnswersModal from "./ReviewAnswersModal";
 
 const GradeQuizAssignmentRow = React.memo((props) => {
   const [timePassed, setTimePassed] = useState(false);
   const [timeLeft, setTimeLeft] = useState("");
   const [arrowActive, setArrowActive] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   const handleChange = (field) => (event) => {
     console.log("field data is : ", field, event.target.value);
@@ -81,6 +83,13 @@ const GradeQuizAssignmentRow = React.memo((props) => {
             </span>
           </div>
 
+          {/* Total Marks */}
+          <div className="w-[48px] xs:w-[60px] sm:w-[90px] flex-shrink-0 text-center px-0.5 xs:px-1">
+            <span className="text-[9px] xs:text-[10px] sm:text-[13px] font-bold text-black leading-tight">
+              {props.totalMarks}
+            </span>
+          </div>
+
           {/* Marks */}
           <div className="w-[48px] xs:w-[56px] sm:w-[80px] flex-shrink-0 text-center px-0.5 xs:px-1">
             <span className="text-[9px] xs:text-[10px] sm:text-[13px] font-bold text-black leading-tight">
@@ -137,6 +146,13 @@ const GradeQuizAssignmentRow = React.memo((props) => {
             ) : (
               moment(props.submission).format("DD MMM, YY")
             )}
+          </span>
+        </div>
+
+        {/* Total Marks */}
+        <div className="w-[48px] xs:w-[60px] sm:w-[90px] flex-shrink-0 flex justify-center px-0.5 xs:px-1">
+          <span className="text-[10px] xs:text-[11px] sm:text-[13px] font-medium text-gray-800 text-center flex items-center justify-center">
+            {props.totalMarks}
           </span>
         </div>
 
@@ -206,6 +222,25 @@ const GradeQuizAssignmentRow = React.memo((props) => {
           </div>
         </div>
       )}
+
+      {/* Review Answers Button (for MCQ) */}
+      {arrowActive && props.quizType === 'mcq_objective' && props.submission !== "Not Submitted Yet" && (
+        <div className="px-2 pb-2 xs:px-3 xs:pb-3 sm:px-6 sm:pb-5">
+           <button
+             onClick={() => setShowReviewModal(true)}
+             className="px-4 py-2 text-[11px] sm:text-[13px] bg-purple-50 text-purple-700 font-semibold border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
+           >
+             Review Student's Answers
+           </button>
+        </div>
+      )}
+
+      <ReviewAnswersModal 
+        open={showReviewModal}
+        setOpen={setShowReviewModal}
+        quizData={props.quizData}
+        submissionObj={props.submissionObj}
+      />
     </div>
   );
 });

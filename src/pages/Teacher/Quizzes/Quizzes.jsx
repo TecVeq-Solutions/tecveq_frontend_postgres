@@ -58,6 +58,7 @@ const Quizzes = () => {
     },
   });
 
+
   const toggleAssignmentMenuOpen = (data) => {
     setQuizdata(data);
     setIsAssignmentMenuOpen((p) => !p);

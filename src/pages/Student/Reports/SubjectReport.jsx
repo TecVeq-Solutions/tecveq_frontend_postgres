@@ -4,6 +4,7 @@ import LargeLoader from "../../../utils/LargeLoader";
 import Card from "../../../components/Student/Reports/Card";
 import AttendanceTable from "../../../components/Student/Reports/AttendanceTable";
 import QuizAssignmentsTable from "../../../components/Student/Reports/QuizAssignmentsTable";
+import LearningMaterialsTable from "../../../components/Student/Reports/LearningMaterialsTable";
 
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS } from "chart.js/auto"; // IMPORTANT
@@ -165,7 +166,14 @@ const SubjectReport = () => {
                 </div>
                 <div className="mt-7">
                   <div className="flex flex-col gap-2">
-                    <p className="md:text-[20px]">Assignments </p>
+                    <p className="md:text-[20px]">Learning Materials</p>
+                    <LearningMaterialsTable subjectId={subjectId} classId={userData?.classroomID} />
+                  </div>
+                </div>
+
+                <div className="mt-7">
+                  <div className="flex flex-col gap-2">
+                    <p className="md:text-[20px]">Assignments</p>
                     <div className="flex flex-row items-center gap-2">
                       <QuizAssignmentsTable data={reportQuery?.data?.assignments} />
                     </div>

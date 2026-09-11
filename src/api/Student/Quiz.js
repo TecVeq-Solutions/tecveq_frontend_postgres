@@ -15,3 +15,15 @@ export const submitQiuz = apiRequest(async (data, id) =>{
     const response = await axios.post(url, data);
     return response;
 })
+
+export const getQuizById = apiRequest(async (id) => {
+    const url = `${BACKEND_URL}/quiz/${id}`;
+    const response = await axios.get(url);
+    return response;
+});
+
+export const getStudentQuiz = apiRequest(async (id) => {
+    const url = `${BACKEND_URL}/quiz/student/${id}`;
+    const response = await axios.get(url);
+    return response;
+});

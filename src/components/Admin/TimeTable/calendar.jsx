@@ -145,7 +145,7 @@ const MyCalendar = ({ data, isPending, refetch, isRefetching }) => {
 
       {!isPending && (
         // overflow-y-auto scrollbar-hide
-        <div className="w-full h-[700px] sm:h-[800px] lg:h-[calc(100vh-200px)] min-h-[500px] overflow-x-auto overflow-y-hidden border border-grey/20 rounded-lg relative">
+        <div className="w-full h-[700px] sm:h-[800px] lg:h-[calc(100vh-200px)] min-h-[500px] overflow-x-auto overflow-y-auto border border-grey/20 rounded-lg relative">
           {isRefetching && (
             <div className="absolute top-0 left-0 right-0 z-50 flex justify-center">
               <div className="bg-blue-600 text-white text-[10px] px-3 py-1 rounded-b-lg shadow-md animate-pulse font-bold">

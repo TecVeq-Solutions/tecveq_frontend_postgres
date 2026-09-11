@@ -14,7 +14,7 @@ import { teacherPresent } from "../../../api/Teacher/Attendence";
 import { useUser } from "../../../context/UserContext";
 import { useMutation } from "@tanstack/react-query";
 import { convertToISOWithTimezoneOffset } from "../../../utils/ConvertTimeZone";
-import { Pencil, Clock, Calendar, User, Monitor, Link2, CheckCircle2 } from "lucide-react";
+import { Pencil, Clock, Calendar, User, Monitor, Link2 } from "lucide-react";
 
 export default function ViewEventDetailsModal({ open, setopen, event, setevents, refetch }) {
   const { classesRefetch } = useTeacher();

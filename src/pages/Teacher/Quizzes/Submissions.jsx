@@ -394,6 +394,7 @@ const Submissions = () => {
                           submissionData={submission?.submission}
                           submission={submission?.submission?.submittedAt}
                           profileLink={submission?.studentID?.profilePic || submission?.profilePic || "http://bit.ly/4gcOBHl"}
+                          quizType={location.state?.quizType}
                         />
                       ))
                   }

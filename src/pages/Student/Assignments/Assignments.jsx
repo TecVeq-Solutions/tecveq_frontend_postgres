@@ -221,8 +221,8 @@ const Assignments = () => {
                                 <button
                                   onClick={() => goToPage(page)}
                                   className={`w-8 h-8 sm:w-10 sm:h-10 rounded-2xl text-sm font-bold transition-all duration-200 active:scale-95 ${currentPage === page
-                                      ? "bg-gradient-to-br from-[#7B1FFF] to-[#5500CC] text-white shadow-[0_5px_16px_rgba(106,0,255,0.35)]"
-                                      : "bg-[#F6F3FF] text-[#6A00FF] hover:bg-[#ECE6FF]"
+                                    ? "bg-gradient-to-br from-[#7B1FFF] to-[#5500CC] text-white shadow-[0_5px_16px_rgba(106,0,255,0.35)]"
+                                    : "bg-[#F6F3FF] text-[#6A00FF] hover:bg-[#ECE6FF]"
                                     }`}
                                 >
                                   {page}
@@ -242,6 +242,8 @@ const Assignments = () => {
                       </div>
                     </div>
                   </>
+
+
                 ) : (
                   /* Empty State */
                   <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -256,6 +258,7 @@ const Assignments = () => {
                     <p className="text-gray-400 text-sm">
                       Your teacher hasn't posted any assignments.
                     </p>
+
                   </div>
                 )}
               </div>

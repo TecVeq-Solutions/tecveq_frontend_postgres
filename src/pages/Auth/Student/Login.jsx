@@ -61,9 +61,9 @@ const Login = () => {
                 email: emailValue,
                 password: passwordValue
             };
-            
+
             const response = await studentLogin(dataBody);
-            
+
             if (response && response !== "error") {
                 setUserData(response);
                 if (response.userType == "student") {
@@ -301,7 +301,7 @@ const Login = () => {
                                 <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Email Address</label>
                                 <div className="relative">
                                     <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
-    ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-black'}`}>
+    ${activeField === 'email' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
 
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -321,10 +321,11 @@ const Login = () => {
                                 <label className={`block text-[10.5px] sm:text-[14px] font-bold tracking-[.14em] uppercase mb-2 transition-colors duration-[0.25s] max-[360px]:text-[9.5px] ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(235,245,255,0.4)]'}`}>Password</label>
                                 <div className="relative">
                                     <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center transition-colors duration-[0.25s] pointer-events-none max-[360px]:left-[11px] 
-    ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-black'}`}>
+    ${activeField === 'password' ? 'text-[#60a5fa]' : 'text-[rgba(255,255,255,.22)]'}`}>
 
                                         <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+
                                         </svg>
                                     </div>
                                     <input
