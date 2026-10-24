@@ -74,8 +74,19 @@ const PlatformFees = () => {
                                     {feesData?.map((fee) => (
                                         <tr key={fee.id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-8 py-5">
-                                                <div className="font-bold text-gray-900 text-base">{fee.admin.name}</div>
-                                                <div className="text-xs text-gray-400 font-medium">{fee.admin.email}</div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-gray-900 text-base">
+                                                        {fee.branchName || fee.admin?.name}
+                                                    </span>
+                                                    {fee.branchCode && (
+                                                        <span className="text-[10px] bg-purple-100 text-[#0B1053] font-black px-2 py-0.5 rounded-lg uppercase">
+                                                            {fee.branchCode}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-gray-400 font-medium">
+                                                    Admin: {fee.admin?.name} ({fee.admin?.email})
+                                                </div>
                                             </td>
                                             <td className="px-8 py-5">
                                                 <span className="text-sm text-gray-600 font-bold">

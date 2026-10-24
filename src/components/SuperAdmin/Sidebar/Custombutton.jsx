@@ -1,7 +1,7 @@
 import React from "react";
 import { GoHome } from "react-icons/go";
 import { VscGraph, VscLayers } from "react-icons/vsc";
-import { LuCalendar, LuBookOpen, LuUsers, LuLayoutDashboard } from "react-icons/lu";
+import { LuCalendar, LuBookOpen, LuUsers, LuLayoutDashboard, LuShieldCheck, LuDatabase } from "react-icons/lu";
 import { CiCalendarDate } from "react-icons/ci";
 
 const iconMap = {
@@ -11,6 +11,9 @@ const iconMap = {
   book: LuBookOpen,
   quiz: LuCalendar,
   levels: VscLayers,
+  license: LuShieldCheck,
+  backup: LuDatabase,
+  user: LuUsers,
 };
 
 const Custombutton = ({ title, active, onpress, icon }) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Custombutton from "./Custombutton";
 import logo from "../../../assets/logo.png";
@@ -48,6 +48,15 @@ const Sidebar = () => {
         { key: "admins", title: "Admin Management", icon: "user", route: "/superadmin/admins" },
         { key: "packages", title: "Subscription Plans", icon: "levels", route: "/superadmin/packages" },
         { key: "payments", title: "Payments", icon: "fees", route: "/superadmin/payments" },
+        { key: "platformFees", title: "Platform Fees", icon: "levels", route: "/superadmin/platform-fees" },
+      ]
+    },
+    {
+      label: "Infrastructure",
+      items: [
+        { key: "tenants", title: "Tenant Databases", icon: "backup", route: "/superadmin/tenants" },
+        { key: "licenses", title: "Licenses & SaaS", icon: "license", route: "/superadmin/licenses" },
+        { key: "backups", title: "Data Backup", icon: "backup", route: "/superadmin/backups" },
       ]
     },
     {

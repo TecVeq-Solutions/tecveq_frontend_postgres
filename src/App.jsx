@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { Route, Routes } from "react-router-dom";
 
 import Dashboard from "./pages/Student/Dashboard/Dashboard";
@@ -92,6 +92,9 @@ import SAReports from "./pages/SuperAdmin/Reports";
 import SABlocked from "./pages/SuperAdmin/BlockedAccounts";
 import SASettings from "./pages/SuperAdmin/Settings";
 import SAProfile from "./pages/SuperAdmin/Profile";
+import LicenseManagement from "./pages/SuperAdmin/Licenses/LicenseManagement";
+import BackupRecovery from "./pages/SuperAdmin/Backup/BackupRecovery";
+import TenantManagement from "./pages/SuperAdmin/Tenants/TenantManagement";
 import BulkSubjectAssign from "./pages/Admin/BulkSubjectAssign/BulkSubjectAssign";
 import ChatBot from "./components/ChatBot/ChatBot";
 import StudentProfileDashboard from "./pages/Common/StudentProfileDashboard";
@@ -414,385 +417,409 @@ function App() {
               </SuperAdminLayout>
             }
           />
+          <Route
+            path="/superadmin/licenses"
+            element={
+              <SuperAdminLayout>
+                <LicenseManagement />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/backups"
+            element={
+              <SuperAdminLayout>
+                <BackupRecovery />
+              </SuperAdminLayout>
+            }
+          />
+          <Route
+            path="/superadmin/tenants"
+            element={
+              <SuperAdminLayout>
+                <TenantManagement />
+              </SuperAdminLayout>
+            }
+          />
         </Route>
-        <Route element={<ProtectedStudent />} >
+                          <Route element={<ProtectedStudent />} >
 
-          <Route
-            path="/reports"
-            element={
-              <StudentLayout>
-                <Reports />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/student/dashboard"
-            element={
-              <StudentLayout>
-                <Dashboard />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/student/materials"
-            element={
-              <StudentLayout>
-                <SLearningMaterials />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/reports/:subject"
-            element={
-              <StudentLayout>
-                <SubjectReport />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/reports/:subject/:title"
-            element={
-              <StudentLayout>
-                <AssignmentReport />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/assignments"
-            element={
-              <StudentLayout>
-                <Assignments />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/quizzes"
-            element={
-              <StudentLayout>
-                <Quizzes />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/timetable"
-            element={
-              <StudentLayout>
-                <TimeTable />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/student/attendence-report"
-            element={
-              <StudentLayout>
-                <StudentAttendenceReport />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/student/leaves"
-            element={
-              <StudentLayout>
-                <StudentLeaves />
-              </StudentLayout>
-            }
-          />
-          <Route
-            path="/student/student-profile/:studentId"
-            element={
-              <StudentLayout>
-                <StudentProfileDashboard />
-              </StudentLayout>
-            }
-          />
-        </Route>
-        <Route element={<ProtectedTeacher />} >
-          <Route
-            path="/teacher/materials"
-            element={
-              <TeacherLayout>
-                <TLearningMaterials />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/presentation/:id"
-            element={<TPresentationMode />}
-          />
-          <Route
-            path="/teacher/dashboard"
-            element={
-              <TeacherLayout>
-                <TDashboard />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/timetable"
-            element={
-              <TeacherLayout>
-                <TeacherProvider>
-                  <TTimeTable />
-                </TeacherProvider>
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/assignments"
-            element={
-              <TeacherLayout>
-                <TAssignments />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/quizzes"
-            element={
-              <TeacherLayout>
-                <TQuizzes />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/reports"
-            element={
-              <TeacherLayout>
-                <TReports />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/reports/:student"
-            element={
-              <TeacherLayout>
-                <TSubjectReport />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/leaves"
-            element={
-              <TeacherLayout>
-                <TeacherMyLeaves />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/student-leaves"
-            element={
-              <TeacherLayout>
-                <TeacherStudentLeaves />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/assignments/submissions"
-            element={
-              <TeacherLayout>
-                <TSubmissions />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/quizzes/submissions"
-            element={
-              <TeacherLayout>
-                <TQuizzSubmissions />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/assignments/GradingAssignments"
-            element={
-              <TeacherLayout>
-                <TGradingAssignments />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/quizzes/GradingQuizzes"
-            element={
-              <TeacherLayout>
-                <TGradingQuizzes />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/attendence"
-            element={
-              <TeacherLayout>
-                <TAttendence />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/attendence/submission"
-            element={
-              <TeacherLayout>
-                <TMarkAttendence />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/attendence-report"
-            element={
-              <TeacherLayout>
-                <TAttendenceReport />
-              </TeacherLayout>
-            }
-          />
+                            <Route
+                              path="/reports"
+                              element={
+                                <StudentLayout>
+                                  <Reports />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/student/dashboard"
+                              element={
+                                <StudentLayout>
+                                  <Dashboard />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/student/materials"
+                              element={
+                                <StudentLayout>
+                                  <SLearningMaterials />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/reports/:subject"
+                              element={
+                                <StudentLayout>
+                                  <SubjectReport />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/reports/:subject/:title"
+                              element={
+                                <StudentLayout>
+                                  <AssignmentReport />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/assignments"
+                              element={
+                                <StudentLayout>
+                                  <Assignments />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/quizzes"
+                              element={
+                                <StudentLayout>
+                                  <Quizzes />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/timetable"
+                              element={
+                                <StudentLayout>
+                                  <TimeTable />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/student/attendence-report"
+                              element={
+                                <StudentLayout>
+                                  <StudentAttendenceReport />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/student/leaves"
+                              element={
+                                <StudentLayout>
+                                  <StudentLeaves />
+                                </StudentLayout>
+                              }
+                            />
+                            <Route
+                              path="/student/student-profile/:studentId"
+                              element={
+                                <StudentLayout>
+                                  <StudentProfileDashboard />
+                                </StudentLayout>
+                              }
+                            />
+                          </Route>
+                          <Route element={<ProtectedTeacher />} >
+                            <Route
+                              path="/teacher/materials"
+                              element={
+                                <TeacherLayout>
+                                  <TLearningMaterials />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/presentation/:id"
+                              element={<TPresentationMode />}
+                            />
+                            <Route
+                              path="/teacher/dashboard"
+                              element={
+                                <TeacherLayout>
+                                  <TDashboard />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/timetable"
+                              element={
+                                <TeacherLayout>
+                                  <TeacherProvider>
+                                    <TTimeTable />
+                                  </TeacherProvider>
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/assignments"
+                              element={
+                                <TeacherLayout>
+                                  <TAssignments />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/quizzes"
+                              element={
+                                <TeacherLayout>
+                                  <TQuizzes />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/reports"
+                              element={
+                                <TeacherLayout>
+                                  <TReports />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/reports/:student"
+                              element={
+                                <TeacherLayout>
+                                  <TSubjectReport />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/leaves"
+                              element={
+                                <TeacherLayout>
+                                  <TeacherMyLeaves />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/student-leaves"
+                              element={
+                                <TeacherLayout>
+                                  <TeacherStudentLeaves />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/assignments/submissions"
+                              element={
+                                <TeacherLayout>
+                                  <TSubmissions />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/quizzes/submissions"
+                              element={
+                                <TeacherLayout>
+                                  <TQuizzSubmissions />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/assignments/GradingAssignments"
+                              element={
+                                <TeacherLayout>
+                                  <TGradingAssignments />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/quizzes/GradingQuizzes"
+                              element={
+                                <TeacherLayout>
+                                  <TGradingQuizzes />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/attendence"
+                              element={
+                                <TeacherLayout>
+                                  <TAttendence />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/attendence/submission"
+                              element={
+                                <TeacherLayout>
+                                  <TMarkAttendence />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/attendence-report"
+                              element={
+                                <TeacherLayout>
+                                  <TAttendenceReport />
+                                </TeacherLayout>
+                              }
+                            />
 
-          <Route
-            path="/teacher/classroom/head-attendence"
-            element={
-              <TeacherLayout>
-                <HeadAttendence />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/classroom/attendence/submission"
-            element={
-              <TeacherLayout>
-                <ClassroomAttandence />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/classroom"
-            element={
-              <TeacherLayout>
-                <TClassroom />
-              </TeacherLayout>
-            }
-          />
-          <Route
-            path="/teacher/student-profile/:studentId"
-            element={
-              <TeacherLayout>
-                <StudentProfileDashboard />
-              </TeacherLayout>
-            }
-          />
-        </Route>
-        <Route element={<ProtectedParent />} >
-          <Route
-            path="/parent/dashboard"
-            element={
-              <ParentLayout>
-                <PDashboard />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/timetable"
-            element={
-              <ParentLayout>
-                <TimeTable />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/attendence-report"
-            element={
-              <ParentLayout>
-                <ParentAttendenceReport />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/reports"
-            element={
-              <ParentLayout>
-                <PReports />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/reports/:subject"
-            element={
-              <ParentLayout>
-                <PSubjectReport />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/:quizes/reports"
-            element={
-              <ParentLayout>
-                <PQuizzesReports />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/quizes/:details"
-            element={
-              <ParentLayout>
-                <PQuizzesDetails />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/:assignments/reports"
-            element={
-              <ParentLayout>
-                <PAssignmentsReports />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/assignments/:details"
-            element={
-              <ParentLayout>
-                <PAssignmentsDetails />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/assignments"
-            element={
-              <ParentLayout>
-                <PAssignments />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/quizzes"
-            element={
-              <ParentLayout>
-                <PQuizzes />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/children"
-            element={
-              <ChildrenScreen />
-            }
-          />
-          <Route
-            path="/parent/fees"
-            element={
-              <ParentLayout>
-                <PFees />
-              </ParentLayout>
-            }
-          />
-          <Route
-            path="/parent/student-profile/:studentId"
-            element={
-              <ParentLayout>
-                <StudentProfileDashboard />
-              </ParentLayout>
-            }
-          />
-        </Route>
+                            <Route
+                              path="/teacher/classroom/head-attendence"
+                              element={
+                                <TeacherLayout>
+                                  <HeadAttendence />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/classroom/attendence/submission"
+                              element={
+                                <TeacherLayout>
+                                  <ClassroomAttandence />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/classroom"
+                              element={
+                                <TeacherLayout>
+                                  <TClassroom />
+                                </TeacherLayout>
+                              }
+                            />
+                            <Route
+                              path="/teacher/student-profile/:studentId"
+                              element={
+                                <TeacherLayout>
+                                  <StudentProfileDashboard />
+                                </TeacherLayout>
+                              }
+                            />
+                          </Route>
+                          <Route element={<ProtectedParent />} >
+                            <Route
+                              path="/parent/dashboard"
+                              element={
+                                <ParentLayout>
+                                  <PDashboard />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/timetable"
+                              element={
+                                <ParentLayout>
+                                  <TimeTable />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/attendence-report"
+                              element={
+                                <ParentLayout>
+                                  <ParentAttendenceReport />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/reports"
+                              element={
+                                <ParentLayout>
+                                  <PReports />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/reports/:subject"
+                              element={
+                                <ParentLayout>
+                                  <PSubjectReport />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/:quizes/reports"
+                              element={
+                                <ParentLayout>
+                                  <PQuizzesReports />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/quizes/:details"
+                              element={
+                                <ParentLayout>
+                                  <PQuizzesDetails />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/:assignments/reports"
+                              element={
+                                <ParentLayout>
+                                  <PAssignmentsReports />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/assignments/:details"
+                              element={
+                                <ParentLayout>
+                                  <PAssignmentsDetails />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/assignments"
+                              element={
+                                <ParentLayout>
+                                  <PAssignments />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/quizzes"
+                              element={
+                                <ParentLayout>
+                                  <PQuizzes />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/children"
+                              element={
+                                <ChildrenScreen />
+                              }
+                            />
+                            <Route
+                              path="/parent/fees"
+                              element={
+                                <ParentLayout>
+                                  <PFees />
+                                </ParentLayout>
+                              }
+                            />
+                            <Route
+                              path="/parent/student-profile/:studentId"
+                              element={
+                                <ParentLayout>
+                                  <StudentProfileDashboard />
+                                </ParentLayout>
+                              }
+                            />
+                          </Route>
       </Routes>
-      <ToastContainer limit={1} autoClose={3000} pauseOnHover={false} />
-      <ChatBot />
+                    <ToastContainer limit={1} autoClose={3000} pauseOnHover={false} />
+                    <ChatBot />
     </>
 
   );
 }
 
-export default App;
+          export default App;
