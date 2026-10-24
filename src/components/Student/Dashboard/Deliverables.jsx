@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useStudent } from "../../../context/StudentContext";
 import { formatDate } from "../../../constants/formattedDate";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../utils/Loader";
 import { useUser } from "../../../context/UserContext";
-import { Package } from 'lucide-react';
+import { Package } from "lucide-react";
+
 const getUrgencyColor = (dueDate) => {
   const diff = (new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24);
   if (diff < 2) return "bg-[#E24B4A]";
@@ -12,26 +13,48 @@ const getUrgencyColor = (dueDate) => {
   return "bg-[#1D9E75]";
 };
 
-const DeliverableItem = ({ item }) => {
-  const isQuiz = item.itemType === "quiz" || item.type === "quiz" || item.hasOwnProperty("questions");
+const DeliverableItem = ({ item, onClick }) => {
+  const isQuiz =
+    item.itemType === "quiz" ||
+    item.type === "quiz" ||
+    Boolean(item.questions);
   const urgency = getUrgencyColor(item.dueDate);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start shrink-0 w-full gap-3 px-3.5 py-[11px] border-b border-black/[0.05] last:border-b-0 hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer">
-
+    <div
+      onClick={onClick}
+      className="flex flex-col sm:flex-row sm:items-start shrink-0 w-full gap-3 px-3.5 py-[11px] border-b border-black/[0.05] last:border-b-0 hover:bg-gray-50/70 transition-colors duration-150 cursor-pointer"
+    >
       {/* Type Icon */}
       <div
-        className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isQuiz ? "bg-[#E1F5EE]" : "bg-[#EEEDFE]"
-          }`}
+        className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+          isQuiz ? "bg-[#E1F5EE]" : "bg-[#EEEDFE]"
+        }`}
       >
         {isQuiz ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" strokeWidth="2" strokeLinecap="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#0F6E56"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
             <circle cx="12" cy="12" r="10" />
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
         ) : (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#534AB7" strokeWidth="2" strokeLinecap="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#534AB7"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
             <line x1="16" y1="13" x2="8" y2="13" />
@@ -44,31 +67,32 @@ const DeliverableItem = ({ item }) => {
         {/* Urgency dot */}
         <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 sm:mt-0 ${urgency}`} />
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-gray-800 mb-0.5 leading-relaxed">{item.title}</p>
-        <p className="text-[11px] text-gray-400 flex items-center gap-1">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
-          Due {formatDate(item.dueDate)}
-        </p>
-      </div>
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[12px] font-medium text-gray-800 mb-0.5 leading-relaxed">{item.title}</p>
+          <p className="text-[11px] text-gray-400 flex items-center gap-1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Due {formatDate(item.dueDate)}
+          </p>
+        </div>
       </div>
 
       {/* Right side */}
       <div className="flex sm:flex-col items-start sm:items-end gap-1.5 shrink-0 mt-2 sm:mt-0 w-full sm:w-auto">
         <span className="text-[10px] font-medium bg-[#0B1053] text-[#B5D4F4] px-2.5 py-0.5 rounded-full whitespace-nowrap">
-          {item.subjectID?.name || item.subject?.name}
+          {item.subjectID?.name || item.subject?.name || "Subject"}
         </span>
         <span
-          className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${isQuiz
-            ? "bg-[#E1F5EE] text-[#085041]"
-            : "bg-[#EEEDFE] text-[#3C3489]"
-            }`}
+          className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+            isQuiz
+              ? "bg-[#E1F5EE] text-[#085041]"
+              : "bg-[#EEEDFE] text-[#3C3489]"
+          }`}
         >
           {isQuiz ? "Quiz" : "Assignment"}
         </span>
@@ -83,19 +107,19 @@ const Deliverables = () => {
   const [allDeliverables, setAllDeliverables] = useState([]);
   const { userData } = useUser();
 
-  const matchedAssignments = allAssignments || [];
-  const matchedQuizes = allQuizes || [];
-
   useEffect(() => {
-    if (allAssignments.length > 0 || allQuizes.length > 0) {
-      const assignmentsWithType = matchedAssignments.map(a => ({ ...a, itemType: "assignment" }));
-      const quizesWithType = matchedQuizes.map(q => ({ ...q, itemType: "quiz" }));
+    const assignments = allAssignments || [];
+    const quizes = allQuizes || [];
+
+    if (assignments.length > 0 || quizes.length > 0) {
+      const assignmentsWithType = assignments.map((a) => ({ ...a, itemType: "assignment" }));
+      const quizesWithType = quizes.map((q) => ({ ...q, itemType: "quiz" }));
       const arr = [...assignmentsWithType, ...quizesWithType];
 
       // Filter out items already submitted by the student
-      const pendingDeliverables = arr.filter(item => {
-        const isSubmitted = item.submissions?.some(sub =>
-          sub.studentID === userData?.id || sub.studentID?.id === userData?.id
+      const pendingDeliverables = arr.filter((item) => {
+        const isSubmitted = item.submissions?.some(
+          (sub) => sub.studentID === userData?.id || sub.studentID?.id === userData?.id
         );
         return !isSubmitted;
       });
@@ -107,16 +131,25 @@ const Deliverables = () => {
     }
   }, [allAssignments, allQuizes, userData?.id]);
 
+  const handleItemClick = (item) => {
+    const isQuiz =
+      item.itemType === "quiz" ||
+      item.type === "quiz" ||
+      Boolean(item.questions);
+    if (isQuiz) {
+      navigate("/quizes");
+    } else {
+      navigate("/assignments");
+    }
+  };
+
   return (
     <div className="flex flex-1">
       <div className="flex flex-col flex-1 gap-3">
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* Icon yahan add kiya hai */}
             <Package className="w-5 h-5 text-gray-600" />
-
             <p className="text-xl font-semibold text-gray-800 tracking-tight">
               Deliverables
             </p>
@@ -152,7 +185,11 @@ const Deliverables = () => {
             >
               {allDeliverables.length > 0 ? (
                 allDeliverables.map((item) => (
-                  <DeliverableItem item={item} key={item.id} />
+                  <DeliverableItem
+                    item={item}
+                    key={item.id}
+                    onClick={() => handleItemClick(item)}
+                  />
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center gap-2 py-12">

@@ -1,10 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-
+import { useEffect, useRef, useState, useCallback } from "react";
 import moment from "moment/moment";
 import Loader from "../../../utils/Loader";
-import IMAGES from "../../../assets/images";
-import profile from "../../../assets/profile.png";
-
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
 import { IoClose, IoArrowBack } from "react-icons/io5";
@@ -15,7 +11,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useUser } from "../../../context/UserContext";
 import { BACKEND_URL_SOCKET } from "../../../constants/api";
 import { getChatsRoomData, getMyChats, getTeachersForChat } from "../../../api/UserApis";
-import { useBlur } from "../../../context/BlurContext";
 import useClickOutside from "../../../hooks/useClickOutlise";
 
 const NAVY = "#0B1053";
@@ -231,72 +226,63 @@ const styles = {
 
 /* ────────────────────────────────────────────────────────── */
 
-const RecentMessages = ({ onclose, dashboard }) => {
+const RecentMessages = ({ onclose }) => {
   const ref = useRef(null);
-  const { toggleBlur } = useBlur();
-
   useClickOutside(ref, () => { onclose(); });
 
   const [loading, setLoading] = useState(false);
-  const [queryData, setQueryData] = useState(null);
-  const [groupActive, setGroupActive] = useState(false);
-  const [enableChatQuery, setEnableChatQuery] = useState(true);
-  const [individualActive, setIndividualActive] = useState(true);
   const [selectedChatParticipants, setSelectedChatParticipants] = useState([]);
   const [msgArray, setMsgArray] = useState([]);
   const [msgArrayDirect, setMsgArrayDirect] = useState([]);
   const [localSocket, setLocalSocket] = useState(null);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [showFullChat, setShowFullChat] = useState(false);
   const [showDirectChat, setShowDirectChat] = useState(false);
   const [subTab, setSubTab] = useState("recent");
   const [searchText, setSearchText] = useState("");
 
-  const { socketContext, setSocketContext, userData } = useUser();
-
-  const toggleGroupActive = () => { setGroupActive(!groupActive); setIndividualActive(false); };
-  const toggleIndividualActive = () => { setIndividualActive(!individualActive); setGroupActive(false); };
+  const { setSocketContext, userData } = useUser();
 
   const handleSendMessage = (msgstr) => {
-    if (msgstr === "") {
+    if (!msgstr || msgstr.trim() === "") {
       toast.error("Cannot send empty message!");
-    } else {
-      const messageObj = {
-        sentBy: userData.id,
-        time: new Date(),
-        type: "text",
-        message: msgstr,
-      };
+      return;
+    }
+
+    const messageObj = {
+      sentBy: userData?.id,
+      time: new Date(),
+      type: "text",
+      message: msgstr.trim(),
+    };
+
+    if (showFullChat) {
+      setMsgArray((prev) => [...prev, { ...messageObj, sentBy: userData }]);
+    } else if (showDirectChat) {
+      setMsgArrayDirect((prev) => [...prev, { ...messageObj, sentBy: userData }]);
+    }
+
+    if (localSocket) {
       if (showFullChat) {
-        setMsgArray((prev) => [...prev, { ...messageObj, sentBy: userData }]);
+        localSocket.emit("message", { room: selectedChat?.id, message: messageObj });
       } else if (showDirectChat) {
-        setMsgArrayDirect((prev) => [...prev, { ...messageObj, sentBy: userData }]);
-      }
-      if (localSocket) {
-        if (showFullChat) {
-          localSocket.emit("message", { room: selectedChat?.id, message: messageObj });
-        } else if (showDirectChat) {
-          localSocket.emit("message", { members: [userData?.id, selectedChat?.id], message: messageObj });
-        }
+        localSocket.emit("message", { members: [userData?.id, selectedChat?.id], message: messageObj });
       }
     }
   };
-
-  const [showFullChat, setShowFullChat] = useState(false);
-
-  const handleShowFullChat = () => { setShowFullChat(!showFullChat); };
 
   const openFullchat = async (data) => {
     setLoading(true);
     setShowDirectChat(false);
     setShowFullChat(true);
-    let conn = io(`${BACKEND_URL_SOCKET}/chatroom`);
+    const conn = io(`${BACKEND_URL_SOCKET}/chatroom`);
     setSocketContext(conn);
     setLocalSocket(conn);
     setSelectedChat(data);
-    setSelectedChatParticipants(data.participants);
+    setSelectedChatParticipants(data.participants || []);
     conn.emit("join", { room: data.id });
     const result = await getChatsRoomData(data.id);
-    setMsgArray(result.messages);
+    setMsgArray(result?.messages || []);
     setLoading(false);
   };
 
@@ -307,35 +293,38 @@ const RecentMessages = ({ onclose, dashboard }) => {
     const conn = io(`${BACKEND_URL_SOCKET}/one-to-one`);
     setLocalSocket(conn);
     setSelectedChat(data);
-    conn.emit("join", [userData.id, data.id]);
-    conn.emit("get-chats", [userData.id, data.id]);
+    conn.emit("join", [userData?.id, data.id]);
+    conn.emit("get-chats", [userData?.id, data.id]);
     conn.on("chat-history", (chats) => {
-      setSelectedChatParticipants(chats?.participants);
-      setMsgArrayDirect(chats?.messages);
+      setSelectedChatParticipants(chats?.participants || []);
+      setMsgArrayDirect(chats?.messages || []);
     });
     setLoading(false);
   };
 
-  const getParticipantData = (pid) => {
-    if (pid === userData.id) return userData;
-    let user = {};
-    selectedChatParticipants.forEach((item) => { if (item.id === pid) user = item; });
-    return user;
-  };
+  const getParticipantData = useCallback((pid) => {
+    if (pid === userData?.id) return userData;
+    return selectedChatParticipants.find((item) => item.id === pid) || {};
+  }, [userData, selectedChatParticipants]);
 
   useEffect(() => {
-    if (localSocket) {
-      localSocket.on("message", (data) => {
-        if (data.message.sentBy === userData.id) return;
-        let user = getParticipantData(data.message.sentBy);
-        if (showFullChat) {
-          setMsgArray((prev) => [...prev, { ...data.message, sentBy: user }]);
-        } else if (showDirectChat) {
-          setMsgArrayDirect((prev) => [...prev, { ...data.message, sentBy: user }]);
-        }
-      });
-    }
-  }, [localSocket, showFullChat, showDirectChat, userData.id]);
+    if (!localSocket) return;
+
+    const handleIncomingMessage = (data) => {
+      if (data?.message?.sentBy === userData?.id) return;
+      const user = getParticipantData(data?.message?.sentBy);
+      if (showFullChat) {
+        setMsgArray((prev) => [...prev, { ...data.message, sentBy: user }]);
+      } else if (showDirectChat) {
+        setMsgArrayDirect((prev) => [...prev, { ...data.message, sentBy: user }]);
+      }
+    };
+
+    localSocket.on("message", handleIncomingMessage);
+    return () => {
+      localSocket.off("message", handleIncomingMessage);
+    };
+  }, [localSocket, showFullChat, showDirectChat, userData?.id, getParticipantData]);
 
   /* ── ChatListItem ── */
   const ChatListItem = ({ data, onpress, isGroup, isActive }) => (
@@ -366,7 +355,7 @@ const RecentMessages = ({ onclose, dashboard }) => {
 
   /* ── GroupMsg bubble ── */
   const GroupMsg = ({ msg }) => {
-    const mine = msg?.sentBy?.id === userData.id;
+    const mine = msg?.sentBy?.id === userData?.id;
     const name = msg?.sentBy?.name || "You";
     const color = avatarColor(name);
 
@@ -386,7 +375,7 @@ const RecentMessages = ({ onclose, dashboard }) => {
   };
 
   /* ── FullChat panel ── */
-  const FullChat = ({ onclose, data, type }) => {
+  const FullChat = ({ onclose: closePanel, data, type }) => {
     const [msgstr, setmsgStr] = useState("");
     const messagesEndRef = useRef(null);
 
@@ -409,7 +398,7 @@ const RecentMessages = ({ onclose, dashboard }) => {
         {/* header */}
         <div style={styles.panelHeader}>
           <div style={styles.panelHeaderLeft}>
-            <button style={styles.iconBtn} onClick={onclose} className="sm:hidden">
+            <button style={styles.iconBtn} onClick={closePanel} className="sm:hidden">
               <IoArrowBack size={16} />
             </button>
             <div style={styles.avatar(avatarColor(data?.name), type === "group")}>
@@ -422,7 +411,7 @@ const RecentMessages = ({ onclose, dashboard }) => {
               </div>
             </div>
           </div>
-          <button style={styles.iconBtn} onClick={onclose}>
+          <button style={styles.iconBtn} onClick={closePanel}>
             <IoClose size={16} />
           </button>
         </div>
@@ -471,13 +460,17 @@ const RecentMessages = ({ onclose, dashboard }) => {
   };
 
   /* ── queries ── */
-  const chatquery = useQuery({ queryKey: ["chat"], queryFn: getMyChats, staleTime: 30000, enabled: enableChatQuery });
-  const teacherquery = useQuery({ queryKey: ["teachers-for-chat"], queryFn: getTeachersForChat, staleTime: 30000, enabled: individualActive });
+  const chatquery = useQuery({
+    queryKey: ["chat"],
+    queryFn: getMyChats,
+    staleTime: 30000,
+  });
 
-  useEffect(() => {
-    if (!queryData) setEnableChatQuery(true);
-    if (!chatquery.isPending) { setQueryData(chatquery?.data); setEnableChatQuery(false); }
-  }, [chatquery.isPending]);
+  const teacherquery = useQuery({
+    queryKey: ["teachers-for-chat"],
+    queryFn: getTeachersForChat,
+    staleTime: 30000,
+  });
 
   /* ── search filter ── */
   const filterBySearch = (arr) =>
@@ -508,22 +501,20 @@ const RecentMessages = ({ onclose, dashboard }) => {
         </div>
 
         {/* tabs */}
-        {individualActive && (
-          <div style={styles.tabBar}>
-            <button
-              style={styles.tab(subTab === "recent")}
-              onClick={() => setSubTab("recent")}
-            >
-              Group Chats
-            </button>
-            <button
-              style={styles.tab(subTab === "teachers")}
-              onClick={() => setSubTab("teachers")}
-            >
-              Teachers
-            </button>
-          </div>
-        )}
+        <div style={styles.tabBar}>
+          <button
+            style={styles.tab(subTab === "recent")}
+            onClick={() => setSubTab("recent")}
+          >
+            Group Chats
+          </button>
+          <button
+            style={styles.tab(subTab === "teachers")}
+            onClick={() => setSubTab("teachers")}
+          >
+            Teachers
+          </button>
+        </div>
       </div>
 
       {/* list */}

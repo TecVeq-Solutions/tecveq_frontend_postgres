@@ -77,8 +77,8 @@ const Sidebar = () => {
     }
   ];
 
-  const Menubar = ({ isMobile }) => (
-    <div className="admin-sidebar flex flex-col w-full sm:w-[50] lg:w-72 xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
+  const Menubar = () => (
+    <div className="admin-sidebar flex flex-col w-full sm:w-64 lg:w-72 xl:w-80 h-screen bg-[#0B1053] text-white shadow-xl">
       {/* Header */}
       <div className="flex items-center justify-between px-[16px] pt-6 pb-5 border-b border-gray-200">
         <div className="w-full">
@@ -145,7 +145,7 @@ const Sidebar = () => {
       {/* Mobile overlay */}
       <div className={`lg:hidden fixed inset-0 z-[200] transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full w-fit" onClick={(e) => e.stopPropagation()}>
-          <Menubar isMobile={true} />
+          <Menubar />
         </div>
         {isSidebarOpen && (
           <div
@@ -157,7 +157,7 @@ const Sidebar = () => {
 
       {/* Desktop */}
       <div className="max-lg:hidden">
-        <Menubar isMobile={false} />
+        <Menubar />
       </div>
     </div>
   );

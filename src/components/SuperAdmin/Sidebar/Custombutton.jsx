@@ -1,7 +1,18 @@
-import React from "react";
 import { GoHome } from "react-icons/go";
 import { VscGraph, VscLayers } from "react-icons/vsc";
-import { LuCalendar, LuBookOpen, LuUsers, LuLayoutDashboard, LuShieldCheck, LuDatabase } from "react-icons/lu";
+import {
+  LuCalendar,
+  LuBookOpen,
+  LuUsers,
+  LuShieldCheck,
+  LuDatabase,
+  LuCreditCard,
+  LuMessageSquare,
+  LuBell,
+  LuBan,
+  LuSettings,
+  LuUser,
+} from "react-icons/lu";
 import { CiCalendarDate } from "react-icons/ci";
 
 const iconMap = {
@@ -14,6 +25,13 @@ const iconMap = {
   license: LuShieldCheck,
   backup: LuDatabase,
   user: LuUsers,
+  fees: LuCreditCard,
+  chat: LuMessageSquare,
+  notification: LuBell,
+  report: VscGraph,
+  delete: LuBan,
+  settings: LuSettings,
+  profile: LuUser,
 };
 
 const Custombutton = ({ title, active, onpress, icon }) => {
