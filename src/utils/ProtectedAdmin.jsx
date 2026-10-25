@@ -5,17 +5,18 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 const ProtectedAdmin = () => {
     const { userData } = useUser();
     const location = useLocation();
+    const user = userData || JSON.parse(localStorage.getItem("tcauser"));
 
-    if (!userData || (userData.userType !== "admin" && userData.userType !== "super_admin")) {
-        return <Navigate to={"/"} />;
+    if (!user || (user.userType !== "admin" && user.userType !== "super_admin")) {
+        return <Navigate to="/admin/login" replace />;
     }
 
     // If user is an admin and is blocked
-    if (userData.userType === "admin" && userData.status === "blocked") {
+    if (user.userType === "admin" && user.status === "blocked") {
         // Allow access ONLY to blocked screen and platform support chat
         const allowedPaths = ["/admin/blocked", "/admin/platform-support"];
         if (!allowedPaths.includes(location.pathname)) {
-            return <Navigate to="/admin/blocked" />;
+            return <Navigate to="/admin/blocked" replace />;
         }
     }
 

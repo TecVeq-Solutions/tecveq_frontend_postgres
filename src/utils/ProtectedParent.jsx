@@ -4,7 +4,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 const ProtectedParent = () => {
     const { userData } = useUser();
-    return userData && userData.userType == "parent" ? <Outlet /> : <Navigate to={"/"} />
+    const user = userData || JSON.parse(localStorage.getItem("tcauser"));
+    return user && user.userType === "parent" ? <Outlet /> : <Navigate to={"/login"} replace />
 }
 
 export default ProtectedParent

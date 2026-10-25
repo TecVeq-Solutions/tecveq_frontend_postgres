@@ -7,6 +7,8 @@ import { useUser } from '../../../context/UserContext';
 import { toast } from 'react-toastify';
 import { useStudent } from '../../../context/StudentContext';
 import { useParent } from '../../../context/ParentContext';
+import { useAdmin } from '../../../context/AdminContext';
+import { useTeacher } from '../../../context/TeacherContext';
 import { io } from 'socket.io-client';
 import { BACKEND_URL, BACKEND_URL_SOCKET } from '../../../constants/api';
 import { PiGraduationCap, PiUsersThree, PiArrowRight } from 'react-icons/pi';
@@ -23,6 +25,8 @@ const Login = () => {
     const { setUserData, setSocketContext } = useUser();
     const { setParentLogedIn } = useParent();
     const { setStudentLogedIn } = useStudent();
+    const { setAdminLogedIn } = useAdmin();
+    const { setTeacherLogedIn } = useTeacher();
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -65,6 +69,10 @@ const Login = () => {
             const response = await studentLogin(dataBody);
 
             if (response && response !== "error") {
+                localStorage.setItem("tcauser", JSON.stringify(response));
+                if (response.tenantId) {
+                    localStorage.setItem("active_tenant_slug", response.tenantId);
+                }
                 setUserData(response);
                 if (response.userType == "student") {
                     if (response.isBlocked == true) {
@@ -76,19 +84,31 @@ const Login = () => {
                         if (response?.isFirstLogin == true) {
                             navigate("/change-password");
                         } else {
-                            localStorage.setItem("tcauser", JSON.stringify(response));
-                            navigate("/student/dashboard");
+                            navigate("/student/dashboard", { replace: true });
                         }
                         setStudentLogedIn(true);
                     }
                 } else if (response.userType == "parent") {
-                    localStorage.setItem("tcauser", JSON.stringify(response));
                     toast.success("Login successful");
-                    navigate("/parent/children");
+                    navigate("/parent/children", { replace: true });
                     setParentLogedIn(true);
+                } else if (response.userType == "admin") {
+                    setAdminLogedIn(true);
+                    toast.success("Login successful");
+                    navigate("/admin/dashboard", { replace: true });
+                } else if (response.userType == "super_admin") {
+                    setAdminLogedIn(true);
+                    toast.success("Login successful");
+                    navigate("/superadmin/dashboard", { replace: true });
+                } else if (response.userType == "teacher") {
+                    const con = io(`${BACKEND_URL_SOCKET}`);
+                    setSocketContext(con);
+                    setTeacherLogedIn(true);
+                    toast.success("Login successful");
+                    navigate("/teacher/dashboard", { replace: true });
                 } else {
                     toast.error("Unauthorized access type");
-                    navigate("/");
+                    navigate("/", { replace: true });
                 }
             } else if (response === "error") {
                 console.error("Login failed: API returned 'error'");

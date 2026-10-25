@@ -4,7 +4,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 const ProtectedTeacher = () => {
     const { userData } = useUser();
-    return userData && userData.userType == "teacher" ? <Outlet /> : <Navigate to={"/"} />
+    const user = userData || JSON.parse(localStorage.getItem("tcauser"));
+    return user && user.userType === "teacher" ? <Outlet /> : <Navigate to={"/admin/login"} replace />
 }
 
 export default ProtectedTeacher

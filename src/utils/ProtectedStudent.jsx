@@ -4,7 +4,8 @@ import { useUser } from '../context/UserContext';
 
 const ProtectedStudent = () => {
   const { userData } = useUser();
-  return userData && userData.userType == "student" ? <Outlet /> : <Navigate to={"/"} />
+  const user = userData || JSON.parse(localStorage.getItem("tcauser"));
+  return user && user.userType === "student" ? <Outlet /> : <Navigate to={"/login"} replace />
 }
 
 export default ProtectedStudent

@@ -65,27 +65,28 @@ const Login = () => {
             const response = await studentLogin(dataBody);
 
             if (response && response !== "error") {
+                localStorage.setItem("tcauser", JSON.stringify(response));
+                if (response.tenantId) {
+                    localStorage.setItem("active_tenant_slug", response.tenantId);
+                }
                 setUserData(response);
                 if (response.userType == "admin") {
                     setAdminLogedIn(true);
                     toast.success("Login successful");
-                    localStorage.setItem("tcauser", JSON.stringify(response));
-                    navigate("/admin/dashboard");
+                    navigate("/admin/dashboard", { replace: true });
                 } else if (response.userType == "super_admin") {
                     setAdminLogedIn(true);
                     toast.success("Login successful");
-                    localStorage.setItem("tcauser", JSON.stringify(response));
-                    navigate("/superadmin/dashboard");
+                    navigate("/superadmin/dashboard", { replace: true });
                 } else if (response.userType == "teacher") {
                     const con = io(`${BACKEND_URL_SOCKET}`);
                     setSocketContext(con);
                     setTeacherLogedIn(true);
                     toast.success("Login successful");
-                    localStorage.setItem("tcauser", JSON.stringify(response));
-                    navigate("/teacher/dashboard");
+                    navigate("/teacher/dashboard", { replace: true });
                 } else {
                     toast.error("Unauthorized access type");
-                    navigate("/admin/login");
+                    navigate("/admin/login", { replace: true });
                 }
             } else if (response === "error") {
                 // apiRequest usually throws, but if it returns "error", handle it here

@@ -70,7 +70,14 @@ const setupAxios = () => {
       // Handle 401 specifically if needed (e.g., redirect to login)
       if (error?.response?.status === 401) {
         localStorage.removeItem("tcauser");
-        window.location.href = "/login";
+        const currentPath = window.location.pathname;
+        if (currentPath !== "/login" && currentPath !== "/admin/login") {
+          if (currentPath.startsWith("/admin") || currentPath.startsWith("/superadmin")) {
+            window.location.href = "/admin/login";
+          } else {
+            window.location.href = "/login";
+          }
+        }
       }
 
       return Promise.reject(error);
