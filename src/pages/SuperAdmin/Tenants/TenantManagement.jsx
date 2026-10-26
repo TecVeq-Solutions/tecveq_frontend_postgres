@@ -63,7 +63,7 @@ const PLAN_BADGES = {
 const TenantManagement = () => {
   const queryClient = useQueryClient();
   const [activeBranch, setActiveBranch] = useState(
-    localStorage.getItem("active_tenant_slug") || "cityschool-1"
+    localStorage.getItem("active_tenant_slug") || "comsats"
   );
   const [testForm, setTestForm] = useState({
     tenantSlug: activeBranch,

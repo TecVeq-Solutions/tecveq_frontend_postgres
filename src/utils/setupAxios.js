@@ -8,7 +8,7 @@ const setupAxios = () => {
 
   // Request interceptor to automatically attach active tenant / branch header
   axios.interceptors.request.use((config) => {
-    const activeTenant = localStorage.getItem("active_tenant_slug") || "cityschool-1";
+    const activeTenant = localStorage.getItem("active_tenant_slug") || "comsats";
     if (activeTenant && !config.headers["X-Tenant-ID"]) {
       config.headers["X-Tenant-ID"] = activeTenant;
     }
