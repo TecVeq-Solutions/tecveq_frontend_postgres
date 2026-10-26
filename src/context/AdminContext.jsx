@@ -20,7 +20,7 @@ export const AdminProvider = ({ children }) => {
   const [selectedTeacherSubjects, setSelectedTeacherSubjects] = useState([]);
   const [adminLogedIn, setAdminLogedIn] = useState(() => {
     const user = JSON.parse(localStorage.getItem('tcauser'));
-    return !!user && (user.userType === 'admin' || user.userType === 'super_admin');
+    return !!user && user.userType === 'admin';
   });
 
 

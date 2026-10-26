@@ -97,7 +97,7 @@ const Login = () => {
                     toast.success("Login successful");
                     navigate("/admin/dashboard", { replace: true });
                 } else if (response.userType == "super_admin") {
-                    setAdminLogedIn(true);
+                    setAdminLogedIn(false);
                     toast.success("Login successful");
                     navigate("/superadmin/dashboard", { replace: true });
                 } else if (response.userType == "teacher") {

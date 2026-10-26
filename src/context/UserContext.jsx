@@ -29,7 +29,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (userData) {
-      setAdminLogedIn(userData.userType === "admin" || userData.userType === "super_admin");
+      setAdminLogedIn(userData.userType === "admin");
       setTeacherLogedIn(userData.userType === "teacher");
       setStudentLogedIn(userData.userType === "student");
     } else {

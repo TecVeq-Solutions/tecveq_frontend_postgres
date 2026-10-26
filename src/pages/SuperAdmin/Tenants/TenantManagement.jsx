@@ -101,7 +101,7 @@ const TenantManagement = () => {
     setTestForm({
       tenantSlug: testForm.tenantSlug,
       name: `${randomName} (${slugSuffix.toUpperCase()})`,
-      email: `${cleanName}.${slugSuffix}@testedu.com`,
+      email: `${cleanName}.${randomId}.${slugSuffix}@testedu.com`,
       rollNo: `${slugSuffix.toUpperCase()}-${randomId}`,
     });
   };
