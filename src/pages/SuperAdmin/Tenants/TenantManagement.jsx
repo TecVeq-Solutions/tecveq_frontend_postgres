@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SuperAdminNavbar from "../../../components/SuperAdmin/SuperAdminNavbar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Loader from "../../../utils/Loader";
@@ -42,7 +42,7 @@ import {
   Mail,
   Building,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const DEMO_NAMES = [
   "Tariq Mehmood",
@@ -62,6 +62,7 @@ const PLAN_BADGES = {
 
 const TenantManagement = () => {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [activeBranch, setActiveBranch] = useState(
     localStorage.getItem("active_tenant_slug") || "comsats"
   );
@@ -76,6 +77,12 @@ const TenantManagement = () => {
 
   // Modals state
   const [isOnboardOpen, setIsOnboardOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("action") === "onboard") {
+      setIsOnboardOpen(true);
+    }
+  }, [searchParams]);
   const [isHandoverOpen, setIsHandoverOpen] = useState(false);
   const [handoverData, setHandoverData] = useState(null);
   const [showPassword, setShowPassword] = useState(false);

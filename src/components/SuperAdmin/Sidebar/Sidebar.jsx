@@ -45,7 +45,7 @@ const Sidebar = () => {
       label: "Main",
       items: [
         { key: "dashboard", title: "Dashboard", icon: "home", route: "/superadmin/dashboard" },
-        { key: "admins", title: "Admin Management", icon: "user", route: "/superadmin/admins" },
+        { key: "admins", title: "Institute Directory", icon: "user", route: "/superadmin/admins" },
         { key: "packages", title: "Subscription Plans", icon: "levels", route: "/superadmin/packages" },
         { key: "payments", title: "Payments", icon: "fees", route: "/superadmin/payments" },
         { key: "platformFees", title: "Platform Fees", icon: "levels", route: "/superadmin/platform-fees" },
