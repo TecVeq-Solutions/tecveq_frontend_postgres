@@ -277,8 +277,7 @@ const MySubscription = () => {
                 await submitPaymentProof({
                     ...formData,
                     month: paymentDate.month() + 1,
-                    year: paymentDate.year(),
-                    packageId: subscription?.packageId || ""
+                    packageId: subscription?.packageId || subscriptionData?.subscription?.packageId || "pkg_enterprise_2026"
                 });
                 toast.success("Payment proof submitted and pending verification.");
             }
