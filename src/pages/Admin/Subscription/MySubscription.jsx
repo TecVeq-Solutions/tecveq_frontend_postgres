@@ -23,6 +23,9 @@ import {
     IoChevronBackOutline,
     IoChevronForwardOutline,
     IoCreateOutline,
+    IoCopyOutline,
+    IoWalletOutline,
+    IoCheckmarkOutline
 } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -158,6 +161,90 @@ const MySubscription = () => {
         notes: '',
         receiptImage: ''
     });
+
+    const [copiedField, setCopiedField] = useState(null);
+    const handleCopy = (text, label) => {
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        setCopiedField(label);
+        toast.success(`${label} copied to clipboard!`);
+        setTimeout(() => setCopiedField(null), 2000);
+    };
+
+    // Dynamic accounts configured by Super Admin
+    const availableAccounts = React.useMemo(() => {
+        if (systemSettings?.paymentAccounts && Array.isArray(systemSettings.paymentAccounts) && systemSettings.paymentAccounts.length > 0) {
+            return systemSettings.paymentAccounts.filter(a => a.isActive !== false);
+        }
+        const fallback = [];
+        if (systemSettings?.bankName || systemSettings?.accountNumber) {
+            fallback.push({
+                id: 'legacy-bank',
+                bankName: systemSettings.bankName || 'Allied Bank Limited (ABL)',
+                type: 'bank',
+                accountTitle: systemSettings.accountTitle || 'TecVeq Solutions (Pvt) Ltd',
+                accountNumber: systemSettings.accountNumber || '',
+                iban: systemSettings.iban || '',
+                instructions: systemSettings.paymentInstructions || 'Transfer via 1Link or Bank Mobile App.'
+            });
+        }
+        if (systemSettings?.jazzCashNumber || systemSettings?.jazzCash) {
+            fallback.push({
+                id: 'legacy-jazz',
+                bankName: 'JazzCash',
+                type: 'wallet',
+                accountTitle: systemSettings.accountTitle || 'TecVeq Solutions',
+                accountNumber: systemSettings.jazzCashNumber || systemSettings.jazzCash,
+                instructions: 'Send money to this JazzCash mobile account and attach screenshot.'
+            });
+        }
+        if (systemSettings?.easyPaisaNumber || systemSettings?.easyPaisa) {
+            fallback.push({
+                id: 'legacy-easy',
+                bankName: 'EasyPaisa',
+                type: 'wallet',
+                accountTitle: systemSettings.accountTitle || 'TecVeq Solutions',
+                accountNumber: systemSettings.easyPaisaNumber || systemSettings.easyPaisa,
+                instructions: 'Send money to this EasyPaisa mobile account and attach screenshot.'
+            });
+        }
+        return fallback;
+    }, [systemSettings]);
+
+    // Automatically set default method if needed
+    React.useEffect(() => {
+        if (availableAccounts.length > 0 && (!formData.method || formData.method === 'Bank Transfer')) {
+            const exactMatch = availableAccounts.some(a => a.bankName.toLowerCase() === 'bank transfer');
+            if (!exactMatch) {
+                setFormData(prev => ({ ...prev, method: availableAccounts[0].bankName }));
+            }
+        }
+    }, [availableAccounts]);
+
+    // Currently matched account based on selected method
+    const activeAccount = React.useMemo(() => {
+        if (!availableAccounts.length) return null;
+        const currentMethod = (formData.method || '').toLowerCase();
+        return availableAccounts.find(a => 
+            a.bankName.toLowerCase() === currentMethod ||
+            currentMethod.includes(a.bankName.toLowerCase()) ||
+            a.bankName.toLowerCase().includes(currentMethod)
+        ) || availableAccounts[0];
+    }, [availableAccounts, formData.method]);
+
+    const getBankBadgeStyle = (bankName = '', type = 'bank') => {
+        const name = bankName.toLowerCase();
+        if (name.includes('jazz')) return { bg: 'bg-rose-50 text-rose-700 border-rose-200', dot: 'bg-rose-500' };
+        if (name.includes('easy')) return { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' };
+        if (name.includes('naya')) return { bg: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' };
+        if (name.includes('sada')) return { bg: 'bg-cyan-50 text-cyan-700 border-cyan-200', dot: 'bg-cyan-500' };
+        if (name.includes('hbl') || name.includes('habib')) return { bg: 'bg-teal-50 text-teal-700 border-teal-200', dot: 'bg-teal-500' };
+        if (name.includes('allied') || name.includes('abl')) return { bg: 'bg-blue-50 text-blue-700 border-blue-200', dot: 'bg-blue-500' };
+        if (name.includes('meezan')) return { bg: 'bg-purple-50 text-purple-700 border-purple-200', dot: 'bg-purple-500' };
+        return type === 'wallet' 
+            ? { bg: 'bg-orange-50 text-orange-700 border-orange-200', dot: 'bg-orange-500' }
+            : { bg: 'bg-indigo-50 text-indigo-700 border-indigo-200', dot: 'bg-indigo-500' };
+    };
 
     // Payment History Pagination
     const [historyCurrentPage, setHistoryCurrentPage] = useState(1);
@@ -486,40 +573,154 @@ const MySubscription = () => {
 
                         {/* Payment Instructions */}
                         <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-100">
-                            <div className="flex items-center gap-2 mb-5">
-                                <IoInformationCircleOutline className="text-indigo-500" size={18} />
-                                <h3 className="text-sm font-bold text-slate-700">
-                                    Payment Instructions
-                                </h3>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <IoInformationCircleOutline className="text-indigo-500" size={20} />
+                                    <h3 className="text-sm font-bold text-slate-800">
+                                        Super Admin Official Receiving Accounts
+                                    </h3>
+                                </div>
+                                <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
+                                    {availableAccounts.length} Methods Available
+                                </span>
                             </div>
 
                             {systemSettings ? (
                                 <div className="space-y-4">
-                                    <p className="text-xs text-slate-500 bg-indigo-50/60 p-3.5 rounded-xl border border-indigo-100 leading-relaxed">
-                                        Send your monthly fee to the account below and upload your payment screenshot for verification.
+                                    <p className="text-xs text-slate-500 bg-indigo-50/60 p-3 rounded-xl border border-indigo-100 leading-relaxed">
+                                        {systemSettings.paymentInstructions || "Please transfer your monthly fee to any of our available bank or mobile wallet accounts below and upload the receipt screenshot for immediate approval."}
                                     </p>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {[
-                                            { label: 'Bank Name', value: systemSettings.bankName || 'Not Set' },
-                                            { label: 'Account Title', value: systemSettings.accountTitle || 'Not Set' },
-                                            { label: 'Account #', value: systemSettings.accountNumber || 'Not Set' },
-                                            { label: 'IBAN', value: systemSettings.iban || 'Not Set' },
-                                            { label: 'JazzCash', value: systemSettings.jazzCashNumber || systemSettings.jazzCash || 'Not Set' },
-                                            { label: 'EasyPaisa', value: systemSettings.easyPaisaNumber || systemSettings.easyPaisa || 'Not Set' },
-                                            { label: 'Support Phone', value: systemSettings.supportPhone || 'Not Set' },
-                                            { label: 'Support Email', value: systemSettings.supportEmail || 'Not Set' },
-                                        ].map((d, idx) => (
-                                            <div key={idx} className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                                                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">
-                                                    {d.label}
-                                                </p>
-
-                                                <p className="text-sm font-semibold text-slate-700 break-words">
-                                                    {d.value}
-                                                </p>
+                                    {/* Account Selection Pills */}
+                                    {availableAccounts.length > 0 && (
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+                                                Select Account / Bank to view details:
+                                            </p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {availableAccounts.map((acc, idx) => {
+                                                    const badge = getBankBadgeStyle(acc.bankName, acc.type);
+                                                    const isSelected = activeAccount?.bankName === acc.bankName;
+                                                    return (
+                                                        <button
+                                                            key={acc.id || idx}
+                                                            type="button"
+                                                            onClick={() => setFormData(prev => ({ ...prev, method: acc.bankName }))}
+                                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                                                                isSelected
+                                                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
+                                                                    : `bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200`
+                                                            }`}
+                                                        >
+                                                            {acc.type === 'wallet' ? <IoWalletOutline size={14} /> : <IoCardOutline size={14} />}
+                                                            <span>{acc.bankName}</span>
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
-                                        ))}
+                                        </div>
+                                    )}
+
+                                    {/* Selected Bank Details Card */}
+                                    {activeAccount ? (
+                                        <div className="rounded-2xl border-2 border-indigo-100 bg-gradient-to-br from-indigo-50/40 via-white to-slate-50/50 p-4 space-y-3.5 shadow-sm">
+                                            <div className="flex items-center justify-between border-b border-indigo-100/60 pb-2.5">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${getBankBadgeStyle(activeAccount.bankName, activeAccount.type).bg}`}>
+                                                        {activeAccount.type === 'wallet' ? <IoWalletOutline size={14} /> : <IoCardOutline size={14} />}
+                                                        {activeAccount.bankName}
+                                                    </span>
+                                                    <span className="text-[11px] font-medium text-slate-400">
+                                                        {activeAccount.type === 'wallet' ? 'Mobile Wallet' : 'Bank Account'}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
+                                                    ● Active Receiver
+                                                </span>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                                {/* Account Title */}
+                                                <div className="p-3 bg-white rounded-xl border border-slate-100 shadow-xs">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                            Account Title
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleCopy(activeAccount.accountTitle, 'Account Title')}
+                                                            className="text-slate-400 hover:text-indigo-600 transition"
+                                                            title="Copy Title"
+                                                        >
+                                                            {copiedField === 'Account Title' ? <IoCheckmarkOutline className="text-emerald-500" size={15} /> : <IoCopyOutline size={14} />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="font-bold text-slate-800 break-words">
+                                                        {activeAccount.accountTitle || 'TecVeq Solutions (Pvt) Ltd'}
+                                                    </p>
+                                                </div>
+
+                                                {/* Account Number */}
+                                                <div className="p-3 bg-white rounded-xl border border-slate-100 shadow-xs">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                            {activeAccount.type === 'wallet' ? 'Mobile Number' : 'Account Number'}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleCopy(activeAccount.accountNumber, 'Account Number')}
+                                                            className="text-slate-400 hover:text-indigo-600 transition"
+                                                            title="Copy Account Number"
+                                                        >
+                                                            {copiedField === 'Account Number' ? <IoCheckmarkOutline className="text-emerald-500" size={15} /> : <IoCopyOutline size={14} />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="font-mono font-bold text-slate-900 text-sm tracking-wide">
+                                                        {activeAccount.accountNumber || '—'}
+                                                    </p>
+                                                </div>
+
+                                                {/* IBAN */}
+                                                {activeAccount.iban && (
+                                                    <div className="p-3 bg-white rounded-xl border border-slate-100 shadow-xs sm:col-span-2">
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                                IBAN (1Link / Raast)
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleCopy(activeAccount.iban, 'IBAN')}
+                                                                className="text-slate-400 hover:text-indigo-600 transition"
+                                                                title="Copy IBAN"
+                                                            >
+                                                                {copiedField === 'IBAN' ? <IoCheckmarkOutline className="text-emerald-500" size={15} /> : <IoCopyOutline size={14} />}
+                                                            </button>
+                                                        </div>
+                                                        <p className="font-mono font-semibold text-slate-800 text-xs break-all">
+                                                            {activeAccount.iban}
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Instructions */}
+                                                {activeAccount.instructions && (
+                                                    <div className="p-3 bg-white rounded-xl border border-slate-100 sm:col-span-2">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                                                            Transfer Instructions
+                                                        </span>
+                                                        <p className="text-xs text-slate-600 italic">
+                                                            {activeAccount.instructions}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : null}
+
+                                    {/* Support Contact Footer */}
+                                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 text-xs text-slate-500 border-t border-slate-100">
+                                        <span>Official Support: <strong>{systemSettings.supportPhone || '+92 300 1234567'}</strong></span>
+                                        <span>Email: <strong>{systemSettings.supportEmail || 'support@tecveq.com'}</strong></span>
                                     </div>
                                 </div>
                             ) : (
@@ -568,14 +769,89 @@ const MySubscription = () => {
                                         value={formData.method}
                                         onChange={(e) => setFormData({ ...formData, method: e.target.value })}
                                     >
-                                        <option>Bank Transfer</option>
-                                        <option>JazzCash</option>
-                                        <option>EasyPaisa</option>
-                                        <option>Cash</option>
-                                        <option>Other</option>
+                                        {availableAccounts.map((acc, idx) => (
+                                            <option key={acc.id || idx} value={acc.bankName}>
+                                                {acc.bankName} {acc.type === 'wallet' ? '(Wallet)' : '(Bank)'}
+                                            </option>
+                                        ))}
+                                        <option value="Cash">Cash</option>
+                                        <option value="Other">Other</option>
                                     </select>
                                 </InputField>
                             </div>
+
+                            {/* Dynamic Details Box for Selected Method */}
+                            {activeAccount && formData.method !== 'Cash' && formData.method !== 'Other' && (
+                                <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-3 text-xs space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-bold text-indigo-950 flex items-center gap-1.5">
+                                            {activeAccount.type === 'wallet' ? <IoWalletOutline size={14} className="text-indigo-600" /> : <IoCardOutline size={14} className="text-indigo-600" />}
+                                            Super Admin Details ({activeAccount.bankName})
+                                        </span>
+                                        <span className="text-[10px] font-semibold text-indigo-600 bg-white px-2 py-0.5 rounded-md border border-indigo-100">
+                                            Transfer Here
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-1 text-slate-700">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-slate-500">Title:</span>
+                                            <span className="font-semibold">{activeAccount.accountTitle}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-slate-500">
+                                                {activeAccount.type === 'wallet' ? 'Wallet / Mobile #:' : 'Account #:'}
+                                            </span>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-mono font-bold text-slate-900">{activeAccount.accountNumber}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleCopy(activeAccount.accountNumber, 'Account Number')}
+                                                    className="text-indigo-600 hover:text-indigo-800"
+                                                    title="Copy"
+                                                >
+                                                    <IoCopyOutline size={13} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {activeAccount.iban && (
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-slate-500">IBAN:</span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="font-mono text-[11px] font-semibold text-slate-800 break-all">{activeAccount.iban}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleCopy(activeAccount.iban, 'IBAN')}
+                                                        className="text-indigo-600 hover:text-indigo-800"
+                                                        title="Copy"
+                                                    >
+                                                        <IoCopyOutline size={13} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {activeAccount.instructions && (
+                                        <p className="text-[11px] text-slate-500 italic pt-1 border-t border-indigo-100/60">
+                                            Note: {activeAccount.instructions}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {formData.method === 'Cash' && (
+                                <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-800">
+                                    <p className="font-bold">Cash Payment Selected</p>
+                                    <p className="text-[11px] text-amber-700 mt-0.5">Please hand over the physical payment to an authorized representative and upload the stamped/signed payment voucher below.</p>
+                                </div>
+                            )}
+
+                            {formData.method === 'Other' && (
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                                    <p className="font-bold">Custom Payment Method</p>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">Please coordinate with Super Admin at <strong>{systemSettings?.supportPhone || '+92 300 1234567'}</strong> for payment details.</p>
+                                </div>
+                            )}
 
                             <InputField label="Transaction ID" required>
                                 <input
