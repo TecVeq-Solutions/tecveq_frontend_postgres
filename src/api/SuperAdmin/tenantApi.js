@@ -27,3 +27,28 @@ export const createTestStudent = apiRequest(async (data) => {
   const response = await axios.post(`${BACKEND_URL}/tenant/create-test-student`, data);
   return response;
 });
+
+/**
+ * 1-Click Institute Onboarding & Database Provisioning
+ */
+export const onboardInstitute = apiRequest(async (data) => {
+  const response = await axios.post(`${BACKEND_URL}/tenant/onboard`, data);
+  return response;
+});
+
+/**
+ * Toggle Tenant Status (ACTIVE / SUSPENDED)
+ */
+export const toggleTenantStatus = apiRequest(async (slug) => {
+  const response = await axios.put(`${BACKEND_URL}/tenant/toggle-status/${slug}`);
+  return response;
+});
+
+/**
+ * Delete a tenant from Master Registry
+ */
+export const deleteTenant = apiRequest(async (slug) => {
+  const response = await axios.delete(`${BACKEND_URL}/tenant/${slug}`);
+  return response;
+});
+
